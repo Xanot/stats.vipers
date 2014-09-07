@@ -59,7 +59,7 @@ class FetcherActor extends Actor {
           case _ => None
         }
       } pipeTo sender
-    case FetchOutfitCharactersRequest(id, alias, enrich, page) =>
+    case FetchOutfitCharactersRequest(alias, id, enrich, page) =>
       Future {
         val json = {
           if(alias.isDefined) {
