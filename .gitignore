@@ -1,0 +1,7 @@
+.idea
+.idea_modules
+.history
+bin
+scala-2.11
+node_modules
+bower_components
