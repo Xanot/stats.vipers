@@ -1,7 +1,7 @@
-package com.vipers.util
+package com.vipers.fetcher.util
 
 import com.vipers.Test
-import com.vipers.model._
+import com.vipers.fetcher.model._
 import org.scalatest.FlatSpecLike
 
 class ApiUrlBuilderTest extends FlatSpecLike with Test {

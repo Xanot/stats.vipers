@@ -15,7 +15,7 @@ object Projects extends Build {
 
   lazy val web = Project("web", file("web"))
     .settings(basicSettings ++ assemblySettings ++ scalaMeterSettings:_*)
-    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter))
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter, _fetcher))
 
   lazy val common = Project("common", file("common"))
     .settings(basicSettings:_*)

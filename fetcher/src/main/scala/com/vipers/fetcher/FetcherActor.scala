@@ -1,24 +1,29 @@
-package com.vipers
+package com.vipers.fetcher
 
 import java.util.concurrent.TimeUnit
+
 import akka.actor.Actor
 import akka.io.IO
 import akka.pattern.{ask, pipe}
 import akka.util.Timeout
-import com.vipers.model._
-import com.vipers.util.ApiUrlBuilder
+import com.vipers.fetcher.model._
+import com.vipers.fetcher.util.ApiUrlBuilder
+import com.vipers.fetcher.util.Wrapper.ApiDeserializer
 import org.json4s.JsonAST._
-import spray.can.Http
-import spray.httpx.RequestBuilding._
-import spray.http._
-import scala.concurrent.{Await, Future}
 import org.json4s.native.JsonMethods._
-import com.vipers.util.Wrapper.ApiDeserializer
+import spray.can.Http
+import spray.http._
+import spray.httpx.RequestBuilding._
 import scala.collection.mutable
+import scala.concurrent.{Await, Future}
+import java.util.concurrent.ConcurrentHashMap
+import scala.collection.JavaConverters._
 
 class FetcherActor extends Actor {
   import scala.concurrent.ExecutionContext.Implicits.global
   import FetcherActor._
+
+  private val cache = new ConcurrentHashMap[FetchOutfitRequest, Option[Outfit]]().asScala
 
   def receive = {
     case FetchCharacterRequest(name, id, enrich) =>
@@ -39,24 +44,33 @@ class FetcherActor extends Actor {
       Future {
         val json = sendRequest(ApiUrlBuilder.getCharactersById(enrich, ids:_*))
         val JArray(parent) = json \ "character_list"
-        val list = mutable.ListBuffer.empty[model.Character]
+        val list = mutable.ListBuffer.empty[Character]
         parent.foreach { charJson =>
           list += charJson.toCharacter().get
         }
         list
       } pipeTo sender
-    case FetchOutfitRequest(alias, id, enrich) =>
+    case m @ FetchOutfitRequest(alias, id, enrich) =>
       Future {
-        val json = {
-          if(alias.isDefined) {
-            sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, enrich))
-          } else {
-            sendRequest(ApiUrlBuilder.getOutfitById(id.get, enrich))
+        if(cache.contains(m)) {
+          cache.get(m)
+        } else {
+          val json = {
+            if (alias.isDefined) {
+              sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, enrich))
+            } else {
+              sendRequest(ApiUrlBuilder.getOutfitById(id.get, enrich))
+            }
           }
-        }
-        json \ "outfit_list" match {
-          case JArray(parent) if parent.nonEmpty =>  Some(parent(0).toOutfit.get)
-          case _ => None
+          json \ "outfit_list" match {
+            case JArray(parent) if parent.nonEmpty =>
+              val o = Some(parent(0).toOutfit.get)
+              cache.put(m, o)
+              o
+            case _ =>
+              cache.put(m, None)
+              None
+          }
         }
       } pipeTo sender
     case FetchOutfitCharactersRequest(alias, id, enrich, page) =>
@@ -71,7 +85,7 @@ class FetcherActor extends Actor {
         json \ "outfit_member_extended_list" match {
           case JArray(parents) if parents.nonEmpty =>
             val JString(total) = parents(0) \ "member_count"
-            val list = mutable.ListBuffer.empty[model.Character]
+            val list = mutable.ListBuffer.empty[Character]
             parents.foreach { parent =>
               list += (parent \ "character").toCharacter(parent.toOutfitMember).get
             }

@@ -1,11 +1,11 @@
-package com.vipers.util
+package com.vipers.fetcher.util
 
-import com.vipers.model._
-import com.vipers.util.CensusQuery.CensusQueryCommand._
+import com.vipers.fetcher.model._
+import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
 import org.json4s.JsonAST._
 import scala.collection.mutable
 
-object Wrapper {
+private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
     def toOutfit : Option[Outfit] = {
       check { () =>

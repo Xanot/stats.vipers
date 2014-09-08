@@ -1,8 +1,8 @@
-package com.vipers.util
+package com.vipers.fetcher.util
 
 import com.vipers.Test
-import com.vipers.util.CensusQuery.CensusQueryCommand._
-import com.vipers.util.CensusQuery.Search
+import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
+import com.vipers.fetcher.util.CensusQuery.Search
 import org.scalatest.WordSpecLike
 
 class CensusQueryTest extends WordSpecLike with Test {

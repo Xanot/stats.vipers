@@ -1,13 +1,13 @@
-package com.vipers.util
+package com.vipers.fetcher.util
 
-import com.vipers.Configuration
-import com.vipers.model._
-import com.vipers.util.CensusQuery.CensusQueryCommand._
-import com.vipers.util.CensusQuery.Search
+import com.vipers.fetcher.Configuration
+import com.vipers.fetcher.model._
+import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
+import com.vipers.fetcher.util.CensusQuery.Search
 import spray.http.Uri
 import Wrapper.{RichEnrichCharacter, RichEnrichOutfit}
 
-object ApiUrlBuilder {
+private[fetcher] object ApiUrlBuilder {
   private val indexUri = Uri(Configuration.apiIndex).withQuery(Lang("en").construct)
   //================================================================================
   // Outfit

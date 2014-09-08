@@ -4,8 +4,9 @@ object Dependencies {
   private val akkaVersion  = "2.3.5"
   private val sprayVersion = "1.3.1"
 
-  val commonDeps     = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"
-  val commonTestDeps = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"  % "test" classifier "tests"
+  val _common         = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"
+  val _commonTest     = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"  % "test" classifier "tests"
+  val _fetcher        = "com.vipers"              %% "fetcher"                %  "[0.1-SNAPSHOT,)"
 
   val logback        = "ch.qos.logback"          %  "logback-classic"        %  "[1.0.13,)"
   val scalaMeter     = "com.storm-enroute"       %% "scalameter"             % "0.7-SNAPSHOT"      % "test"
@@ -26,5 +27,5 @@ object Dependencies {
 
   val akkaDependencies = Seq(akkaActor, akkaSlf4j, akkaTest)
   val sprayDependencies = Seq(sprayCan, sprayRouting, sprayCaching, sprayHttp, sprayTestkit, json4sNative)
-  val commonDependencies = Seq(commonDeps, commonTestDeps, scalaTest, logback)
+  val commonDependencies = Seq(_common, _commonTest, scalaTest, logback)
 }

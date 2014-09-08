@@ -1,4 +1,4 @@
-package com.vipers.model
+package com.vipers.fetcher.model
 
 //================================================================================
 // Character request/response

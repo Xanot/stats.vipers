@@ -1,4 +1,4 @@
-package com.vipers.model
+package com.vipers.fetcher.model
 
 case class Outfit(name : String,
                   alias : String,

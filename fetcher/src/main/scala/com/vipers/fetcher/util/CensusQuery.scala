@@ -1,8 +1,8 @@
-package com.vipers.util
+package com.vipers.fetcher.util
 
-import com.vipers.util.CensusQuery.{Search, CensusQueryCommand}
+import com.vipers.fetcher.util.CensusQuery.{Search, CensusQueryCommand}
 
-sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCommand*) {
+private[fetcher] sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCommand*) {
   def construct : Seq[(String, String)] = search.map(s => Seq(s.field -> s.value)).getOrElse(Nil) ++ commands.map(_.construct)
   def ++(r : CensusQuery) : CensusQuery = CensusQuery(search, commands ++ r.commands :_*)
   def ++(r : Option[CensusQuery]) : CensusQuery = r.map(q => this ++ q).getOrElse(this)
@@ -10,7 +10,7 @@ sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCom
   def +(r : Option[CensusQueryCommand]) : CensusQuery = r.map(c => this + c).getOrElse(this)
 }
 
-object CensusQuery {
+private[fetcher] object CensusQuery {
   sealed case class Search(field : String, value : String)
 
   /**

@@ -2,7 +2,8 @@ package com.vipers
 
 import akka.actor._
 import akka.testkit.TestKit
-import com.vipers.model._
+import com.vipers.fetcher.FetcherActor
+import com.vipers.fetcher.model._
 import org.scalatest.WordSpecLike
 import akka.pattern.ask
 import org.scalatest.concurrent.ScalaFutures
