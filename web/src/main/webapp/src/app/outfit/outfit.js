@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('outfit', ['ui.router'])
+angular.module('outfit', ['utils', 'ui.router'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider.state('outfit', {
       url: '/outfit',
@@ -11,12 +11,10 @@ angular.module('outfit', ['ui.router'])
 
   .controller('OutfitController', ['$scope', 'OutfitService', function($scope, OutfitService) {
     $scope.getOutfit = function(alias) {
-      OutfitService.getOutfitByAlias("VIPR").then(function(response) {
-        $scope.test = response.data
+      OutfitService.getOutfitByAlias(alias.toLowerCase()).then(function(response) {
+        $scope.outfit = response.data
       })
     };
-
-    $scope.getOutfit();
   }])
 
   .factory('OutfitService', ['$http', 'UrlService', function($http, UrlService) {

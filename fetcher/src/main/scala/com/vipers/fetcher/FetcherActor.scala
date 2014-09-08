@@ -102,5 +102,5 @@ class FetcherActor extends Actor {
 }
 
 object FetcherActor {
-  val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(5000, TimeUnit.SECONDS)
 }

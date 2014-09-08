@@ -11,7 +11,7 @@ case class Outfit(name : String,
 
 case class OutfitMember(rank : String,
                         rankOrdinal : Byte,
-                        memberSinceData : Long)
+                        memberSinceDate : Long)
 
 case class BattleRank(rank : Short, percentToNext : Short)
 
