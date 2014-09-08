@@ -1,0 +1,27 @@
+{
+  "name": "stats.vipers",
+  "version": "0.0.0",
+  "homepage": "https://github.com/xanot/stats.vipers",
+  "authors": [
+    "xanot <cobaltXanot@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "bin"
+  ],
+  "dependencies": {
+    "angular": "1.2.23",
+    "angular-animate": "1.2.23",
+    "angular-mocks": "1.2.23",
+    "angular-strap": "2.1.0",
+    "angular-ui-router": "0.2.11",
+    "nprogress": "0.1.6",
+    "moment": "2.8.3",
+    "jquery": "1.11.1"
+  }
+}

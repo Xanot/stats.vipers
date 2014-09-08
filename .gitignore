@@ -2,6 +2,7 @@
 .idea_modules
 .history
 bin
+client
 scala-2.11
 node_modules
 bower_components

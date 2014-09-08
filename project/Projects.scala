@@ -10,6 +10,10 @@ object Projects extends Build {
     .aggregate(fetcher, common)
 
   lazy val fetcher = Project("fetcher", file("fetcher"))
+    .settings(basicSettings ++ scalaMeterSettings:_*)
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter))
+
+  lazy val web = Project("web", file("web"))
     .settings(basicSettings ++ assemblySettings ++ scalaMeterSettings:_*)
     .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter))
 

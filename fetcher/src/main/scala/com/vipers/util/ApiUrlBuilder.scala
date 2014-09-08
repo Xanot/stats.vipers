@@ -72,8 +72,6 @@ object ApiUrlBuilder {
     indexUri.copy(path = indexUri.path ++ path, query = Uri.Query(indexUri.query.toMap ++ params))
   }
 
-  private def construct(path : Uri.Path, params : (String, String)*) : Uri = construct(path, params.toMap)
-
   private def withPage(page : Page) : Seq[(String, String)] = {
     val records = page.records.map { records => Seq(Limit(records).construct) }.getOrElse(Nil)
     val start = page.start.map { start => Seq(Start(start).construct) }.getOrElse(Nil)
