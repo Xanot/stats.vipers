@@ -127,9 +127,9 @@ object Wrapper {
       val showAndHide = showHide()
 
       if(enrichCharacter.withFaction) {
-        CharacterJoin(show = Some(showAndHide._1), hide = Some(showAndHide._2), nested = Some(FactionJoin()), on = on, to = to, injectAt = injectAt)
+        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, nested = Some(FactionJoin()), on = on, to = to, injectAt = injectAt)
       } else {
-        CharacterJoin(show = Some(showAndHide._1), hide = Some(showAndHide._2), on = on, to = to, injectAt = injectAt)
+        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, on = on, to = to, injectAt = injectAt)
       }
     }
 
@@ -137,13 +137,13 @@ object Wrapper {
       val showAndHide = showHide()
 
       if(enrichCharacter.withFaction) {
-        CensusQuery(None, Show(showAndHide._1: _*), Hide(showAndHide._2: _*), Join(FactionJoin()))
+        CensusQuery(None, Join(FactionJoin())) + showAndHide._1.map(s => Show(s:_*)) + showAndHide._2.map(h => Hide(h:_*))
       } else {
-        CensusQuery(None, Show(showAndHide._1: _*), Hide(showAndHide._2: _*))
+        CensusQuery(None) + showAndHide._1.map(s => Show(s:_*)) + showAndHide._2.map(h => Hide(h:_*))
       }
     }
 
-    private def showHide() : (Seq[String], Seq[String]) = {
+    private def showHide() : (Option[Seq[String]], Option[Seq[String]]) = {
       val show = mutable.ListBuffer.empty[String]
       val hide = mutable.ListBuffer.empty[String]
 
@@ -170,7 +170,7 @@ object Wrapper {
         }
       }
 
-      (show, hide)
+      (if(show.nonEmpty) Some(show) else None, if(hide.nonEmpty) Some(hide) else None)
     }
   }
 

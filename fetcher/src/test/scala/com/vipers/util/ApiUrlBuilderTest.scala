@@ -85,7 +85,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id,outfit_member^inject_at:members^list:1(character^inject_at:character)")
+      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id(faction^inject_at:faction),outfit_member^inject_at:members^list:1(character^inject_at:character)")
       uri.query.get("outfit_id").get should be("1234")
     }
   }
@@ -133,7 +133,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     val enrich = EnrichCharacter(withBattleRank = Some(true), withCerts = Some(true), withFaction = true)
     val uri = ApiUrlBuilder.getCharactersById(Some(enrich), "1", "2", "3", "4")
     uri.path.tail.toString().endsWith("character") should be(right = true)
-    uri.query.length should be(5)
+    uri.query.length should be(4)
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:show").get should be("battle_rank,certs")
     uri.query.get("c:join").get should be("faction^inject_at:faction")
@@ -154,7 +154,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.path.tail.toString().endsWith("character") should be(right = true)
     uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
-    uri.query.get("c:show").get should be("battle_rank,certs,times")
+    uri.query.get("c:show").get should be("battle_rank,certs")
     uri.query.get("name.first_lower").get should be("xanot")
   }
 }

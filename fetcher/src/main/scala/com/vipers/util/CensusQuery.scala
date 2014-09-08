@@ -4,7 +4,10 @@ import com.vipers.util.CensusQuery.{Search, CensusQueryCommand}
 
 sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCommand*) {
   def construct : Seq[(String, String)] = search.map(s => Seq(s.field -> s.value)).getOrElse(Nil) ++ commands.map(_.construct)
-  def +(r : CensusQuery) : CensusQuery = CensusQuery(search, commands ++ r.commands :_*)
+  def ++(r : CensusQuery) : CensusQuery = CensusQuery(search, commands ++ r.commands :_*)
+  def ++(r : Option[CensusQuery]) : CensusQuery = r.map(q => this ++ q).getOrElse(this)
+  def +(r : CensusQueryCommand) : CensusQuery = CensusQuery(search, commands :+ r :_*)
+  def +(r : Option[CensusQueryCommand]) : CensusQuery = r.map(c => this + c).getOrElse(this)
 }
 
 object CensusQuery {
@@ -71,7 +74,7 @@ object CensusQuery {
     //================================================================================
     // Join
     //================================================================================
-    sealed abstract class JoinQuery(collection : String,
+    abstract class JoinQuery(collection : String,
                         injectAt : String,
                         isList : Option[Boolean] = None,
                         on : Option[String] = None,
@@ -87,19 +90,28 @@ object CensusQuery {
         isList.map { isList => if(isList) builder ++= "^list:1" else builder ++= "^list:0" }
         on.map { on => builder ++= s"^on:$on"}
         to.map { to => builder ++= s"^to:$to"}
-        terms.map{ seq =>
-          builder ++= "^terms:"
-          seq.foreach { term =>
-            builder ++= s"${term._1}=${term._2}'"
+        terms.map { seq =>
+          if(seq.nonEmpty) {
+            builder ++= "^terms:"
+            val last = seq.last
+            seq.foreach { term =>
+              builder ++= s"${term._1}=${term._2}"
+              if(term != last)
+                builder ++= "'"
+            }
           }
         }
         hide.map { seq =>
-          builder ++= "^hide:"
-          builder ++= seq.mkString("'")
+          if(seq.nonEmpty) {
+            builder ++= "^hide:"
+            builder ++= seq.mkString("'")
+          }
         }
         show.map { seq =>
-          builder ++= "^show:"
-          builder ++= seq.mkString("'")
+          if(seq.nonEmpty) {
+            builder ++= "^show:"
+            builder ++= seq.mkString("'")
+          }
         }
         nested.map { nested => builder ++= s"(${nested.toString})"}
         builder.toString()

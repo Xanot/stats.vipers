@@ -51,7 +51,7 @@ object ApiUrlBuilder {
   //================================================================================
   private def getCharacters(s : Search, enrich : Option[EnrichCharacter], ids : String*) : Uri = {
     val params = enrich.map { enrichChar =>
-      (CensusQuery(Some(s)) + enrichChar.toQuery).construct
+      (CensusQuery(Some(s)) ++ enrichChar.toQuery).construct
     }.getOrElse {
       CensusQuery(Some(s)).construct
     }

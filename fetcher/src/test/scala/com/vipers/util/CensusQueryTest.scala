@@ -56,7 +56,24 @@ class CensusQueryTest extends WordSpecLike with Test {
   }
   "CommaSeparatedCensusQueryCommand" should {
     "construct Join command" in {
-      ???
+      Join(
+        new JoinQuery(
+          "weapon",
+          "my_weapon",
+          isList = Some(false),
+          on = Some("weapon_id"),
+          to = Some("some_other_weapon_id"),
+          terms = Some(Seq(("termKey", "termValue"), ("termKey2", "termValue2"))),
+          hide = Some(Seq("hideField", "hideField2")),
+          show = Some(Seq("showField", "showField2")),
+          nested = Some(CharacterJoin())
+      ) {}, FactionJoin()).construct match {
+        case (command, v) =>
+          command should be("c:join")
+          v should be ("weapon^inject_at:my_weapon^list:0^on:weapon_id^to:some_other_weapon_id^terms:termKey=termValue'termKey2=termValue2^hide:hideField'hideField2^show:showField'showField2(character^inject_at:character),faction^inject_at:faction")
+      }
+
+
     }
   }
   "CensusQuery" should {
@@ -98,7 +115,7 @@ class CensusQueryTest extends WordSpecLike with Test {
         Show("field1", "field2"),
         Timing(true),
         Join(CharacterJoin(nested = Some(FactionJoin())), FactionJoin())
-      ) + CensusQuery(None, commands = Case(true), Limit(10))
+      ) ++ CensusQuery(None, commands = Case(true), Limit(10))
 
       p.construct match {
         case search:: show :: timing :: join :: cas :: limit :: Nil =>
@@ -108,6 +125,19 @@ class CensusQueryTest extends WordSpecLike with Test {
           join should be("c:join",
             "character^inject_at:character(faction^inject_at:faction),faction^inject_at:faction"
           )
+          cas should be("c:case", "true")
+          limit should be("c:limit", "10")
+      }
+
+      (CensusQuery(None, Start(5)) ++ None ++ Some(CensusQuery(None, Limit(10)))).construct match {
+        case start :: limit :: Nil =>
+          start should be(("c:start", "5"))
+          limit should be(("c:limit", "10"))
+      }
+    }
+    "be added with CensusQueryCommand" in {
+      (CensusQuery(None, commands = Case(true)) + None + Limit(10)).construct match {
+        case cas :: limit :: Nil =>
           cas should be("c:case", "true")
           limit should be("c:limit", "10")
       }
