@@ -11,12 +11,16 @@ angular.module('outfit.view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitViewController', ['$scope', '$stateParams', 'OutfitViewController', function($scope, $stateParams, OutfitViewController) {
+  .controller('OutfitViewController', ['$scope', '$state', '$stateParams', 'OutfitViewController', function($scope, $state, $stateParams, OutfitViewController) {
     function getOutfit(alias) {
       OutfitViewController.getOutfitByAlias(alias.toLowerCase()).then(function(response) {
         $scope.outfit = response.data
       })
     }
+
+    $scope.leaderHref = function(id) {
+      return $state.href('player.view', {id: id})
+    };
 
     if($stateParams.alias) {
       getOutfit($stateParams.alias)
