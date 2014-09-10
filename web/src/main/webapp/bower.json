@@ -22,6 +22,7 @@
     "angular-strap": "2.1.0",
     "angular-ui-router": "0.2.11",
     "angular-moment": "0.8.2",
+    "angular-marked": "0.0.12",
     "nprogress": "0.1.6",
     "jquery": "1.11.1",
     "argjs": "1.1.0"

@@ -1,4 +1,4 @@
-/* Prevent navbar radius */
+/* Prevent radius */
 * {
     border-radius: 0 !important;
     -moz-border-radius: 0 !important;
@@ -12,7 +12,7 @@
     color: #c60000;
 }
 .NC {
-    color: #0000cc;
+    color: rgb(30, 51, 255);
 }
 
 /* Battle Rank colors*/
