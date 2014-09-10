@@ -16,12 +16,13 @@
   ],
   "dependencies": {
     "angular": "1.2.23",
+    "angular-sanitize": "1.2.23",
     "angular-animate": "1.2.23",
     "angular-mocks": "1.2.23",
     "angular-strap": "2.1.0",
     "angular-ui-router": "0.2.11",
+    "angular-moment": "0.8.2",
     "nprogress": "0.1.6",
-    "moment": "2.8.3",
     "jquery": "1.11.1",
     "argjs": "1.1.0"
   }

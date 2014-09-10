@@ -1,16 +1,13 @@
-<div class="container">
-  <div class="row">
-    <div class=" col-xs-3 input-group">
+<div class="row">
+  <div class="col-md-2">
+    <div class="input-group">
       <input type="text" class="form-control" placeholder="Outfit Alias" ng-model="alias">
       <span class="input-group-btn">
-        <button class="btn btn-default" type="button" ng-click="getOutfit(alias)">Go!</button>
+        <button class="btn btn-default" type="button" ng-click="toOutfit(alias)">Go!</button>
       </span>
     </div>
   </div>
-  <div class="row">
-    {{ outfit.leaderCharacter.faction.codeTag }}
-    <div ng-repeat="member in outfit.members">
-      {{ member.name }} - {{ member.battleRank.rank }} - {{ member.membership.memberSinceDate }}
-    </div>
-  </div>
+
+  <div class="col-md-10" ui-view></div>
 </div>
+

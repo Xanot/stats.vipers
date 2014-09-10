@@ -1,0 +1,52 @@
+/* Prevent navbar radius */
+* {
+    border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+}
+
+/* Faction colors */
+.VS {
+    color: #cd00cd;
+}
+.TR {
+    color: #c60000;
+}
+.NC {
+    color: #0000cc;
+}
+
+/* Battle Rank colors*/
+.br1 { /* < 50 */
+    color: rgba(255, 190, 0, 0.22);
+}
+.br2 { /* < 85 */
+    color: rgba(255, 190, 0, 0.45);
+}
+.br3 { /* < 100 */
+    color: rgba(255, 190, 0, 0.65);
+}
+.br4 { /* 100 */
+    color: #ffcf00;
+}
+
+/* Outfit rank colors */
+.ordinal1 {
+    color: rgba(0, 255, 253, 0.65)
+}
+.ordinal2 {
+    color: rgba(137, 250, 255, 0.65)
+}
+.ordinal3 {
+    color: rgba(181, 252, 255, 0.65)
+}
+.ordinal4 {
+    color: rgba(204, 252, 255, 0.65)
+}
+.ordinal5 {
+    color: rgba(247, 252, 255, 0.65)
+}
+
+/* Nprogress bar color*/
+#nprogress .bar {
+    background: #00dd26;
+}
