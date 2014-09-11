@@ -1,6 +1,12 @@
-# Dev Environment
+# Dev prerequisites
 
-TODO
+  * JDK
+  * SBT (http://www.scala-sbt.org/)
+  * NodeJs (http://nodejs.org/)
+  * Bower: Execute "npm install -g bower"
+  * Gulp: Execute "npm install -g gulp"
+
+Note: IDEA Community Edition(with the Scala plugin) / WebStorm combo is recommended. You may generate the IntelliJ project file by executing "gen-idea" in sbt.
 
 # Configuration
 
