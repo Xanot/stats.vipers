@@ -24,7 +24,7 @@ trait Route extends HttpService
 trait JsonRoute extends Route with Json4sSupport
 
 class Service extends Actor with JsonRoute {
-  import context.dispatcher // ExecutionContext for the futures and scheduler
+  import context.dispatcher
 
   implicit val timeout = Timeout(5000)
   implicit val json4sFormats = DefaultFormats

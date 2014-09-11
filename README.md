@@ -33,7 +33,7 @@ Execute "gulp build" inside /web/src/main/webapp. This generates a "client" fold
 
 Run "Boot" (which is inside the "web" sub-project)
 
-Navigate to localhost:8080 (this is the default port)
+Navigate to http://localhost:8080/ui/index.html
 
 # How to run tests
 
