@@ -8,6 +8,7 @@ import org.json4s.DefaultFormats
 import spray.can.Http
 import spray.http.HttpHeaders.RawHeader
 import spray.httpx.Json4sSupport
+import spray.httpx.encoding.Gzip
 import spray.routing.HttpService
 import akka.pattern.ask
 
@@ -48,13 +49,15 @@ class Service extends Actor with JsonRoute {
     pathPrefix("outfit") {
       path(Segment) { alias =>
         get {
-          onComplete(
-            (fetcherActor ? FetchOutfitRequest(Some(alias), None,
-              Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
-            )).mapTo[Option[Outfit]]
-          ) {
-            case Success(outfit) => complete(outfit)
-            case Failure(m) => complete(m.toString)
+          encodeResponse(Gzip) {
+            onComplete(
+              (fetcherActor ? FetchOutfitRequest(Some(alias), None,
+                Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
+              )).mapTo[Option[Outfit]]
+            ) {
+              case Success(outfit) => complete(outfit)
+              case Failure(m) => complete(m.toString)
+            }
           }
         }
       }
