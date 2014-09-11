@@ -2,6 +2,7 @@ package com.vipers.fetcher.model
 
 case class Outfit(name : String,
                   alias : String,
+                  aliasLower : String,
                   leaderCharacterId : String,
                   memberCount : Int,
                   id : String,

@@ -1,25 +1,40 @@
-This README would normally document whatever steps are necessary to get your application up and running.
+# Dev Environment
 
-### What is this repository for? ###
+TODO
 
-* Quick summary
+# Configuration
 
-### How do I get set up? ###
+You may set the SOE service id in fetcher.conf. The default one throttles the number of requests.
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+# Dependencies
 
-### Contribution guidelines ###
+The following sub-projects need to be served locally:
 
-* Writing tests
-* Code review
-* Other guidelines
+   * "common" -> Execute "common/publishLocal" using sbt
+   * "fetcher" -> Execute "fetcher/publishLocal"
 
-### Who do I talk to? ###
+Note: Don't forget to publish it again whenever you make any changes to a sub-project
 
-* Repo owner or admin
-* Other community or team contact
+Client dependencies can be installed by executing "npm install && bower install" inside /web/src/main/webapp 
+
+# Database configuration
+
+Currently none, indexer worker WIP
+
+# How to test-run
+
+Execute "gulp build" inside /web/src/main/webapp. This generates a "client" folder inside /web/src/main/resources containing the minified client and its libraries
+
+Run "Boot" (which is inside the "web" sub-project)
+
+Navigate to localhost:8080 (this is the default port)
+
+# How to run tests
+
+Each sub-project has its own set of tests(e.g. if you want to run the "fetcher" tests, execute "fetcher/test" in sbt)
+
+You may run the client tests by executing "gulp test" inside /web/src/main/webapp
+
+# Deployment instructions
+
+TODO

@@ -9,10 +9,11 @@ private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
     def toOutfit : Option[Outfit] = {
       check { () =>
-        val (JString(name), JString(alias), JString(id), JString(memberCount), JString(leaderCharacterId), JString(timeCreatedDate)) = {
+        val (JString(name), JString(alias), JString(aliasLower), JString(id), JString(memberCount), JString(leaderCharacterId), JString(timeCreatedDate)) = {
           (
             json \ "name",
             json \ "alias",
+            json \ "alias_lower",
             json \ "outfit_id",
             json \ "member_count",
             json \ "leader_character_id",
@@ -20,7 +21,7 @@ private[fetcher] object Wrapper {
             )
         }
 
-        Outfit(name, alias, leaderCharacterId, memberCount.toInt, id, timeCreatedDate.toLong, (json \ "leader_character").toCharacter(), {
+        Outfit(name, alias, aliasLower, leaderCharacterId, memberCount.toInt, id, timeCreatedDate.toLong, (json \ "leader_character").toCharacter(), {
           val list = mutable.ListBuffer.empty[Character]
           json \ "members" match {
             case JArray(parents) =>

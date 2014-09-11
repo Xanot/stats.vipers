@@ -46,10 +46,10 @@ class Service extends Actor with JsonRoute {
       }
     } ~
     pathPrefix("outfit") {
-      path(Segment) { outfitAlias =>
+      path(Segment) { alias =>
         get {
           onComplete(
-            (fetcherActor ? FetchOutfitRequest(Some(outfitAlias), None,
+            (fetcherActor ? FetchOutfitRequest(Some(alias), None,
               Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
             )).mapTo[Option[Outfit]]
           ) {

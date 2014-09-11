@@ -10,12 +10,12 @@ angular.module('outfit', ['outfit.view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitController', ['$scope', '$state', '$stateParams', 'OutfitController', function($scope, $state, OutfitController) {
+  .controller('OutfitController', ['$scope', '$state', '$stateParams', 'OutfitService', function($scope, $state, OutfitService) {
     $scope.itemsPerPage = 20;
     $scope.curentPage = 1;
 
     function getOutfits(page) {
-      OutfitController.getOutfits({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
+      OutfitService.getOutfits({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
         $scope.outfits = response.data
       })
     }
@@ -27,7 +27,7 @@ angular.module('outfit', ['outfit.view', 'utils', 'ui.router'])
 //    getOutfits(1)
   }])
 
-  .factory('OutfitController', ['$http', 'UrlService', function($http, UrlService) {
+  .factory('OutfitService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       getOutfits: function(page) {
         return $http.get(UrlService.url("/outfit", page))

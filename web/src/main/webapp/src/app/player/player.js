@@ -10,12 +10,12 @@ angular.module('player', ['player.view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerController', ['$scope', '$stateParams', 'PlayerController', function($scope, $stateParams, PlayerController) {
+  .controller('PlayerController', ['$scope', '$stateParams', 'PlayerService', function($scope, $stateParams, PlayerService) {
     $scope.itemsPerPage = 20;
     $scope.curentPage = 1;
 
     function getPlayers(page) {
-      PlayerController.getPlayers({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
+      PlayerService.getPlayers({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
         $scope.players = response.data
       })
     }
@@ -23,7 +23,7 @@ angular.module('player', ['player.view', 'utils', 'ui.router'])
 //    getPlayers(1)
   }])
 
-  .factory('PlayerController', ['$http', 'UrlService', function($http, UrlService) {
+  .factory('PlayerService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       getPlayers: function(alias, page) {
         return $http.get(UrlService.url("/player/" + alias, page))

@@ -11,11 +11,10 @@ angular.module('outfit.view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitViewController', ['$scope', '$state', '$stateParams', 'OutfitViewController', function($scope, $state, $stateParams, OutfitViewController) {
-    function getOutfit(alias) {
-      OutfitViewController.getOutfitByAlias(alias.toLowerCase()).then(function(response) {
-        $scope.outfit = response.data
-      })
+  .controller('OutfitViewController', ['$scope', '$state', '$stateParams', 'Outfit', function($scope, $state, $stateParams, Outfit) {
+    function getOutfit(aliasLower) {
+      Outfit.find(aliasLower);
+      Outfit.bindOne($scope, 'outfit', aliasLower);
     }
 
     $scope.leaderHref = function(id) {
@@ -23,14 +22,14 @@ angular.module('outfit.view', ['utils', 'ui.router'])
     };
 
     if($stateParams.alias) {
-      getOutfit($stateParams.alias)
+      getOutfit($stateParams.alias.toLowerCase())
     }
   }])
 
-  .factory('OutfitViewController', ['$http', 'UrlService', function($http, UrlService) {
-    return {
-      getOutfitByAlias: function(alias) {
-        return $http.get(UrlService.url("/outfit/" + alias))
-      }
-    }
+  .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {
+    return DS.defineResource({
+      name: "outfit",
+      baseUrl: UrlService.url("/"),
+      idAttribute: 'aliasLower'
+    });
   }]);
