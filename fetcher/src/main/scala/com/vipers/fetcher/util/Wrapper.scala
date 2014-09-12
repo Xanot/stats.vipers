@@ -128,9 +128,9 @@ private[fetcher] object Wrapper {
       val showAndHide = showHide()
 
       if(enrichCharacter.withFaction) {
-        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, nested = Some(FactionJoin()), on = on, to = to, injectAt = injectAt)
+        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, nested = Some(FactionJoin()), on = on, to = to, injectAt = injectAt, isOuter = Some(false))
       } else {
-        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, on = on, to = to, injectAt = injectAt)
+        CharacterJoin(show = showAndHide._1, hide = showAndHide._2, on = on, to = to, injectAt = injectAt, isOuter = Some(false))
       }
     }
 

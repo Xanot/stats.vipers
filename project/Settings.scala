@@ -22,4 +22,9 @@ object Settings {
     testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
     logBuffered := false
   )
+
+  lazy val localPublishSettings = Seq(
+    publishArtifact in (Test, packageDoc) := false,
+    publishArtifact in (Compile, packageDoc) := false
+  )
 }

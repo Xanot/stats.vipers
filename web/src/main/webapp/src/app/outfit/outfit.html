@@ -1,13 +1,29 @@
 <div class="row">
-  <div class="col-md-2">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Outfit Alias" ng-model="alias">
-      <span class="input-group-btn">
-        <button class="btn btn-default" type="button" ng-click="toOutfit(alias)">Go!</button>
-      </span>
-    </div>
+  <div class="col-md-4">
+    <!--Outfits-->
+    <table class="table table-striped table-bordered table-responsive">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Creation Date</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="outfit in outfits">
+        <td> {{ $index + 1 }}</td>
+        <td>
+          <a href="{{ outfitHref(outfit.aliasLower) }}" class="{{ outfit.leaderCharacter.faction.codeTag }}">
+            {{ outfit.name }}
+          </a>
+        </td>
+        <td>
+          <span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
-
-  <div class="col-md-10" ui-view></div>
+  <div class="col-md-8" ui-view></div>
 </div>
 

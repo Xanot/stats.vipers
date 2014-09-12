@@ -9,7 +9,7 @@
             <dt>Created</dt>
             <dd><span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span></dd>
             <dt>Members</dt>
-            <dd> {{ outfit.memberCount }} </dd>
+            <dd> {{ outfit.members.length }} </dd>
             <dt>Leader</dt>
             <dd>
               <a href="{{ leaderHref(outfit.leaderCharacterId) }}" class="{{ outfit.leaderCharacter.faction.codeTag }}">

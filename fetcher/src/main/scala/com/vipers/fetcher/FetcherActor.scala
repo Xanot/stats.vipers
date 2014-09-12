@@ -20,10 +20,11 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.collection.JavaConverters._
 
 class FetcherActor extends Actor {
-  import scala.concurrent.ExecutionContext.Implicits.global
+  import context.dispatcher
   import FetcherActor._
 
-  private val cache = new ConcurrentHashMap[FetchOutfitRequest, Option[Outfit]]().asScala
+  private val fetchOutfitRequestCache = new ConcurrentHashMap[FetchOutfitRequest, Option[Outfit]]().asScala
+  private val fetchMultipleOutfitsRequestCache = new ConcurrentHashMap[FetchMultipleOutfitsRequest, List[Outfit]]().asScala
 
   def receive = {
     case FetchCharacterRequest(name, id, enrich) =>
@@ -52,8 +53,8 @@ class FetcherActor extends Actor {
       } pipeTo sender
     case m @ FetchOutfitRequest(alias, id, enrich) =>
       Future {
-        if(cache.contains(m)) {
-          cache.get(m)
+        if(fetchOutfitRequestCache.contains(m)) {
+          fetchOutfitRequestCache(m)
         } else {
           val json = {
             if (alias.isDefined) {
@@ -62,15 +63,35 @@ class FetcherActor extends Actor {
               sendRequest(ApiUrlBuilder.getOutfitById(id.get, enrich))
             }
           }
-          json \ "outfit_list" match {
-            case JArray(parent) if parent.nonEmpty =>
-              val o = Some(parent(0).toOutfit.get)
-              cache.put(m, o)
-              o
-            case _ =>
-              cache.put(m, None)
-              None
+          try {
+            json \ "outfit_list" match {
+              case JArray(parent) if parent.nonEmpty =>
+                val o = Some(parent(0).toOutfit.get)
+                fetchOutfitRequestCache += m -> o
+                o
+              case _ =>
+                fetchOutfitRequestCache += m -> None
+                None
+            }
+          } catch {
+            case e : Exception => e.printStackTrace()
           }
+
+        }
+      } pipeTo sender
+
+    case m @ FetchMultipleOutfitsRequest(sort, page) =>
+      Future {
+        if(fetchMultipleOutfitsRequestCache.contains(m)) {
+          fetchMultipleOutfitsRequestCache(m)
+        } else {
+          val JArray(outfits) = sendRequest(ApiUrlBuilder.getOutfits(sort, page)) \ "outfit_list"
+          val list = mutable.ListBuffer.empty[Outfit]
+          outfits.foreach { outfitJson =>
+            list += outfitJson.toOutfit.get
+          }
+          fetchMultipleOutfitsRequestCache += m -> list.toList
+          list.toList
         }
       } pipeTo sender
     case FetchOutfitCharactersRequest(alias, id, enrich, page) =>

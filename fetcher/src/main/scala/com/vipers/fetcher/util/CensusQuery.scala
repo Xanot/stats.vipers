@@ -1,5 +1,6 @@
 package com.vipers.fetcher.util
 
+import com.vipers.fetcher.model.Sort.{Order, ASC, DESC}
 import com.vipers.fetcher.util.CensusQuery.{Search, CensusQueryCommand}
 
 private[fetcher] sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCommand*) {
@@ -59,8 +60,14 @@ private[fetcher] object CensusQuery {
     case class Show(protected val values : String*) extends CommaSeparatedCensusQueryCommand[String]("show")
     case class Has(protected val values : String*) extends CommaSeparatedCensusQueryCommand[String]("has")
 
-    case class Sort(protected val pairs : (String, String)*) extends CommaSeparatedCensusQueryCommand[String]("sort") {
-      override protected val values =  pairs.map { case (field, sortDirection) => s"$field:$sortDirection" }
+    case class Sort(protected val pairs : (String ,Order)*) extends CommaSeparatedCensusQueryCommand[String]("sort") {
+      override protected val values =  pairs.map { case (field, order) =>
+        val o = order match {
+          case DESC => -1
+          case ASC => 1
+        }
+        s"$field:$o"
+      }
     }
 
     case class Join(protected val values : JoinQuery*) extends CommaSeparatedCensusQueryCommand[JoinQuery]("join")
@@ -82,7 +89,8 @@ private[fetcher] object CensusQuery {
                         terms : Option[Seq[(String, String)]] = None,
                         hide : Option[Seq[String]] = None,
                         show : Option[Seq[String]] = None,
-                        nested : Option[JoinQuery] = None) {
+                        nested : Option[JoinQuery] = None,
+                        isOuter: Option[Boolean] = None) {
 
       override def toString : String = {
         val builder = new StringBuilder
@@ -113,6 +121,7 @@ private[fetcher] object CensusQuery {
             builder ++= seq.mkString("'")
           }
         }
+        isOuter.map { isOuter => if(isOuter) builder ++= "^outer:1" else builder ++= "^outer:0"}
         nested.map { nested => builder ++= s"(${nested.toString})"}
         builder.toString()
       }
@@ -124,7 +133,8 @@ private[fetcher] object CensusQuery {
                                 terms : Option[Seq[(String, String)]] = None,
                                 hide : Option[Seq[String]] = None,
                                 show : Option[Seq[String]] = None,
-                                nested : Option[JoinQuery] = None) extends JoinQuery("outfit_member", injectAt, Some(true), on, to, terms, hide, show ,nested)
+                                nested : Option[JoinQuery] = None,
+                                isOuter : Option[Boolean] = None) extends JoinQuery("outfit_member", injectAt, Some(true), on, to, terms, hide, show ,nested, isOuter)
 
     case class CharacterJoin(injectAt : String = "character",
                              on : Option[String] = None,
@@ -132,12 +142,14 @@ private[fetcher] object CensusQuery {
                              terms : Option[Seq[(String, String)]] = None,
                              hide : Option[Seq[String]] = None,
                              show : Option[Seq[String]] = None,
-                             nested : Option[JoinQuery] = None) extends JoinQuery("character", injectAt, None, on, to, terms, hide, show ,nested)
+                             nested : Option[JoinQuery] = None,
+                             isOuter : Option[Boolean] = None) extends JoinQuery("character", injectAt, None, on, to, terms, hide, show ,nested, isOuter)
 
     case class FactionJoin(injectAt : String = "faction",
                            terms : Option[Seq[(String, String)]] = None,
                            hide : Option[Seq[String]] = None,
                            show : Option[Seq[String]] = None,
-                           nested : Option[JoinQuery] = None) extends JoinQuery("faction", injectAt, None, None, None, terms, hide, show ,nested)
+                           nested : Option[JoinQuery] = None,
+                           isOuter : Option[Boolean] = None) extends JoinQuery("faction", injectAt, None, None, None, terms, hide, show ,nested, isOuter)
   }
 }

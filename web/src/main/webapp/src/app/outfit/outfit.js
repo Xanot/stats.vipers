@@ -10,27 +10,23 @@ angular.module('outfit', ['outfit.view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitController', ['$scope', '$state', '$stateParams', 'OutfitService', function($scope, $state, OutfitService) {
-    $scope.itemsPerPage = 20;
-    $scope.curentPage = 1;
-
+  .controller('OutfitController', ['$scope', '$state', 'OutfitBasic', function($scope, $state, OutfitBasic) {
     function getOutfits(page) {
-      OutfitService.getOutfits({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
-        $scope.outfits = response.data
-      })
+      OutfitBasic.findAll({});
+      OutfitBasic.bindAll($scope, 'outfits', {});
     }
 
-    $scope.toOutfit = function(alias) {
-      $state.go("outfit.view", {alias : alias});
+    $scope.outfitHref = function(aliasLower) {
+      return $state.href("outfit.view", {alias : aliasLower});
     };
 
-//    getOutfits(1)
+    getOutfits(1)
   }])
 
-  .factory('OutfitService', ['$http', 'UrlService', function($http, UrlService) {
-    return {
-      getOutfits: function(page) {
-        return $http.get(UrlService.url("/outfit", page))
-      }
-    }
+  .factory('OutfitBasic', ['DS', 'UrlService', function(DS, UrlService) {
+    return DS.defineResource({
+      name: "outfitBasic",
+      endpoint: "outfit",
+      baseUrl: UrlService.url("/")
+    });
   }]);

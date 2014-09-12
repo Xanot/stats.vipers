@@ -11,3 +11,14 @@ object Page {
   val FirstFifty = Page(Some(50), OptionNone)
   val FirstHundred = Page(Some(100), OptionNone)
 }
+
+object Sort {
+  type Sort = (Criteria, Order)
+
+  sealed trait Order
+  case object DESC extends Order
+  case object ASC  extends Order
+
+  sealed trait Criteria
+  case object CREATION_DATE extends Criteria
+}

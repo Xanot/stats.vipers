@@ -10,7 +10,7 @@ object Projects extends Build {
     .aggregate(fetcher, common)
 
   lazy val fetcher = Project("fetcher", file("fetcher"))
-    .settings(basicSettings ++ scalaMeterSettings:_*)
+    .settings(basicSettings ++ localPublishSettings ++ scalaMeterSettings:_*)
     .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter))
 
   lazy val web = Project("web", file("web"))
@@ -18,7 +18,7 @@ object Projects extends Build {
     .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter, _fetcher))
 
   lazy val common = Project("common", file("common"))
-    .settings(basicSettings:_*)
-    .settings(publishArtifact in (Test, packageBin) := true)
+    .settings(basicSettings ++ localPublishSettings:_*)
+    .settings(publishArtifact in (Test, packageBin) := true) // enable publishing the test API jar
     .settings(libraryDependencies ++= akkaDependencies ++ Seq(scalaTest, scalaMeter, logback, slick))
 }

@@ -1,6 +1,7 @@
 package com.vipers.fetcher.util
 
 import com.vipers.Test
+import com.vipers.fetcher.model.Sort.{ASC, DESC}
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
 import com.vipers.fetcher.util.CensusQuery.Search
 import org.scalatest.WordSpecLike
@@ -46,7 +47,7 @@ class CensusQueryTest extends WordSpecLike with Test {
       Has("field5", "field6").construct should be(("c:has", "field5,field6"))
     }
     "construct Sort command" in {
-      Sort(("field", "1"), ("field", "0")).construct should be(("c:sort", "field:1,field:0"))
+      Sort(("field", DESC), ("field", ASC)).construct should be(("c:sort", "field:-1,field:1"))
     }
   }
   "SimpleCensusQueryCommand" should {

@@ -1,5 +1,7 @@
 package com.vipers.fetcher.model
 
+import com.vipers.fetcher.model.Sort.Sort
+
 //================================================================================
 // Character request/response
 //================================================================================
@@ -32,3 +34,5 @@ case class FetchOutfitCharactersRequest(alias : Option[String],
 
 case class FetchOutfitCharactersResponse(total : Int,
                                          characters : Seq[Character])
+
+case class FetchMultipleOutfitsRequest(sort : Sort, page : Page)

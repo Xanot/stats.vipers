@@ -2,7 +2,9 @@ package com.vipers.fetcher.util
 
 import com.vipers.fetcher.Configuration
 import com.vipers.fetcher.model._
+import com.vipers.fetcher.model.Sort.{Sort => SortModel, CREATION_DATE}
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
+import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand.{Sort => SortQ}
 import com.vipers.fetcher.util.CensusQuery.Search
 import spray.http.Uri
 import Wrapper.{RichEnrichCharacter, RichEnrichOutfit}
@@ -19,6 +21,16 @@ private[fetcher] object ApiUrlBuilder {
       CensusQuery(Some(s)).construct
     }
     construct(Uri.Path("outfit"), params.toMap)
+  }
+
+  def getOutfits(s : SortModel, p : Page) : Uri = {
+    val sort = SortQ(
+      (s._1 match {
+        case CREATION_DATE => "time_created"
+      }, s._2)
+    )
+    val params = CensusQuery(None, sort).construct
+    construct(Uri.Path("outfit"), params.toMap ++ withPage(p))
   }
 
   def getOutfitByAlias(outfitAlias : String, enrichOutfit : Option[EnrichOutfit] = None) : Uri = {
