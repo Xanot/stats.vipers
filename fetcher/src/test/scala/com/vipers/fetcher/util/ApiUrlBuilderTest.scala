@@ -24,7 +24,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id(faction^inject_at:faction)")
+      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id^outer:0(faction^inject_at:faction)")
       uri.query.get("alias_lower").get should be("vipr")
     }
     // With member characters
@@ -34,7 +34,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("outfit_member^inject_at:members^list:1(character^inject_at:character)")
+      uri.query.get("c:join").get should be("outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0)")
       uri.query.get("alias_lower").get should be("vipr")
     }
     // With leader (with faction) and member characters
@@ -44,7 +44,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id,outfit_member^inject_at:members^list:1(character^inject_at:character)")
+      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id^outer:0,outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0)")
       uri.query.get("alias_lower").get should be("vipr")
     }
   }
@@ -65,7 +65,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id(faction^inject_at:faction)")
+      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id^outer:0(faction^inject_at:faction)")
       uri.query.get("outfit_id").get should be("1234")
     }
     // With member characters
@@ -75,7 +75,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("outfit_member^inject_at:members^list:1(character^inject_at:character)")
+      uri.query.get("c:join").get should be("outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0)")
       uri.query.get("outfit_id").get should be("1234")
     }
     // With leader (with faction) and member characters
@@ -85,7 +85,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
       uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id(faction^inject_at:faction),outfit_member^inject_at:members^list:1(character^inject_at:character)")
+      uri.query.get("c:join").get should be("character^inject_at:leader_character^on:leader_character_id^to:character_id^outer:0(faction^inject_at:faction),outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0)")
       uri.query.get("outfit_id").get should be("1234")
     }
   }
@@ -116,6 +116,16 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
       uri.query.get("c:join").get should be("character^inject_at:character")
       uri.query.get("outfit_id").get should be("1234")
     }
+  }
+
+  "getOutfits uri" should "be constructed" in {
+    val uri = ApiUrlBuilder.getOutfits((Sort.CREATION_DATE, Sort.ASC), Page(Some(1), Some(5)))
+    uri.path.tail.toString().endsWith("outfit") should be(right = true)
+    uri.query.length should be(4)
+    uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:limit").get should be("1")
+    uri.query.get("c:start").get should be("5")
+    uri.query.get("c:sort").get should be("time_created:1")
   }
 
   //================================================================================

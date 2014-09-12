@@ -14,7 +14,7 @@ trait OutfitApi extends JsonRoute { this: Actor =>
 
   private val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
 
-  protected val outfitRoute = {
+  protected lazy val outfitRoute = {
     pathPrefix("outfit") {
       pathEnd {
         get {

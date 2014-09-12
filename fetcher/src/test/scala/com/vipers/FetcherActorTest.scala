@@ -197,5 +197,16 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response should be(None)
       }
     }
+    "return multiple outfits given sort order and page" in {
+      // valid id
+      var request = FetchMultipleOutfitsRequest((Sort.CREATION_DATE, Sort.ASC), Page.FirstFive)
+      whenReady((fetcherActor ? request).mapTo[List[Outfit]]) { response =>
+        response.length should be(5)
+        response(0).leaderCharacter should be (None)
+        response(0).members should be(None)
+        response(0).aliasLower should be("te")
+        response(4).aliasLower should be("conz")
+      }
+    }
   }
 }
