@@ -1,9 +1,9 @@
 package com.vipers
 
 import java.util.concurrent.TimeUnit
-
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import akka.util.Timeout
+import com.vipers.fetcher.FetcherActor
 import com.vipers.routes.{UI, OutfitApi, CharacterApi}
 import org.json4s.DefaultFormats
 import spray.http.HttpHeaders.RawHeader
@@ -12,6 +12,8 @@ import spray.routing.HttpService
 
 sealed class ApiActor extends Actor with Api {
   override val actorRefFactory = context
+
+  protected val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
 
   def receive = runRoute {
     respondWithHeaders(RawHeader("Access-Control-Allow-Origin", "*")) { ctx => route(ctx) } // Enable CORS

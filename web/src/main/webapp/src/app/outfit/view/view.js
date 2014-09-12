@@ -1,11 +1,10 @@
 'use strict';
 
-angular.module('outfit.view', ['utils', 'ui.router'])
+angular.module('outfit-view', ['utils', 'ui.router'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
-      .state('outfit.view', {
-        parent: 'outfit',
-        url: '/:alias',
+      .state('outfit-view', {
+        url: '/outfit/:alias',
         controller: 'OutfitViewController',
         templateUrl: 'app/outfit/view/view.html'
       })
@@ -21,9 +20,7 @@ angular.module('outfit.view', ['utils', 'ui.router'])
       return $state.href('player.view', {id: id})
     };
 
-    if($stateParams.alias) {
-      getOutfit($stateParams.alias.toLowerCase())
-    }
+    getOutfit($stateParams.alias.toLowerCase())
   }])
 
   .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {

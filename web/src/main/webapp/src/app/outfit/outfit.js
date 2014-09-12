@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('outfit', ['outfit.view', 'utils', 'ui.router'])
+angular.module('outfit', ['outfit-view', 'utils', 'ui.router'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('outfit', {
@@ -17,7 +17,7 @@ angular.module('outfit', ['outfit.view', 'utils', 'ui.router'])
     }
 
     $scope.outfitHref = function(aliasLower) {
-      return $state.href("outfit.view", {alias : aliasLower});
+      return $state.href("outfit-view", {alias : aliasLower});
     };
 
     getOutfits(1)

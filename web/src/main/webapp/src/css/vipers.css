@@ -41,3 +41,41 @@
 #nprogress .bar {
     background: #00dd26;
 }
+
+/* Table header input */
+.table-input input, textarea{
+    background-color:#222222;
+    color: #FFF;
+    padding: 0;
+    margin-bottom: -10px;
+}
+.table-input ::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #FFF;
+}
+.table-input :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #FFF;
+}
+.table-input ::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #FFF;
+}
+.table-input :-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #FFF;
+}
+
+/* Table cell percentage */
+td .progress {
+    position: relative;
+    height: 20px;
+    background: transparent;
+    margin-bottom: 0;
+}
+td .progress .progress-bar span {
+    position: absolute;
+    display: block;
+    width: 100%;
+
+    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 15px;
+}

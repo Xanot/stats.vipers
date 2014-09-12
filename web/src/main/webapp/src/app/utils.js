@@ -1,3 +1,5 @@
+"use strict";
+
 angular.module('utils', ['constants'])
   .factory('UrlService', ['Constants', function(Constants) {
     return {

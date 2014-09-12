@@ -1,18 +1,14 @@
 package com.vipers.routes
 
-import akka.actor.{Actor, Props}
 import akka.pattern.ask
-import com.vipers.fetcher.FetcherActor
 import com.vipers.fetcher.model._
-import com.vipers.JsonRoute
+import com.vipers.{ApiActor, JsonRoute}
 import spray.httpx.encoding.Gzip
 import scala.util.{Failure, Success}
 import spray.http.StatusCodes._
 
-trait OutfitApi extends JsonRoute { this: Actor =>
+trait OutfitApi extends JsonRoute { this: ApiActor =>
   import context.dispatcher
-
-  private val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
 
   protected lazy val outfitRoute = {
     pathPrefix("outfit") {

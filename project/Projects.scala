@@ -19,6 +19,6 @@ object Projects extends Build {
 
   lazy val common = Project("common", file("common"))
     .settings(basicSettings ++ localPublishSettings:_*)
-    .settings(publishArtifact in (Test, packageBin) := true) // enable publishing the test API jar
+    .settings(publishArtifact in (Test, packageBin) := true)
     .settings(libraryDependencies ++= akkaDependencies ++ Seq(scalaTest, scalaMeter, logback, slick))
 }

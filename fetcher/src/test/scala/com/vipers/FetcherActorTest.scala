@@ -183,7 +183,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       }
     }
     "return outfit member characters given alias" in {
-      // valid id
+      // valid alias
       var request = FetchOutfitCharactersRequest(Some("VIPR"), None, Some(EnrichCharacter()), Page.FirstTen)
       whenReady((fetcherActor ? request).mapTo[Option[FetchOutfitCharactersResponse]]) { response =>
         response.get.total should be > 50
@@ -191,15 +191,14 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.get.characters(1).battleRank.get.rank.toInt should be > 0
       }
 
-      // non-existent id
+      // non-existent alias
       request = FetchOutfitCharactersRequest(Some("VETFEQGEQ"), None, Some(EnrichCharacter()), Page.FirstFive)
       whenReady((fetcherActor ? request).mapTo[Option[FetchOutfitCharactersResponse]]) { response =>
         response should be(None)
       }
     }
     "return multiple outfits given sort order and page" in {
-      // valid id
-      var request = FetchMultipleOutfitsRequest((Sort.CREATION_DATE, Sort.ASC), Page.FirstFive)
+      val request = FetchMultipleOutfitsRequest((Sort.CREATION_DATE, Sort.ASC), Page.FirstFive)
       whenReady((fetcherActor ? request).mapTo[List[Outfit]]) { response =>
         response.length should be(5)
         response(0).leaderCharacter should be (None)

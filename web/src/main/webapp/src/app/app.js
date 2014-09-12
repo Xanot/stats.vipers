@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('main', ['navbar', 'home', 'outfit', 'player',
+angular.module('main', ['navbar', 'home', 'outfit',
   'ui.router', 'ngSanitize', 'ngAnimate', 'mgcrea.ngStrap', 'angularMoment', 'hc.marked', 'angular-data.DS', 'angular-data.DSCacheFactory'])
 
   .config(['$urlRouterProvider', '$httpProvider', function($urlRouterProvider, $httpProvider){

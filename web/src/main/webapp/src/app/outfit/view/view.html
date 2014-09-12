@@ -1,4 +1,4 @@
-<div>
+<div ng-if="outfit">
   <!-- Header -->
   <div class="row">
     <div>
@@ -27,15 +27,17 @@
       <thead>
       <tr>
         <th>#</th>
-        <th>Name</th>
-        <th>Outfit rank</th>
-        <th>BR</th>
-        <th>Member since</th>
-        <th>Last login</th>
+        <th class="table-input">
+          <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
+        </th>
+        <th><a ng-click="predicate='membership.rankOrdinal'; reverse=!reverse">Outfit rank</a></th>
+        <th><a ng-click="predicate='battleRank.rank'; reverse=!reverse">BR</a></th>
+        <th><a ng-click="predicate='times.lastLoginDate'; reverse=!reverse">Last login</a></th>
+        <th><a ng-click="predicate='membership.memberSinceDate'; reverse=!reverse">Member since</a></th>
       </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="member in outfit.members">
+      <tr ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse">
         <td> {{ $index + 1 }}</td>
         <td>
           <a ui-sref="player.view({id : {{ member.id }} })" class="{{ outfit.leaderCharacter.faction.codeTag }}">
@@ -46,25 +48,28 @@
           <span class="ordinal{{ member.membership.rankOrdinal }}">{{ member.membership.rank }}</span>
            - {{ member.membership.rankOrdinal | outfitRank }}
         </td>
-        <td>
-          <span ng-if="member.battleRank.rank < 100" class="progress">
-            <span class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ member.battleRank.percentToNext }}%;"
+        <td class="text-center">
+          <div ng-if="member.battleRank.rank < 100" class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ member.battleRank.percentToNext }}%;"
                   data-type="info" data-title="{{ member.battleRank.percentToNext }}%" bs-tooltip>
-              <h5> {{ member.battleRank.rank }} </h5>
-            </span>
-          </span>
+              <span>{{ member.battleRank.rank }}</span>
+            </div>
+          </div>
           <span ng-if="member.battleRank.rank == 100" class="br100">
             {{ member.battleRank.rank }}
           </span>
         </td>
         <td>
-          <span am-time-ago="member.membership.memberSinceDate" data-type="info" data-title="{{ member.membership.memberSinceDate | amCalendar }}" bs-tooltip></span>
+          <span am-time-ago="member.times.lastLoginDate" data-type="info" data-title="{{ member.times.lastLoginDate | amCalendar }}" bs-tooltip></span>
         </td>
         <td>
-          <span am-time-ago="member.times.lastLoginDate" data-type="info" data-title="{{ member.times.lastLoginDate | amCalendar }}" bs-tooltip></span>
+          <span am-time-ago="member.membership.memberSinceDate" data-type="info" data-title="{{ member.membership.memberSinceDate | amCalendar }}" bs-tooltip></span>
         </td>
       </tr>
       </tbody>
     </table>
   </div>
+</div>
+<div ng-if="!outfit" class="text-center">
+  <i class="fa fa-cog fa-spin fa-5x"></i>
 </div>

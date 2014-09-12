@@ -17,9 +17,7 @@ angular.module('player.view', ['utils', 'ui.router'])
       })
     }
 
-    if($stateParams.id) {
-      getPlayer($stateParams.id)
-    }
+    getPlayer($stateParams.id)
   }])
 
   .factory('PlayerViewService', ['$http', 'UrlService', function($http, UrlService) {
