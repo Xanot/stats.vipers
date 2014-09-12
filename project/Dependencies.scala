@@ -4,16 +4,15 @@ object Dependencies {
   private val akkaVersion  = "2.3.5"
   private val sprayVersion = "1.3.1"
 
-  val _common         = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"
-  val _commonTest     = "com.vipers"              %% "common"                 %  "[0.1-SNAPSHOT,)"  % "test" classifier "tests"
-  val _fetcher        = "com.vipers"              %% "fetcher"                %  "[0.1-SNAPSHOT,)"
+  val _common         = "com.vipers"              %% "common"                %  "[0.1-SNAPSHOT,)"
+  val _commonTest     = "com.vipers"              %% "common"                %  "[0.1-SNAPSHOT,)"  % "test" classifier "tests"
+  val _fetcher        = "com.vipers"              %% "fetcher"               %  "[0.1-SNAPSHOT,)"
 
   val logback        = "ch.qos.logback"          %  "logback-classic"        %  "[1.0.13,)"
-  val scalaMeter     = "com.storm-enroute"       %% "scalameter"             %  "[0.7-SNAPSHOT,)"      % "test"
+  val scalaMeter     = "com.storm-enroute"       %% "scalameter"             %  "[0.7-SNAPSHOT,)"  % "test"
   val jbcrypt        = "org.mindrot"             %  "jbcrypt"                %  "[0.3m,)"
   val json4sNative   = "org.json4s"              %% "json4s-native"          %  "[3.2.10,)"
-  val slick          = "com.typesafe.slick"      %% "slick"                  %  "2.1.0,"
-
+  val slick          = "com.typesafe.slick"      %% "slick"                  %  "2.1.0"
   val akkaActor      = "com.typesafe.akka"       %% "akka-actor"             %  akkaVersion
   val akkaSlf4j      = "com.typesafe.akka"       %% "akka-slf4j"             %  akkaVersion
   val scalaTest      = "org.scalatest"           %% "scalatest"              %  "[2.1.3,)"         % "test"

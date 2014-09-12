@@ -31,7 +31,7 @@ Currently none, indexer worker WIP
 
 Execute "gulp build" inside /web/src/main/webapp. This generates a "client" folder inside /web/src/main/resources containing the minified client and its libraries
 
-Run "Boot" (which is inside the "web" sub-project)
+Execute "web/run" in sbt
 
 Navigate to http://localhost:8080/ui/index.html
 
