@@ -1,4 +1,4 @@
-<div ng-if="outfit">
+<div ng-if="outfit && outfit!='null'">
   <!-- Header -->
   <div class="row">
     <div>
@@ -69,6 +69,9 @@
     </table>
   </div>
 </div>
+<div ng-if="outfit=='null'" class="text-center">
+   Outfit Not Found
+</div>
 <div ng-if="!outfit" class="text-center">
-  <i class="fa fa-cog fa-spin fa-5x"></i>
+   <i class="fa fa-cog fa-spin fa-5x"></i>
 </div>

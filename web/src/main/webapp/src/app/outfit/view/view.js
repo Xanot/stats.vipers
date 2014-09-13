@@ -12,7 +12,9 @@ angular.module('outfit-view', ['utils', 'ui.router'])
 
   .controller('OutfitViewController', ['$scope', '$state', '$stateParams', 'Outfit', function($scope, $state, $stateParams, Outfit) {
     function getOutfit(aliasLower) {
-      Outfit.find(aliasLower);
+      Outfit.find(aliasLower).catch(function (err) {
+  $scope.outfit="null" // reason why query failed
+});;
       Outfit.bindOne($scope, 'outfit', aliasLower);
     }
 
