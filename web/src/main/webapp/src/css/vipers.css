@@ -1,3 +1,12 @@
+/* Navbar */
+@media (max-width: 767px) {
+    .navbar-toggle {
+        margin-left: 15px;
+        display: block !important;
+        float: left;
+    }
+}
+
 /* Prevent radius */
 * {
     border-radius: 0 !important;

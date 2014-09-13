@@ -1,4 +1,4 @@
-<div class="row" ng-repeat="post in posts">
+<div ng-repeat="post in posts">
   <h4> {{ post.title }} <small> {{ post.creationDate | amCalendar }} </small></h4>
   <div class="well well-sm">
     <div marked ng-include="post.file">

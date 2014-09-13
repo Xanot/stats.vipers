@@ -14,19 +14,31 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
     pathPrefix("outfit") {
       pathEnd {
         get {
-          encodeResponse(Gzip) {
-            onComplete((fetcherActor ? FetchMultipleOutfitsRequest((Sort.CREATION_DATE, Sort.ASC), Page.FirstTen)).mapTo[List[Outfit]]) {
-              case Success(outfits) => complete(outfits)
-              case Failure(m) => complete(InternalServerError, m.toString)
+          parameter("aliasLower".?) { aliasLower =>
+            encodeResponse(Gzip) {
+              if(!aliasLower.isDefined) {
+                onComplete((fetcherActor ? FetchMultipleOutfitsRequest((Sort.CREATION_DATE, Sort.ASC), Page.FirstTen)).mapTo[List[Outfit]]) {
+                  case Success(outfits) => complete(outfits)
+                  case Failure(m) => complete(InternalServerError, m.toString)
+                }
+              } else {
+                onComplete(
+                  (fetcherActor ? FetchOutfitRequest(aliasLower, None,
+                    Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
+                  )).mapTo[Option[Outfit]]) {
+                  case Success(outfit) => complete(List(outfit))
+                  case Failure(m) => complete(InternalServerError, m.toString)
+                }
+              }
             }
           }
         }
       } ~
-      path(Segment) { alias =>
+      path(Segment) { id =>
         get {
           encodeResponse(Gzip) {
             onComplete(
-              (fetcherActor ? FetchOutfitRequest(Some(alias), None,
+              (fetcherActor ? FetchOutfitRequest(None, Some(id),
                 Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
               )).mapTo[Option[Outfit]]) {
               case Success(outfit) => complete(outfit)
