@@ -1,11 +1,11 @@
-package com.vipers
+package com.vipers.fetcher
 
 import akka.actor._
+import akka.pattern.ask
 import akka.testkit.TestKit
-import com.vipers.fetcher.FetcherActor
+import com.vipers.Test
 import com.vipers.fetcher.model._
 import org.scalatest.WordSpecLike
-import akka.pattern.ask
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Span}
 

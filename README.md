@@ -26,7 +26,7 @@ Client dependencies can be installed by executing "npm install && bower install"
 
 # Database configuration
 
-TODO
+Set the dbms you want to use along with its url and optional user/password in indexer/src/main/resources/database.conf
 
 # How to test-run
 

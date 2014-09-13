@@ -15,7 +15,7 @@ object Projects extends Build {
 
   lazy val indexer = Project("indexer", file("indexer"))
     .settings(basicSettings ++ localPublishSettings ++ scalaMeterSettings:_*)
-    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ Seq(slick, scalaMeter, _fetcher))
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ databaseDependencies ++ Seq(scalaMeter, _fetcher))
 
   lazy val web = Project("web", file("web"))
     .settings(basicSettings ++ assemblySettings ++ scalaMeterSettings:_*)
@@ -24,5 +24,5 @@ object Projects extends Build {
   lazy val common = Project("common", file("common"))
     .settings(basicSettings ++ localPublishSettings:_*)
     .settings(publishArtifact in (Test, packageBin) := true)
-    .settings(libraryDependencies ++= akkaDependencies ++ Seq(scalaTest, scalaMeter, logback, slick))
+    .settings(libraryDependencies ++= akkaDependencies ++ databaseDependencies ++ Seq(scalaTest, scalaMeter, logback))
 }
