@@ -6,36 +6,50 @@ angular.module('outfit-view', ['utils', 'ui.router'])
       .state('outfit-view', {
         url: '/outfit/:aliasOrId',
         controller: 'OutfitViewController',
-        templateUrl: 'app/outfit/view/view.html'
+        templateUrl: 'app/outfit/view/view.html',
+        resolve: {
+          resolveOutfit : ['$q', '$stateParams', 'Outfit', 'AlertService', function($q, $stateParams, Outfit, AlertService) {
+            function getOutfitByAlias(aliasLower) {
+              var query = { aliasLower : aliasLower };
+              Outfit.findAll(query).then(function(response) {
+                deferred.resolve(response[0]);
+              }).catch(function(err) {
+                deferred.reject();
+                AlertService.alert(err.status, err.statusText, "danger")
+              });
+            }
+
+            function getOutfitById(id) {
+              Outfit.find(id).then(function(response) {
+                deferred.resolve(response);
+              }).catch(function(err) {
+                deferred.reject();
+                AlertService.alert(err.status, err.statusText, "danger")
+              });
+            }
+
+            var deferred = $q.defer();
+
+            if($stateParams.aliasOrId.length <= 4) {
+              getOutfitByAlias($stateParams.aliasOrId.toLowerCase())
+            } else {
+              getOutfitById($stateParams.aliasOrId)
+            }
+
+            return deferred.promise;
+          }]
+        }
       })
   }])
 
-  .controller('OutfitViewController', ['$scope', '$state', '$stateParams', 'Outfit', function($scope, $state, $stateParams, Outfit) {
-    function getOutfitByAlias(aliasLower) {
-      var query = { aliasLower : aliasLower };
-      Outfit.findAll(query);
+  .controller('OutfitViewController', ['$scope', '$state', 'Outfit', 'resolveOutfit',
+    function($scope, $state, Outfit, resolveOutfit) {
 
-      $scope.$watch(function () {
-        return Outfit.lastModified();
-      }, function () {
-        $scope.outfit = Outfit.filter(query)[0];
-      });
-    }
-
-    function getOutfitById(id) {
-      Outfit.find(id);
-      Outfit.bindOne($scope, 'outfit', id);
-    }
+    Outfit.bindOne($scope, 'outfit', resolveOutfit.id);
 
     $scope.leaderHref = function(id) {
       return $state.href('player.view', {id: id})
     };
-
-    if($stateParams.aliasOrId.length <= 4) {
-      getOutfitByAlias($stateParams.aliasOrId.toLowerCase())
-    } else {
-      getOutfitById($stateParams.aliasOrId)
-    }
   }])
 
   .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {

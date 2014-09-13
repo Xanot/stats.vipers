@@ -9,6 +9,20 @@ angular.module('utils', ['constants'])
     };
   }])
 
+  .factory('AlertService', ['$alert', function($alert) {
+    return {
+      alert : function(title, content, type) {
+        $alert({
+          title: "" + title,
+          content: content,
+          type: type,
+          duration: 2,
+          placement: 'top-right'
+        });
+      }
+    }
+  }])
+
   .filter('outfitRank', function() {
     return function(rank) {
       switch(rank) {
@@ -29,22 +43,5 @@ angular.module('utils', ['constants'])
           break;
       }
     };
-  })
-
-  .factory('ProgressInterceptor', ['$q', function($q) {
-    return {
-      request: function (config) {
-        NProgress.start();
-        return config || $q.when(config);
-      },
-      response: function (response) {
-        NProgress.done();
-        return response || $q.when(response);
-      },
-      responseError: function (rejection) {
-        NProgress.done();
-        return $q.reject(rejection);
-      }
-    }
-  }]);
+  });
 

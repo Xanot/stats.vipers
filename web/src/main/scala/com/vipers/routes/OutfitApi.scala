@@ -26,7 +26,12 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
                   (fetcherActor ? FetchOutfitRequest(aliasLower, None,
                     Some(EnrichOutfit(withLeaderCharacter = Some(EnrichCharacter(withFaction = true)), Some(EnrichCharacter())))
                   )).mapTo[Option[Outfit]]) {
-                  case Success(outfit) => complete(List(outfit))
+                  case Success(outfit) => complete {
+                    if(outfit.isDefined)
+                      List(outfit.get)
+                    else
+                      NotFound
+                  }
                   case Failure(m) => complete(InternalServerError, m.toString)
                 }
               }
