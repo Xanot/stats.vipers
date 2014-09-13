@@ -13,9 +13,13 @@ object Projects extends Build {
     .settings(basicSettings ++ localPublishSettings ++ scalaMeterSettings:_*)
     .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter))
 
+  lazy val indexer = Project("indexer", file("indexer"))
+    .settings(basicSettings ++ localPublishSettings ++ scalaMeterSettings:_*)
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ Seq(slick, scalaMeter, _fetcher))
+
   lazy val web = Project("web", file("web"))
     .settings(basicSettings ++ assemblySettings ++ scalaMeterSettings:_*)
-    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter, _fetcher))
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ sprayDependencies ++ Seq(scalaMeter, _fetcher, _indexer))
 
   lazy val common = Project("common", file("common"))
     .settings(basicSettings ++ localPublishSettings:_*)

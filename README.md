@@ -18,6 +18,7 @@ The following sub-projects need to be served locally:
 
    * "common" -> Execute "common/publishLocal" using sbt
    * "fetcher" -> Execute "fetcher/publishLocal"
+   * "indexer" -> Execute "indexer/publishLocal"
 
 Note: Don't forget to publish it again whenever you make any changes to a sub-project
 
@@ -25,7 +26,7 @@ Client dependencies can be installed by executing "npm install && bower install"
 
 # Database configuration
 
-Currently none, indexer worker WIP
+TODO
 
 # How to test-run
 
