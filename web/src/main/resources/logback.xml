@@ -1,4 +1,6 @@
 <configuration>
+    <logger name="scala.slick" level="WARN"/>
+    
     <root level="ALL">
         <appender class="ch.qos.logback.core.ConsoleAppender">
             <encoder>

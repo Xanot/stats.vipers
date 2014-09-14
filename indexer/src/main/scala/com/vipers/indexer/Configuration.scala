@@ -7,6 +7,7 @@ private[indexer] object Configuration {
   object Database {
     private lazy val config = ConfigFactory.load("database.conf")
     val dbms = config.getString("dbms")
+    val driver = config.getString(s"$dbms.driver")
     val url = config.getString(s"$dbms.url")
     val user : Option[String] = {
       try { Some(config.getString(s"$dbms.user")) }
