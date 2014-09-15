@@ -19,6 +19,7 @@ The following sub-projects need to be served locally:
    * "common" -> Execute "common/publishLocal" using sbt
    * "fetcher" -> Execute "fetcher/publishLocal"
    * "indexer" -> Execute "indexer/publishLocal"
+   * "notifier" -> Execute "notifier/publishLocal"
 
 Note: Don't forget to publish it again whenever you make any changes to a sub-project
 
