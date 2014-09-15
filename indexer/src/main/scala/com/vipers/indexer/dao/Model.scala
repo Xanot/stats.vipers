@@ -1,6 +1,6 @@
 package com.vipers.indexer.dao
 
-private[indexer] object Model {
+object Model {
   trait WithID {
     val id : String
   }

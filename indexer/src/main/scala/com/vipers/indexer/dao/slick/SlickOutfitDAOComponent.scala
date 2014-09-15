@@ -7,7 +7,7 @@ import com.vipers.indexer.dao.Model.Outfit
 private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with OutfitDAOComponent { this: SlickDB =>
   import driver.simple._
 
-  override val outfitDAO = new SlickOutfitDAO
+  override lazy val outfitDAO = new SlickOutfitDAO
 
   sealed class SlickOutfitDAO extends SlickDAO[Outfit] with OutfitDAO {
     override val table = TableQuery[Outfits]

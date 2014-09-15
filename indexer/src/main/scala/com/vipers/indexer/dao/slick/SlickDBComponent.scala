@@ -7,7 +7,7 @@ import scala.slick.driver._
 import scala.slick.jdbc.JdbcBackend
 import scala.slick.jdbc.JdbcBackend.Database
 
-private[indexer] class SlickDBComponent extends SlickOutfitDAOComponent with SlickCharacterDAOComponent with SlickDB {
+private[indexer] class SlickDBComponent extends SlickDB with SlickOutfitDAOComponent {
   override protected val db: JdbcBackend.Database = {
     Database.forDataSource {
       val dbUrl : String = Configuration.Database.url
@@ -30,6 +30,17 @@ private[indexer] class SlickDBComponent extends SlickOutfitDAOComponent with Sli
       case "sqlite" => SQLiteDriver
       case "derby" => DerbyDriver
       case "hsqldb" => HsqldbDriver
+    }
+  }
+
+  { // Create tables
+    import driver.simple._
+    try {
+      withTransaction { implicit s =>
+        outfitDAO.table.ddl.create
+      }
+    } catch {
+      case _ : Exception => // Tables already created
     }
   }
 }

@@ -11,7 +11,7 @@ private[indexer] trait SlickDAOComponent extends DAOComponent { this: SlickDB =>
     val table : TableQuery[_]
 
     private lazy val genericTable = table.asInstanceOf[TableQuery[TableWithID]]
-    private val findCompiled = Compiled((id : Column[String]) => genericTable.filter(_.id === id))
+    private lazy val findCompiled = Compiled((id : Column[String]) => genericTable.filter(_.id === id))
 
     override def find(id: String)(implicit s : Session) : Option[Model] = findCompiled(id).firstOption
     override def update(model: Model)(implicit s : Session) : Boolean = findCompiled(model.id).update(model) == 1

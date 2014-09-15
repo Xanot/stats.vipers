@@ -1,6 +1,7 @@
 .idea
 .idea_modules
 .history
+*.db
 bin
 client
 scala-2.11
