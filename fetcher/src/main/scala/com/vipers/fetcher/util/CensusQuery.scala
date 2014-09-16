@@ -1,6 +1,7 @@
 package com.vipers.fetcher.util
 
-import com.vipers.fetcher.model.Sort.{Order, ASC, DESC}
+import com.vipers.model.Sort
+import Sort.{Order, ASC, DESC}
 import com.vipers.fetcher.util.CensusQuery.{Search, CensusQueryCommand}
 
 private[fetcher] sealed case class CensusQuery(search : Option[Search], commands : CensusQueryCommand*) {

@@ -1,7 +1,8 @@
 package com.vipers.fetcher.util
 
 import com.vipers.Test
-import com.vipers.fetcher.model.Sort.{ASC, DESC}
+import com.vipers.model.{Sort => SortModel}
+import SortModel.{ASC, DESC}
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
 import com.vipers.fetcher.util.CensusQuery.Search
 import org.scalatest.WordSpecLike

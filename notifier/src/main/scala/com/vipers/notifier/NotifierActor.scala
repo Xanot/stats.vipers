@@ -11,7 +11,6 @@ import org.eclipse.jetty.server.{ServerConnector, Server}
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 import akka.pattern.pipe
-
 import scala.concurrent.duration.FiniteDuration
 
 class NotifierActor extends Actor with Logging {
@@ -71,7 +70,8 @@ object NotifierActor {
   private val server : Server = {
     val server = new Server()
     val connector = new ServerConnector(server)
-    connector.setPort(8081)
+    connector.setHost(Configuration.WebSocket.host)
+    connector.setPort(Configuration.WebSocket.port)
     server.addConnector(connector)
     val context = new ServletContextHandler
     context.setContextPath("/")

@@ -3,7 +3,7 @@ package com.vipers.indexer.dao
 import java.sql.SQLException
 
 import com.vipers.dao.DAOTest
-import com.vipers.indexer.dao.Model.Outfit
+import com.vipers.model.Outfit
 import com.vipers.indexer.dao.slick.SlickOutfitDAOComponent
 import org.scalatest.WordSpecLike
 

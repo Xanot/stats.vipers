@@ -2,7 +2,7 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.OutfitDAOComponent
-import com.vipers.indexer.dao.Model.Outfit
+import com.vipers.model.Outfit
 
 private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with OutfitDAOComponent { this: SlickDB =>
   import driver.simple._

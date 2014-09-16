@@ -1,8 +1,8 @@
 package com.vipers.routes
 
 import akka.pattern.ask
-import com.vipers.indexer.dao.Model._
 import com.vipers.indexer.IndexerActor._
+import com.vipers.model.Outfit
 import com.vipers.{ApiActor, JsonRoute}
 import spray.httpx.encoding.Gzip
 import scala.util.{Failure, Success}

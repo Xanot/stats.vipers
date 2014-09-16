@@ -1,80 +1,76 @@
 package com.vipers.fetcher.util
 
 import com.vipers.fetcher.Configuration
-import com.vipers.fetcher.model._
-import com.vipers.fetcher.model.Sort.{Sort => SortModel, CREATION_DATE}
+import com.vipers.model.Page
+import com.vipers.model.Sort.{Sort => SortModel, MEMBER_COUNT, CREATION_DATE}
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand.{Sort => SortQ}
 import com.vipers.fetcher.util.CensusQuery.Search
 import spray.http.Uri
-import Wrapper.{RichEnrichCharacter, RichEnrichOutfit}
 
 private[fetcher] object ApiUrlBuilder {
   private val indexUri = Uri(Configuration.apiIndex).withQuery(Lang("en").construct)
   //================================================================================
   // Outfit
   //================================================================================
-  private def getOutfit(s : Search, enrichOutfit : Option[EnrichOutfit]) : Uri = {
-    val params = enrichOutfit.map { enrichOutfit =>
-      CensusQuery(Some(s), Join(enrichOutfit.toJoin:_*)).construct
-    }.getOrElse {
-      CensusQuery(Some(s)).construct
+  private def getOutfit(s : Search, isSimple : Boolean) : Uri = {
+    val params = isSimple match {
+      case true => CensusQuery(Some(s)).construct
+      case false => CensusQuery(Some(s),
+        Join(
+          CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())),
+          OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin()))))
+        )
+      ).construct
     }
     construct(Uri.Path("outfit"), params.toMap)
   }
 
-  def getOutfits(s : SortModel, p : Page) : Uri = {
+  def getSimpleOutfits(s : SortModel, p : Page) : Uri = {
     val sort = SortQ(
       (s._1 match {
         case CREATION_DATE => "time_created"
+        case MEMBER_COUNT => "member_count"
       }, s._2)
     )
     val params = CensusQuery(None, sort).construct
     construct(Uri.Path("outfit"), params.toMap ++ withPage(p))
   }
 
-  def getOutfitByAlias(outfitAlias : String, enrichOutfit : Option[EnrichOutfit] = None) : Uri = {
-    getOutfit(Search("alias_lower", outfitAlias.toLowerCase), enrichOutfit)
+  def getOutfitByAlias(outfitAlias : String, isSimple : Boolean) : Uri = {
+    getOutfit(Search("alias_lower", outfitAlias.toLowerCase), isSimple)
   }
 
-  def getOutfitById(outfitId : String, enrichOutfit : Option[EnrichOutfit] = None) : Uri = {
-    getOutfit(Search("outfit_id", outfitId), enrichOutfit)
+  def getOutfitById(outfitId : String, isSimple : Boolean) : Uri = {
+    getOutfit(Search("outfit_id", outfitId), isSimple)
   }
 
-  private def getOutfitCharacters(s : Search, page : Page, enrich : Option[EnrichCharacter]) : Uri = {
-    val params = enrich.map { enrichChar =>
-      CensusQuery(Some(s), Join(enrichChar.toJoin())).construct
-    }.getOrElse {
-      CensusQuery(Some(s), Join(CharacterJoin())).construct
-    }
+  private def getOutfitCharacters(s : Search, page : Page) : Uri = {
+    val params = CensusQuery(Some(s), Join(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin())))).construct
     construct(Uri.Path("outfit_member_extended"), params.toMap ++ withPage(page))
   }
 
-  def getOutfitCharactersByAlias(alias : String, page : Page, enrich : Option[EnrichCharacter] = None) : Uri = {
-    getOutfitCharacters(Search("alias_lower", alias.toLowerCase), page, enrich)
+  def getOutfitCharactersByAlias(alias : String, page : Page) : Uri = {
+    getOutfitCharacters(Search("alias_lower", alias.toLowerCase), page)
   }
 
-  def getOutfitCharactersById(outfitId : String, page : Page, enrich : Option[EnrichCharacter] = None) : Uri = {
-    getOutfitCharacters(Search("outfit_id", outfitId), page, enrich)
+  def getOutfitCharactersById(outfitId : String, page : Page) : Uri = {
+    getOutfitCharacters(Search("outfit_id", outfitId), page)
   }
 
   //================================================================================
   // Character
   //================================================================================
-  private def getCharacters(s : Search, enrich : Option[EnrichCharacter], ids : String*) : Uri = {
-    val params = enrich.map { enrichChar =>
-      (CensusQuery(Some(s)) ++ enrichChar.toQuery).construct
-    }.getOrElse {
-      CensusQuery(Some(s)).construct
-    }
+  private def getCharacters(s : Search, ids : String*) : Uri = {
+    val params = CensusQuery(Some(s), Join(FactionJoin())).construct
     construct(Uri.Path("character"), params.toMap)
   }
 
-  def getCharactersById(enrich : Option[EnrichCharacter], ids : String*) : Uri = {
-    getCharacters(Search("character_id", ids.mkString(",")), enrich)
+  def getCharactersById(ids : String*) : Uri = {
+    getCharacters(Search("character_id", ids.mkString(",")))
   }
-  def getCharacterByName(name : String, enrich : Option[EnrichCharacter]) : Uri = {
-    getCharacters(Search("name.first_lower", name.toLowerCase), enrich)
+  def getCharacterByName(name : String) : Uri = {
+    getCharacters(Search("name.first_lower", name.toLowerCase))
   }
 
   //================================================================================

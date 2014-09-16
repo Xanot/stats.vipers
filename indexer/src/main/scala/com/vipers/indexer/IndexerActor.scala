@@ -5,9 +5,9 @@ import akka.actor.{Props, Actor}
 import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
-import com.vipers.fetcher.model.{FetchOutfitRequest, Outfit => FetcherOutfit}
+import com.vipers.fetcher.FetcherActor.{FetchOutfitResponse, FetchOutfitRequest}
+import com.vipers.model._
 import com.vipers.indexer.IndexerActor.{GetMultipleOutfits, GetOutfit}
-import com.vipers.indexer.dao.Model.Outfit
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import scala.concurrent.Future
 import akka.pattern.pipe
@@ -23,14 +23,16 @@ class IndexerActor extends Actor with Logging {
   }
 
   def receive = {
-    case m : Some[FetcherOutfit] =>
-      // TODO: Index
-      val outfit = m.get
-      db.withTransaction { implicit s =>
-        db.outfitDAO.create(Outfit(outfit.name, outfit.name.toLowerCase, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId, outfit.memberCount, outfit.id, outfit.creationDate))
+    case m : FetchOutfitResponse =>
+      Future {
+        m.contents.map { case (outfit, leader, members) =>
+          // TODO: Index
+          db.withTransaction { implicit s =>
+            db.outfitDAO.create(outfit)
 
-        // TODO: Notify client here
-        log.info(db.outfitDAO.find(outfit.id).get.toString)
+            // TODO: Notify client here
+          }
+        }
       }
 
     case GetOutfit(alias, id) =>
@@ -39,13 +41,13 @@ class IndexerActor extends Actor with Logging {
           if(alias.isDefined) {
             db.outfitDAO.findByAliasLower(alias.get).orElse {
               // TODO: Schedule indexing if not found
-              fetcherActor ! FetchOutfitRequest(alias, None, None)
+              fetcherActor ! FetchOutfitRequest(alias, None)
               None
             }
           } else if(id.isDefined) {
             db.outfitDAO.findByAliasLower(id.get).orElse {
               // TODO: Schedule indexing if not found
-              fetcherActor ! FetchOutfitRequest(id, None, None)
+              fetcherActor ! FetchOutfitRequest(id, None)
               None
             }
           }
@@ -58,6 +60,8 @@ class IndexerActor extends Actor with Logging {
           db.outfitDAO.findAll
         }
       } pipeTo sender
+
+    case e : AnyRef => log.error(e.toString)
   }
 }
 

@@ -1,4 +1,4 @@
-package com.vipers.fetcher.model
+package com.vipers.model
 
 import scala.{None => OptionNone}
 
@@ -21,4 +21,5 @@ object Sort {
 
   sealed trait Criteria
   case object CREATION_DATE extends Criteria
+  case object MEMBER_COUNT extends Criteria
 }
