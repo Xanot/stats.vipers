@@ -1,6 +1,7 @@
 package com.vipers.indexer.dao
 
 import com.vipers.dbms.DB
+import com.vipers.fetcher.FetcherActor.OutfitMember
 import com.vipers.model._
 
 private[indexer] object DAOs {
@@ -9,6 +10,7 @@ private[indexer] object DAOs {
       def find(id: String)(implicit s : Session) : Option[T]
       def findAll(implicit s : Session) : List[T]
       def create(model: T)(implicit s : Session) : Boolean
+      def createAll(models : T*)(implicit s : Session) : Boolean
       def update(model: T)(implicit s : Session) : Boolean
       def deleteById(id: String)(implicit s : Session) : Boolean
     }
@@ -18,6 +20,7 @@ private[indexer] object DAOs {
     val outfitDAO : OutfitDAO
 
     trait OutfitDAO { this: DAO[Outfit] =>
+      def findLeader(outfitId : String)(implicit s : Session) : Option[Character]
       def findByNameLower(nameLower : String)(implicit s : Session) : Option[Outfit]
       def findByAliasLower(aliasLower : String)(implicit s : Session) : Option[Outfit]
     }
@@ -26,8 +29,16 @@ private[indexer] object DAOs {
   trait CharacterDAOComponent extends DAOComponent { this: DB =>
     val characterDAO : CharacterDAO
 
-    trait CharacterDAO { this: DAO[Outfit] =>
-      def findByName(name : String)(implicit s : Session) = ???
+    trait CharacterDAO { this: DAO[Character] =>
+      def findByNameLower(name : String)(implicit s : Session) : Option[Character]
+    }
+  }
+
+  trait OutfitMembershipDAOComponent extends DAOComponent { this: DB =>
+    val outfitMembershipDAO : OutfitMembershipDAO
+
+    trait OutfitMembershipDAO { this: DAO[OutfitMembership] =>
+      def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember]
     }
   }
 }

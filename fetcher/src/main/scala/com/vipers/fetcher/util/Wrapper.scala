@@ -8,7 +8,7 @@ private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
     def toOutfit : Option[Outfit] = {
       check {
-        val (JString(name), JString(nameLower), JString(alias), JString(aliasLower), JString(id), JString(memberCount), JString(leaderCharacterId), JString(timeCreatedDate)) = {
+        val (JString(name), JString(nameLower), JString(alias), JString(aliasLower), JString(id), JString(memberCount), JString(leaderCharacterId), JString(factionCodeTag), JString(timeCreatedDate)) = {
           (
             json \ "name",
             json \ "name_lower",
@@ -17,17 +17,19 @@ private[fetcher] object Wrapper {
             json \ "outfit_id",
             json \ "member_count",
             json \ "leader_character_id",
+            json \ "leader" \ "faction" \ "code_tag",
             json \ "time_created"
-            )
+          )
         }
 
-        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, id, timeCreatedDate.toLong)
+        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, factionCodeTag, id, timeCreatedDate.toLong)
       }
     }
 
     def toCharacter : Option[Character] = {
       check {
         val JString(name) = json \ "name" \ "first"
+        val JString(nameLower) = json \ "name" \ "first_lower"
         val JString(id) = json \ "character_id"
 
         val br = json \ "battle_rank"
@@ -59,6 +61,7 @@ private[fetcher] object Wrapper {
 
         Character(
           name,
+          nameLower,
           id,
           battleRank.toShort,
           battleRankPercentToNext.toShort,
@@ -77,15 +80,16 @@ private[fetcher] object Wrapper {
 
     def toOutfitMembership : Option[OutfitMembership] = {
       check {
-        val (JString(outfitId), JString(rank), JString(rankOrdinal), JString(memberSinceDate)) = {
+        val (JString(outfitId), JString(characterId), JString(rank), JString(rankOrdinal), JString(memberSinceDate)) = {
           (
             json \ "outfit_id",
+            json \ "character_id",
             json.findField{case (k, v) => k.endsWith("rank")}.get._2, // match rank or member_rank
             json.findField{case (k, v) => k.endsWith("ordinal")}.get._2,
             json \ "member_since"
             )
         }
-        OutfitMembership(outfitId, rank, rankOrdinal.toByte, memberSinceDate.toLong)
+        OutfitMembership(outfitId, characterId, rank, rankOrdinal.toByte, memberSinceDate.toLong)
       }
     }
 

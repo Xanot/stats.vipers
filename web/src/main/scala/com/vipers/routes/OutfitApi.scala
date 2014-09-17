@@ -23,14 +23,14 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
                   case Failure(m) => complete(InternalServerError, m.toString)
                 }
               } else {
-                onComplete(
-                  (indexerActor ? GetOutfit(aliasLower, None)).mapTo[Option[Outfit]]) {
-                  case Success(outfit) => complete {
-                    if(outfit.isDefined)
-                      List(outfit.get)
-                    else
-                      NotFound
-                  }
+                onComplete(indexerActor ? GetOutfitRequest(aliasLower, None)) {
+                  case Success(response) =>
+                    complete {
+                      response match {
+                        case m: GetOutfitResponse => List(m)
+                        case BeingIndexed => NotFound
+                      }
+                    }
                   case Failure(m) => complete(InternalServerError, m.toString)
                 }
               }
@@ -41,9 +41,14 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
       path(Segment) { id =>
         get {
           encodeResponse(Gzip) {
-            onComplete(
-              (indexerActor ? GetOutfit(None, Some(id))).mapTo[Option[Outfit]]) {
-              case Success(outfit) => complete(outfit)
+            onComplete(indexerActor ? GetOutfitRequest(None, Some(id))) {
+              case Success(response) =>
+                complete {
+                  response match {
+                    case m: GetOutfitResponse => m
+                    case BeingIndexed => NotFound
+                  }
+                }
               case Failure(m) => complete(InternalServerError, m.toString)
             }
           }

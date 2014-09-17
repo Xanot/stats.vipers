@@ -9,12 +9,13 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   // Outfit
   //================================================================================
   "getOutfitByAlias uri" should "be constructed" in {
-    // Simple
+    // Simple (with leader and faction)
     {
       val uri = ApiUrlBuilder.getOutfitByAlias("vipr", isSimple = true)
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
-      uri.query.length should be(2)
+      uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
+      uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id(faction^inject_at:faction)")
       uri.query.get("alias_lower").get should be("vipr")
     }
 
@@ -30,12 +31,13 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   }
 
   "getOutfitById uri" should "be constructed" in {
-    // Simple
+    // Simple (with leader and faction)
     {
       val uri = ApiUrlBuilder.getOutfitById("1234", isSimple = true)
       uri.path.tail.toString().endsWith("outfit") should be(right = true)
-      uri.query.length should be(2)
+      uri.query.length should be(3)
       uri.query.get("c:lang").get should be("en")
+      uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id(faction^inject_at:faction)")
       uri.query.get("outfit_id").get should be("1234")
     }
 
@@ -79,9 +81,10 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   "getOutfits uri" should "be constructed" in {
     val uri = ApiUrlBuilder.getSimpleOutfits((Sort.CREATION_DATE, Sort.ASC), Page(Some(1), Some(5)))
     uri.path.tail.toString().endsWith("outfit") should be(right = true)
-    uri.query.length should be(4)
+    uri.query.length should be(5)
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:limit").get should be("1")
+    uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id(faction^inject_at:faction)")
     uri.query.get("c:start").get should be("5")
     uri.query.get("c:sort").get should be("time_created:1")
   }

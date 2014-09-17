@@ -19,7 +19,7 @@
       <tr ng-repeat="outfit in outfits">
         <td> {{ $index + 1 }}</td>
         <td>
-          <a href="{{ outfitHref(outfit.aliasLower) }}" class="{{ outfit.leaderCharacter.faction.codeTag }}">
+          <a href="{{ outfitHref(outfit) }}" class="{{ outfit.factionCodeTag }}">
             {{ outfit.name }}
           </a>
         </td>

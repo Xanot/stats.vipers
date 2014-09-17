@@ -7,7 +7,9 @@ import scala.slick.driver._
 import scala.slick.jdbc.JdbcBackend
 import scala.slick.jdbc.JdbcBackend.Database
 
-private[indexer] class SlickDBComponent extends SlickDB with SlickOutfitDAOComponent {
+private[indexer] class SlickDBComponent extends SlickDB
+  with SlickOutfitDAOComponent with SlickCharacterDAOComponent with SlickOutfitMembershipDAOComponent {
+
   override protected val db: JdbcBackend.Database = {
     Database.forDataSource {
       val dbUrl : String = Configuration.Database.url
@@ -37,7 +39,7 @@ private[indexer] class SlickDBComponent extends SlickDB with SlickOutfitDAOCompo
     import driver.simple._
     try {
       withTransaction { implicit s =>
-        outfitDAO.table.ddl.create
+        (characterDAO.table.ddl ++ outfitDAO.table.ddl ++ outfitMembershipDAO.table.ddl).create
       }
     } catch {
       case _ : Exception => // Tables already created

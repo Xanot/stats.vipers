@@ -6,9 +6,9 @@ import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
 import com.vipers.fetcher.FetcherActor.{FetchOutfitResponse, FetchOutfitRequest}
-import com.vipers.model._
-import com.vipers.indexer.IndexerActor.{GetMultipleOutfits, GetOutfit}
+import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
+import com.vipers.model.{Outfit, OutfitMembership, Character}
 import scala.concurrent.Future
 import akka.pattern.pipe
 
@@ -18,37 +18,32 @@ class IndexerActor extends Actor with Logging {
   private val db : SlickDBComponent = new SlickDBComponent
   private val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
 
-  override def preStart(): Unit = {
-    // TODO: Schedule here
-  }
-
   def receive = {
     case m : FetchOutfitResponse =>
       Future {
-        m.contents.map { case (outfit, leader, members) =>
-          // TODO: Index
+        m.contents.map { case (outfit, members) =>
+          // Index
           db.withTransaction { implicit s =>
+            db.characterDAO.createAll(members.map(_._1):_*)
             db.outfitDAO.create(outfit)
-
+            db.outfitMembershipDAO.createAll(members.map(_._2):_*)
             // TODO: Notify client here
           }
         }
       }
 
-    case GetOutfit(alias, id) =>
+    case GetOutfitRequest(alias, id) =>
       Future {
         db.withSession { implicit s =>
           if(alias.isDefined) {
-            db.outfitDAO.findByAliasLower(alias.get).orElse {
-              // TODO: Schedule indexing if not found
+            db.outfitDAO.findByAliasLower(alias.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
               fetcherActor ! FetchOutfitRequest(alias, None)
-              None
+              BeingIndexed
             }
           } else if(id.isDefined) {
-            db.outfitDAO.findByAliasLower(id.get).orElse {
-              // TODO: Schedule indexing if not found
-              fetcherActor ! FetchOutfitRequest(id, None)
-              None
+            db.outfitDAO.find(id.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
+              fetcherActor ! FetchOutfitRequest(None, id)
+              BeingIndexed
             }
           }
         }
@@ -63,12 +58,48 @@ class IndexerActor extends Actor with Logging {
 
     case e : AnyRef => log.error(e.toString)
   }
+
+  private def getOutfitResponse(outfit : Outfit)(implicit s : db.Session) = {
+    new GetOutfitResponse(outfit.name, outfit.nameLower, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId,
+      outfit.memberCount, outfit.factionCodeTag, outfit.id, outfit.creationDate, db.outfitDAO.findLeader(outfit.id).get,
+      db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id).map { s =>
+        CharacterWithMembership(s._1.name : String, s._1.nameLower : String, s._1.id : String, s._1.battleRank : Short,
+          s._1.battleRankPercent : Short, s._1.availableCerts : Int, s._1.earnedCerts : Int, s._1.certPercent : Short,
+          s._1.spentCerts : Int, s._1.factionCodeTag : String, s._1.creationDate : Long, s._1.lastLoginDate : Long,
+          s._1.lastSaveDate : Long, s._1.loginCount : Int, s._1.minutesPlayed : Int, s._2)
+      })
+  }
 }
 
 object IndexerActor {
+  val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+
   sealed trait IndexerMessage
-  case class GetOutfit(aliasLower : Option[String], id : Option[String]) extends IndexerMessage
+
+  // Received
+  case class GetOutfitRequest(aliasLower : Option[String], id : Option[String]) extends IndexerMessage
   case object GetMultipleOutfits extends IndexerMessage
 
-  val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+  // Sent
+  case object BeingIndexed extends IndexerMessage
+  case class GetOutfitResponse(name : String, nameLower : String, alias : String, aliasLower : String,
+                          leaderCharacterId : String, memberCount : Int, factionCodeTag : String, id : String, creationDate : Long,
+                          leader : Character, members : List[CharacterWithMembership]) extends IndexerMessage
+
+  private[indexer] case class CharacterWithMembership(name : String,
+                                                      nameLower : String,
+                                                      id : String,
+                                                      battleRank : Short,
+                                                      battleRankPercent : Short,
+                                                      availableCerts : Int,
+                                                      earnedCerts : Int,
+                                                      certPercent : Short,
+                                                      spentCerts : Int,
+                                                      factionCodeTag : String,
+                                                      creationDate : Long,
+                                                      lastLoginDate : Long,
+                                                      lastSaveDate : Long,
+                                                      loginCount : Int,
+                                                      minutesPlayed : Int,
+                                                      membership : OutfitMembership)
 }

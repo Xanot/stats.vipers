@@ -18,6 +18,7 @@ private[indexer] trait SlickDAOComponent extends DAOComponent { this: SlickDB =>
     override def findAll(implicit s : Session) : List[Model] = genericTable.list
     override def deleteById(id: String)(implicit s : Session) : Boolean = findCompiled(id).delete == 1
     override def create(model: Model)(implicit s : Session) : Boolean = genericTable.insert(model) == 1
+    override def createAll(models : Model*)(implicit s : Session) : Boolean = genericTable.insertAll(models:_*).get == models.length
 
     protected abstract class TableWithID(tag : Tag, name : String) extends Table[Model](tag, name) {
       def id = column[String]("id", O.PrimaryKey, O.DBType("VARCHAR(30)"))

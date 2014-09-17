@@ -10,10 +10,12 @@ case class Outfit(name : String,
                   aliasLower : String,
                   leaderCharacterId : String,
                   memberCount : Int,
+                  factionCodeTag : String,
                   override val id : String,
                   creationDate : Long) extends WithID
 
 case class Character(name : String,
+                     nameLower : String,
                      override val id : String,
 
                      battleRank : Short,
@@ -33,6 +35,7 @@ case class Character(name : String,
                      minutesPlayed : Int) extends WithID
 
 case class OutfitMembership(outfitId : String,
+                            override val id : String, // Character id
                             outfitRank : String,
                             outfitRankOrdinal : Byte,
-                            outfitMemberSinceDate : Long)
+                            outfitMemberSinceDate : Long) extends WithID

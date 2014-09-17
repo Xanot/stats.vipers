@@ -15,13 +15,19 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   private def getOutfit(s : Search, isSimple : Boolean) : Uri = {
     val params = isSimple match {
-      case true => CensusQuery(Some(s)).construct
-      case false => CensusQuery(Some(s),
-        Join(
-          CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())),
-          OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin()))))
-        )
-      ).construct
+      case true =>
+        CensusQuery(Some(s),
+          Join(
+            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin()))
+          )
+        ).construct
+      case false =>
+        CensusQuery(Some(s),
+          Join(
+            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())),
+            OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin()))))
+          )
+        ).construct
     }
     construct(Uri.Path("outfit"), params.toMap)
   }
@@ -33,7 +39,8 @@ private[fetcher] object ApiUrlBuilder {
         case MEMBER_COUNT => "member_count"
       }, s._2)
     )
-    val params = CensusQuery(None, sort).construct
+    val join = Join(CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())))
+    val params = CensusQuery(None, sort, join).construct
     construct(Uri.Path("outfit"), params.toMap ++ withPage(p))
   }
 

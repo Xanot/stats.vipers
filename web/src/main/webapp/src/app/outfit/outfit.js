@@ -16,8 +16,14 @@ angular.module('outfit', ['outfit-view', 'utils', 'ui.router'])
       OutfitBasic.bindAll($scope, 'outfits', {});
     }
 
-    $scope.outfitHref = function(aliasLower) {
-      return $state.href("outfit-view", {aliasOrId : aliasLower});
+    $scope.outfitHref = function(outfit) {
+      if(outfit) {
+        if(outfit.aliasLower) {
+          return $state.href("outfit-view", {aliasOrId : outfit.aliasLower});
+        } else {
+          return $state.href("outfit-view", {aliasOrId : outfit.id});
+        }
+      }
     };
 
     $scope.outfitHrefSearch = function(s) {

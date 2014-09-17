@@ -48,7 +48,6 @@ class FetcherActor extends Actor {
     case m @ FetchSimpleMultipleOutfitsRequest(sort, page) =>
       Future {
         val JArray(outfits) = sendRequest(ApiUrlBuilder.getSimpleOutfits(sort, page)) \ "outfit_list"
-        println(outfits)
         val list = mutable.ListBuffer.empty[Outfit]
         outfits.foreach { outfitJson =>
           list += outfitJson.toOutfit.get
@@ -80,7 +79,7 @@ class FetcherActor extends Actor {
         }
         json \ "outfit_list" match {
           case JArray(parent) if parent.nonEmpty =>
-            FetchOutfitResponse(Some(parent(0).toOutfit.get, (parent(0) \ "leader").toCharacter.get, {
+            FetchOutfitResponse(Some(parent(0).toOutfit.get, {
               val list = mutable.ListBuffer.empty[OutfitMember]
               val JArray(parents) = parent(0) \ "members"
 
@@ -141,7 +140,7 @@ object FetcherActor {
   case class FetchSimpleMultipleOutfitsRequest(sort : Sort, page : Page)
 
   case class FetchOutfitRequest(alias : Option[String], id : Option[String])
-  case class FetchOutfitResponse(contents : Option[(Outfit, Character, Seq[OutfitMember])])
+  case class FetchOutfitResponse(contents : Option[(Outfit, Seq[OutfitMember])])
 
   case class FetchOutfitCharactersRequest(alias : Option[String], id : Option[String], page : Page)
   case class FetchOutfitCharactersResponse(total : Int, characters : Seq[OutfitMember])

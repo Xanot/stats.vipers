@@ -3,43 +3,70 @@ package com.vipers.indexer.dao
 import java.sql.SQLException
 
 import com.vipers.dao.DAOTest
-import com.vipers.model.Outfit
-import com.vipers.indexer.dao.slick.SlickOutfitDAOComponent
+import com.vipers.model.{Character, Outfit}
+import com.vipers.indexer.dao.slick.{SlickCharacterDAOComponent, SlickOutfitDAOComponent}
 import org.scalatest.WordSpecLike
 
-class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest with SlickOutfitDAOComponent {
+class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
+  with SlickOutfitDAOComponent with SlickCharacterDAOComponent {
+
   import driver.simple._
 
   override def beforeAll(): Unit = {
     withTransaction { implicit s =>
-      outfitDAO.table.ddl.create
+      (outfitDAO.table.ddl ++ characterDAO.table.ddl).create
     }
   }
 
   override def afterAll(): Unit = {
     withTransaction { implicit s =>
-      outfitDAO.table.ddl.drop
+      (outfitDAO.table.ddl ++ characterDAO.table.ddl).drop
     }
   }
 
   "Outfit" should {
     "be created" in {
+      val char = Character(
+        "TestLeader",
+        "test",
+        "5428013610391601489",
+        90,
+        20,
+        900,
+        800,
+        80,
+        9000,
+        "VS",
+        System.currentTimeMillis(),
+        System.currentTimeMillis(),
+        System.currentTimeMillis(),
+        100,
+        15000
+      )
+
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "37523756405021402", 1408310892)) should be(true)
+        characterDAO.create(char)
+        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "VS", "37523756405021402", 1408310892)) should be(true)
       }
 
       // duplicate id
       intercept[SQLException] {
         withTransaction { implicit s =>
-          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "37523756405021402", 1408310892))
+          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "VS", "37523756405021402", 1408310892))
         }
       }
     }
 
     "s be retrieved" in {
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("test", "test", "test", "test", "test", 126, "test", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, "VS", "test", 1408310892)) should be(true)
         outfitDAO.findAll.length should be(2)
+      }
+    }
+
+    "leader character retrieved" in {
+      withSession { implicit s =>
+        outfitDAO.findLeader("37523756405021402").get.name should be("TestLeader")
       }
     }
 

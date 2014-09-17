@@ -2,7 +2,7 @@
   <!-- Header -->
   <div>
     <div>
-      <h4 class="{{ outfit.leaderCharacter.faction.codeTag }}">
+      <h4 class="{{ outfit.factionCodeTag }}">
         {{ outfit.name }} <span ng-if="outfit.alias">[{{ outfit.alias }}]</span>
         <small class="pull-right">
           <dl class="dl-horizontal">
@@ -12,8 +12,8 @@
             <dd> {{ outfit.members.length }} </dd>
             <dt>Leader</dt>
             <dd>
-              <a href="{{ leaderHref(outfit.leaderCharacterId) }}" class="{{ outfit.leaderCharacter.faction.codeTag }}">
-                {{ outfit.leaderCharacter.name }}
+              <a href="{{ leaderHref(outfit.leader.id) }}" class="{{ outfit.factionCodeTag }}">
+                {{ outfit.leader.name }}
               </a>
             </dd>
           </dl>
@@ -30,39 +30,39 @@
         <th class="table-input">
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
         </th>
-        <th><a ng-click="predicate='membership.rankOrdinal'; reverse=!reverse">Outfit rank</a></th>
-        <th><a ng-click="predicate='battleRank.rank'; reverse=!reverse">BR</a></th>
-        <th><a ng-click="predicate='times.lastLoginDate'; reverse=!reverse">Last login</a></th>
-        <th><a ng-click="predicate='membership.memberSinceDate'; reverse=!reverse">Member since</a></th>
+        <th><a ng-click="predicate='membership.outfitRankOrdinal'; reverse=!reverse">Outfit rank</a></th>
+        <th><a ng-click="predicate='battleRank'; reverse=!reverse">BR</a></th>
+        <th><a ng-click="predicate='lastLoginDate'; reverse=!reverse">Last login</a></th>
+        <th><a ng-click="predicate='membership.outfitMemberSinceDate'; reverse=!reverse">Member since</a></th>
       </tr>
       </thead>
       <tbody>
       <tr ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse">
         <td> {{ $index + 1 }}</td>
         <td>
-          <a ui-sref="player.view({id : {{ member.id }} })" class="{{ outfit.leaderCharacter.faction.codeTag }}">
+          <a ui-sref="player.view({id : {{ member.id }} })" class="{{ outfit.factionCodeTag }}">
             {{ member.name }}
           </a>
         </td>
         <td>
-          <span class="ordinal{{ member.membership.rankOrdinal }}">{{ member.membership.rank }}</span>
-           - {{ member.membership.rankOrdinal | outfitRank }}
+          <span class="ordinal{{ member.membership.outfitRankOrdinal }}">{{ member.membership.outfitRank }}</span>
+           - {{ member.membership.outfitRankOrdinal | outfitRank }}
         </td>
         <td class="text-center">
-          <div ng-if="member.battleRank.rank < 100" class="progress" data-type="info" data-title="{{ member.battleRank.percentToNext }}%" bs-tooltip>
-            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ member.battleRank.percentToNext }}%;">
-              <span>{{ member.battleRank.rank }}</span>
+          <div ng-if="member.battleRank < 100" class="progress" data-type="info" data-title="{{ member.battleRankPercent }}%" bs-tooltip>
+            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ member.battleRankPercent }}%;">
+              <span>{{ member.battleRank }}</span>
             </div>
           </div>
-          <span ng-if="member.battleRank.rank == 100" class="br100">
-            {{ member.battleRank.rank }}
+          <span ng-if="member.battleRank == 100" class="br100">
+            {{ member.battleRank }}
           </span>
         </td>
         <td>
-          <span am-time-ago="member.times.lastLoginDate" data-type="info" data-title="{{ member.times.lastLoginDate | amCalendar }}" bs-tooltip></span>
+          <span am-time-ago="member.lastLoginDate" data-type="info" data-title="{{ member.lastLoginDate | amCalendar }}" bs-tooltip></span>
         </td>
         <td>
-          <span am-time-ago="member.membership.memberSinceDate" data-type="info" data-title="{{ member.membership.memberSinceDate | amCalendar }}" bs-tooltip></span>
+          <span am-time-ago="member.membership.outfitMemberSinceDate" data-type="info" data-title="{{ member.membership.outfitMemberSinceDate | amCalendar }}" bs-tooltip></span>
         </td>
       </tr>
       </tbody>
