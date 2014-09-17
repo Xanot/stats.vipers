@@ -22,26 +22,26 @@
     </div>
   </div>
   <!-- Members -->
-  <div>
+  <div infinite-scroll="increaseLimit()" infinite-scroll-distance='1'>
     <table class="table table-striped table-bordered table-responsive">
       <thead>
       <tr>
         <th>#</th>
         <th class="table-input">
-          <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
+          <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;" ng-focus="limitRows = 50;">
         </th>
-        <th><a ng-click="predicate='membership.outfitRankOrdinal'; reverse=!reverse">Outfit rank</a></th>
-        <th><a ng-click="predicate='battleRank'; reverse=!reverse">BR</a></th>
-        <th><a ng-click="predicate='lastLoginDate'; reverse=!reverse">Last login</a></th>
-        <th><a ng-click="predicate='membership.outfitMemberSinceDate'; reverse=!reverse">Member since</a></th>
+        <th><a ng-click="limitRows = 50; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">Outfit rank</a></th>
+        <th><a ng-click="limitRows = 50; predicate='battleRank'; reverse=!reverse;">BR</a></th>
+        <th><a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">Last login</a></th>
+        <th><a ng-click="limitRows = 50; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">Member since</a></th>
       </tr>
       </thead>
       <tbody>
-      <tr bindonce ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse | limitTo:100">
+      <tr bindonce ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse | limitTo:limitRows">
         <td> {{ $index + 1 }} </td>
         <td>
           <a bo-href="'#/player/' + member.id" bo-class="{'faction-1' : outfit.factionId === 1, 'faction-2' : outfit.factionId === 2, 'faction-3' : outfit.factionId === 3}">
-            <span bo-text="member.name "></span>
+            <span bo-text="member.name"></span>
           </a>
         </td>
         <td>

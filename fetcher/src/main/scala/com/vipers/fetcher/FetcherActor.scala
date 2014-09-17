@@ -70,29 +70,25 @@ class FetcherActor extends Actor {
       } pipeTo sender
     case m @ FetchOutfitRequest(alias, id) =>
       Future {
-        try {
-          val json = {
-            if (alias.isDefined) {
-              sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = false))
-            } else {
-              sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = false))
-            }
+        val json = {
+          if (alias.isDefined) {
+            sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = false))
+          } else {
+            sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = false))
           }
-          json \ "outfit_list" match {
-            case JArray(parent) if parent.nonEmpty =>
-              FetchOutfitResponse(Some(parent(0).toOutfit.get, {
-                val list = mutable.ListBuffer.empty[OutfitMember]
-                val JArray(parents) = parent(0) \ "members"
+        }
+        json \ "outfit_list" match {
+          case JArray(parent) if parent.nonEmpty =>
+            FetchOutfitResponse(Some(parent(0).toOutfit.get, {
+              val list = mutable.ListBuffer.empty[OutfitMember]
+              val JArray(parents) = parent(0) \ "members"
 
-                parents.foreach { parent =>
-                  list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
-                }
-                list
-              }))
-            case _ => FetchOutfitResponse(None)
-          }
-        } catch {
-          case e : Exception => e.printStackTrace()
+              parents.foreach { parent =>
+                list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
+              }
+              list
+            }))
+          case _ => FetchOutfitResponse(None)
         }
       } pipeTo sender
     case FetchOutfitCharactersRequest(alias, id, page) =>

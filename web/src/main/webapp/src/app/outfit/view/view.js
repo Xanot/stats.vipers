@@ -44,12 +44,21 @@ angular.module('outfit-view', ['utils', 'ui.router'])
 
   .controller('OutfitViewController', ['$scope', '$state', 'Outfit', 'resolveOutfit',
     function($scope, $state, Outfit, resolveOutfit) {
+    $scope.limitRows = 50;
 
     Outfit.bindOne($scope, 'outfit', resolveOutfit.id);
 
     $scope.leaderHref = function(id) {
       return $state.href('player.view', {id: id})
     };
+
+    $scope.increaseLimit = function() {
+      $scope.limitRows += 30;
+    };
+
+    $scope.$watch("filterName", function() {
+      $scope.limitRows = 50;
+    });
   }])
 
   .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {
