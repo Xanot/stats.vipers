@@ -2,7 +2,7 @@
 
 angular.module('main', ['navbar', 'home', 'outfit', 'player',
   'ui.router', 'ngSanitize', 'ngAnimate', 'mgcrea.ngStrap', 'angularMoment', 'hc.marked',
-  'angular-data.DS', 'angular-data.DSCacheFactory', 'angular-loading-bar'])
+  'angular-data.DS', 'angular-data.DSCacheFactory', 'angular-loading-bar', 'pasvaz.bindonce'])
 
   .config(['$urlRouterProvider', function($urlRouterProvider){
     $urlRouterProvider.otherwise('home');

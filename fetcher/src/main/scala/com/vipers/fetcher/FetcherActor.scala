@@ -70,25 +70,29 @@ class FetcherActor extends Actor {
       } pipeTo sender
     case m @ FetchOutfitRequest(alias, id) =>
       Future {
-        val json = {
-          if (alias.isDefined) {
-            sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = false))
-          } else {
-            sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = false))
+        try {
+          val json = {
+            if (alias.isDefined) {
+              sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = false))
+            } else {
+              sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = false))
+            }
           }
-        }
-        json \ "outfit_list" match {
-          case JArray(parent) if parent.nonEmpty =>
-            FetchOutfitResponse(Some(parent(0).toOutfit.get, {
-              val list = mutable.ListBuffer.empty[OutfitMember]
-              val JArray(parents) = parent(0) \ "members"
+          json \ "outfit_list" match {
+            case JArray(parent) if parent.nonEmpty =>
+              FetchOutfitResponse(Some(parent(0).toOutfit.get, {
+                val list = mutable.ListBuffer.empty[OutfitMember]
+                val JArray(parents) = parent(0) \ "members"
 
-              parents.foreach { parent =>
-                list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
-              }
-              list
-            }))
-          case _ => FetchOutfitResponse(None)
+                parents.foreach { parent =>
+                  list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
+                }
+                list
+              }))
+            case _ => FetchOutfitResponse(None)
+          }
+        } catch {
+          case e : Exception => e.printStackTrace()
         }
       } pipeTo sender
     case FetchOutfitCharactersRequest(alias, id, page) =>
@@ -120,7 +124,7 @@ class FetcherActor extends Actor {
 }
 
 object FetcherActor {
-  val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(15000, TimeUnit.MILLISECONDS)
   import com.vipers.model.Sort.Sort
 
   type OutfitMember = (Character, OutfitMembership)

@@ -22,7 +22,7 @@ sealed class ApiActor extends Actor with Api {
 
 trait Route extends HttpService
 trait JsonRoute extends Route with Json4sSupport {
-  implicit val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+  implicit val timeout = Timeout(15000, TimeUnit.MILLISECONDS)
   implicit val json4sFormats = DefaultFormats
 }
 

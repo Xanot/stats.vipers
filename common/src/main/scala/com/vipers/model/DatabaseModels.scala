@@ -10,7 +10,7 @@ case class Outfit(name : String,
                   aliasLower : String,
                   leaderCharacterId : String,
                   memberCount : Int,
-                  factionCodeTag : String,
+                  factionId : Byte,
                   override val id : String,
                   creationDate : Long) extends WithID
 
@@ -26,7 +26,7 @@ case class Character(name : String,
                      certPercent : Short,
                      spentCerts : Int,
 
-                     factionCodeTag : String,
+                     factionId : Byte,
 
                      creationDate : Long,
                      lastLoginDate : Long,

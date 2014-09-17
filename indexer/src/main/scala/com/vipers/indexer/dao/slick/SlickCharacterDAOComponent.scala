@@ -28,7 +28,7 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
       def certPercent = column[Short]("cert_percent", O.NotNull)
       def certsSpent = column[Int]("certs_spent", O.NotNull)
 
-      def factionCodeTag = column[String]("faction_code_tag", O.NotNull, O.DBType("VARCHAR(2)"))
+      def factionId = column[Byte]("faction_id", O.NotNull)
 
       def creationDate = column[Long]("creation_date", O.NotNull)
       def lastLoginDate = column[Long]("last_login_date", O.NotNull)
@@ -37,7 +37,7 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
       def minutesPlayed = column[Int]("minutes_played", O.NotNull)
 
       def * = (name, nameLower, id, battleRank, battleRankPercent, certsAvailable, certsEarned, certPercent,
-        certsSpent, factionCodeTag, creationDate, lastLoginDate, lastSaveDate, loginCount, minutesPlayed) <> (Character.tupled, Character.unapply)
+        certsSpent, factionId, creationDate, lastLoginDate, lastSaveDate, loginCount, minutesPlayed) <> (Character.tupled, Character.unapply)
     }
   }
 }

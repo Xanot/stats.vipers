@@ -61,18 +61,16 @@ class IndexerActor extends Actor with Logging {
 
   private def getOutfitResponse(outfit : Outfit)(implicit s : db.Session) = {
     new GetOutfitResponse(outfit.name, outfit.nameLower, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId,
-      outfit.memberCount, outfit.factionCodeTag, outfit.id, outfit.creationDate, db.outfitDAO.findLeader(outfit.id).get,
+      outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, db.outfitDAO.findLeader(outfit.id).get,
       db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id).map { s =>
-        CharacterWithMembership(s._1.name : String, s._1.nameLower : String, s._1.id : String, s._1.battleRank : Short,
-          s._1.battleRankPercent : Short, s._1.availableCerts : Int, s._1.earnedCerts : Int, s._1.certPercent : Short,
-          s._1.spentCerts : Int, s._1.factionCodeTag : String, s._1.creationDate : Long, s._1.lastLoginDate : Long,
-          s._1.lastSaveDate : Long, s._1.loginCount : Int, s._1.minutesPlayed : Int, s._2)
+        CharacterWithMembership(s._1.name, s._1.nameLower, s._1.id, s._1.battleRank, s._1.battleRankPercent, s._1.availableCerts, s._1.earnedCerts, s._1.certPercent,
+          s._1.spentCerts, s._1.factionId, s._1.creationDate, s._1.lastLoginDate, s._1.lastSaveDate, s._1.loginCount : Int, s._1.minutesPlayed : Int, s._2)
       })
   }
 }
 
 object IndexerActor {
-  val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(15000, TimeUnit.MILLISECONDS)
 
   sealed trait IndexerMessage
 
@@ -83,7 +81,7 @@ object IndexerActor {
   // Sent
   case object BeingIndexed extends IndexerMessage
   case class GetOutfitResponse(name : String, nameLower : String, alias : String, aliasLower : String,
-                          leaderCharacterId : String, memberCount : Int, factionCodeTag : String, id : String, creationDate : Long,
+                          leaderCharacterId : String, memberCount : Int, factionId : Byte, id : String, creationDate : Long,
                           leader : Character, members : List[CharacterWithMembership]) extends IndexerMessage
 
   private[indexer] case class CharacterWithMembership(name : String,
@@ -95,7 +93,7 @@ object IndexerActor {
                                                       earnedCerts : Int,
                                                       certPercent : Short,
                                                       spentCerts : Int,
-                                                      factionCodeTag : String,
+                                                      factionId : Byte,
                                                       creationDate : Long,
                                                       lastLoginDate : Long,
                                                       lastSaveDate : Long,

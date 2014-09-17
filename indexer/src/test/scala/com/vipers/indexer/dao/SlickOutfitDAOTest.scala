@@ -36,7 +36,7 @@ class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
         800,
         80,
         9000,
-        "VS",
+        1,
         System.currentTimeMillis(),
         System.currentTimeMillis(),
         System.currentTimeMillis(),
@@ -46,20 +46,20 @@ class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
 
       withTransaction { implicit s =>
         characterDAO.create(char)
-        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "VS", "37523756405021402", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892)) should be(true)
       }
 
       // duplicate id
       intercept[SQLException] {
         withTransaction { implicit s =>
-          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, "VS", "37523756405021402", 1408310892))
+          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892))
         }
       }
     }
 
     "s be retrieved" in {
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, "VS", "test", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, 1, "test", 1408310892)) should be(true)
         outfitDAO.findAll.length should be(2)
       }
     }

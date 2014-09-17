@@ -1,8 +1,8 @@
-<div ng-if="outfit">
+<div bindonce="outfit">
   <!-- Header -->
   <div>
     <div>
-      <h4 class="{{ outfit.factionCodeTag }}">
+      <h4 class="faction-{{outfit.factionId}}">
         {{ outfit.name }} <span ng-if="outfit.alias">[{{ outfit.alias }}]</span>
         <small class="pull-right">
           <dl class="dl-horizontal">
@@ -12,7 +12,7 @@
             <dd> {{ outfit.members.length }} </dd>
             <dt>Leader</dt>
             <dd>
-              <a href="{{ leaderHref(outfit.leader.id) }}" class="{{ outfit.factionCodeTag }}">
+              <a href="{{ leaderHref(outfit.leader.id) }}" class="faction-{{outfit.factionId}}">
                 {{ outfit.leader.name }}
               </a>
             </dd>
@@ -37,25 +37,30 @@
       </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse">
-        <td> {{ $index + 1 }}</td>
+      <tr bindonce ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse | limitTo:100">
+        <td> {{ $index + 1 }} </td>
         <td>
-          <a ui-sref="player.view({id : {{ member.id }} })" class="{{ outfit.factionCodeTag }}">
-            {{ member.name }}
+          <a bo-href="'#/player/' + member.id" bo-class="{'faction-1' : outfit.factionId === 1, 'faction-2' : outfit.factionId === 2, 'faction-3' : outfit.factionId === 3}">
+            <span bo-text="member.name "></span>
           </a>
         </td>
         <td>
-          <span class="ordinal{{ member.membership.outfitRankOrdinal }}">{{ member.membership.outfitRank }}</span>
-           - {{ member.membership.outfitRankOrdinal | outfitRank }}
+          <span bo-class="{
+            'ordinal-1' : member.membership.outfitRankOrdinal === 1,
+            'ordinal-2' : member.membership.outfitRankOrdinal === 2,
+            'ordinal-3' : member.membership.outfitRankOrdinal === 3,
+            'ordinal-4' : member.membership.outfitRankOrdinal === 4,
+            'ordinal-5' : member.membership.outfitRankOrdinal === 5}" bo-text="member.membership.outfitRank"></span>
+           - <span bo-text="member.membership.outfitRankOrdinal | outfitRank"></span>
         </td>
         <td class="text-center">
-          <div ng-if="member.battleRank < 100" class="progress" data-type="info" data-title="{{ member.battleRankPercent }}%" bs-tooltip>
-            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: {{ member.battleRankPercent }}%;">
-              <span>{{ member.battleRank }}</span>
+          <div bo-if="member.battleRank < 100" class="progress" data-type="info" data-title="{{ member.battleRankPercent }}%" bs-tooltip>
+            <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" bo-style="{'width': member.battleRankPercent + '%'}">
+              <span bo-text="member.battleRank"></span>
             </div>
           </div>
-          <span ng-if="member.battleRank == 100" class="br100">
-            {{ member.battleRank }}
+          <span bo-if="member.battleRank == 100" class="br100">
+            <span bo-text="member.battleRank"></span>
           </span>
         </td>
         <td>
@@ -68,7 +73,4 @@
       </tbody>
     </table>
   </div>
-</div>
-<div ng-if="!outfit" class="text-center">
-  <i class="fa fa-cog fa-spin fa-5x"></i>
 </div>

@@ -19,9 +19,8 @@
       <tr ng-repeat="outfit in outfits">
         <td> {{ $index + 1 }}</td>
         <td>
-          <a href="{{ outfitHref(outfit) }}" class="{{ outfit.factionCodeTag }}">
-            {{ outfit.name }}
-          </a>
+          <span ng-if="outfit.alias" class="faction-{{outfit.factionId}}">[{{ outfit.alias }}]</span>
+          <a href="{{ outfitHref(outfit) }}" class="faction-{{outfit.factionId}}">{{ outfit.name }}</a>
         </td>
         <td>
           <span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span>

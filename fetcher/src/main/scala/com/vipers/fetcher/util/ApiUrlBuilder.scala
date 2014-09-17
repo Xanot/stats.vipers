@@ -18,14 +18,14 @@ private[fetcher] object ApiUrlBuilder {
       case true =>
         CensusQuery(Some(s),
           Join(
-            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin()))
+            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"))
           )
         ).construct
       case false =>
         CensusQuery(Some(s),
           Join(
-            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())),
-            OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin()))))
+            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id")),
+            OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false))))
           )
         ).construct
     }
@@ -39,7 +39,7 @@ private[fetcher] object ApiUrlBuilder {
         case MEMBER_COUNT => "member_count"
       }, s._2)
     )
-    val join = Join(CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"), nested = Some(FactionJoin())))
+    val join = Join(CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id")))
     val params = CensusQuery(None, sort, join).construct
     construct(Uri.Path("outfit"), params.toMap ++ withPage(p))
   }
@@ -53,7 +53,7 @@ private[fetcher] object ApiUrlBuilder {
   }
 
   private def getOutfitCharacters(s : Search, page : Page) : Uri = {
-    val params = CensusQuery(Some(s), Join(CharacterJoin(isOuter = Some(false), nested = Some(FactionJoin())))).construct
+    val params = CensusQuery(Some(s), Join(CharacterJoin(isOuter = Some(false)))).construct
     construct(Uri.Path("outfit_member_extended"), params.toMap ++ withPage(page))
   }
 
@@ -69,7 +69,7 @@ private[fetcher] object ApiUrlBuilder {
   // Character
   //================================================================================
   private def getCharacters(s : Search, ids : String*) : Uri = {
-    val params = CensusQuery(Some(s), Join(FactionJoin())).construct
+    val params = CensusQuery(Some(s)).construct
     construct(Uri.Path("character"), params.toMap)
   }
 

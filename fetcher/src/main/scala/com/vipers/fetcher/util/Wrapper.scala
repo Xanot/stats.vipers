@@ -8,7 +8,7 @@ private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
     def toOutfit : Option[Outfit] = {
       check {
-        val (JString(name), JString(nameLower), JString(alias), JString(aliasLower), JString(id), JString(memberCount), JString(leaderCharacterId), JString(factionCodeTag), JString(timeCreatedDate)) = {
+        val (JString(name), JString(nameLower), JString(alias), JString(aliasLower), JString(id), JString(memberCount), JString(leaderCharacterId), JString(factionId), JString(timeCreatedDate)) = {
           (
             json \ "name",
             json \ "name_lower",
@@ -17,12 +17,12 @@ private[fetcher] object Wrapper {
             json \ "outfit_id",
             json \ "member_count",
             json \ "leader_character_id",
-            json \ "leader" \ "faction" \ "code_tag",
+            json \ "leader" \ "faction_id",
             json \ "time_created"
           )
         }
 
-        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, factionCodeTag, id, timeCreatedDate.toLong)
+        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, factionId.toByte, id, timeCreatedDate.toLong)
       }
     }
 
@@ -46,7 +46,7 @@ private[fetcher] object Wrapper {
           )
         }
 
-        val JString(factionCodeTag) = json \ "faction" \ "code_tag"
+        val JString(factionId) = json \ "faction_id"
 
         val times = json \ "times"
         val (JString(creationDate), JString(lastLoginDate), JString(lastSaveDate), JString(loginCount), JString(minutesPlayed)) = {
@@ -69,7 +69,7 @@ private[fetcher] object Wrapper {
           earnedPoints.toInt,
           percentToNext.toDouble.toShort,
           spentPoints.toInt,
-          factionCodeTag,
+          factionId.toByte,
           creationDate.toLong,
           lastLoginDate.toLong,
           lastSaveDate.toLong,

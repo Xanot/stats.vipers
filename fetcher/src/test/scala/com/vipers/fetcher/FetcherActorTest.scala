@@ -35,6 +35,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       whenReady((fetcherActor ? request).mapTo[Option[Character]]) { character =>
         character.get.id should be("5428035526967126513")
         character.get.name should be("Xanot")
+        character.get.factionId should be(1)
       }
 
       // non-existing name
