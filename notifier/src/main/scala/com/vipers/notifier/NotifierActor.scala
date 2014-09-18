@@ -12,6 +12,8 @@ import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 import akka.pattern.pipe
 import scala.concurrent.duration.FiniteDuration
+import org.json4s.native.JsonMethods._
+import org.json4s.JsonDSL._
 
 class NotifierActor extends Actor with Logging {
   import context.dispatcher
@@ -45,16 +47,16 @@ class NotifierActor extends Actor with Logging {
       Future {
         server.isRunning
       } pipeTo sender
-    case Notify(event) =>
+    case m : NotifierEvent =>
       Future {
-        log.info("Notifying: " + event)
-        val iterator = listeners(event).iterator()
+        log.debug("Notifying: " + m.event)
+        val iterator = listeners(m.event).iterator()
         while(iterator.hasNext) {
           val socket = iterator.next()
           if(socket.isNotConnected) {
             iterator.remove()
           } else {
-            socket.getRemote.sendString(event)
+            socket.getRemote.sendString(compact(render(("event" -> m.event) ~ ("data" -> m.data))))
           }
         }
       }
@@ -93,5 +95,9 @@ object NotifierActor {
   case object Start extends NotifierMessage
   case object Stop extends NotifierMessage
   case object IsRunning extends NotifierMessage
-  case class Notify(event : String) extends NotifierMessage
+
+  // Event types
+  sealed abstract class NotifierEvent(val event : String, val data : String) extends NotifierMessage
+  case class Notify(override val event : String, override val data : String) extends NotifierEvent(event, data)
+  case class OutfitBeingIndexed(outfitAliasLower : String) extends NotifierEvent(s"o:$outfitAliasLower", outfitAliasLower)
 }

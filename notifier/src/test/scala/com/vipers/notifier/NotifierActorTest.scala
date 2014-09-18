@@ -49,19 +49,19 @@ class NotifierActorTest (_system : ActorSystem) extends TestKit(_system) with Wo
       val latch = new CountDownLatch(1)
       val listener = new DefaultWebSocketListener {
         override def onOpen(websocket: WebSocket): Unit = {
-          websocket.sendTextMessage("character:12")
+          websocket.sendTextMessage("""{"event":"subscribe","data":"c:12"}""")
         }
 
         override def onMessage(message: String): Unit = {
           message match {
-            case "character:12" => latch.countDown()
+            case """{"event":"c:12","data":"12"}""" => latch.countDown()
           }
         }
       }
 
       test(listener) {
         Thread.sleep(500)
-        notifierActor ! Notify("character:12")
+        notifierActor ! Notify("c:12", "12")
         latch.await()
         latch.getCount should be(0)
       }

@@ -19,7 +19,7 @@ object Projects extends Build {
 
   lazy val notifier = Project("notifier", file("notifier"))
     .settings(basicSettings ++ localPublishSettings ++ scalaMeterSettings:_*)
-    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ websocketDependencies)
+    .settings(libraryDependencies ++= akkaDependencies ++ commonDependencies ++ websocketDependencies ++ Seq(json4sNative))
 
   lazy val web = Project("web", file("web"))
     .settings(basicSettings ++ assemblySettings ++ scalaMeterSettings:_*)

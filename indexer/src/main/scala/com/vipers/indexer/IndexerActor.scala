@@ -9,6 +9,8 @@ import com.vipers.fetcher.FetcherActor.{FetchOutfitResponse, FetchOutfitRequest}
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import com.vipers.model.{Outfit, OutfitMembership, Character}
+import com.vipers.notifier.NotifierActor
+import com.vipers.notifier.NotifierActor.{Stop, Start, OutfitBeingIndexed}
 import scala.concurrent.Future
 import akka.pattern.pipe
 
@@ -17,17 +19,28 @@ class IndexerActor extends Actor with Logging {
 
   private val db : SlickDBComponent = new SlickDBComponent
   private val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
+  private val notifierActor = context.actorOf(Props(classOf[NotifierActor]))
+
+  override def preStart() : Unit = {
+    notifierActor ! Start
+  }
+
+  override def postStop() : Unit = {
+    notifierActor ! Stop
+  }
 
   def receive = {
     case m : FetchOutfitResponse =>
       Future {
         m.contents.map { case (outfit, members) =>
-          // Index
           db.withTransaction { implicit s =>
+            // Index
             db.characterDAO.createAll(members.map(_._1):_*)
             db.outfitDAO.create(outfit)
             db.outfitMembershipDAO.createAll(members.map(_._2):_*)
-            // TODO: Notify client here
+
+            // Notify actor
+            notifierActor ! OutfitBeingIndexed(outfit.aliasLower)
           }
         }
       }

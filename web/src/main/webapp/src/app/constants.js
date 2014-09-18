@@ -2,11 +2,11 @@
 
 angular.module('constants', [])
   .constant('Constants', {
-    'REST_PROTOCOL' : 'http',
+    'PROTOCOL'      : 'http',
     'HOST'          : 'localhost',
     'PORT'          : '8080',
-    'WebSocketService' : {
-      'PROTOCOL' : 'wss',
+    'WebSocket' : {
+      'PROTOCOL' : 'ws',
       'HOST' : 'localhost',
       'PORT' : '8081'
     }

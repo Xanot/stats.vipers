@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('outfit-view', ['utils', 'ui.router'])
+angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('outfit-view', {
@@ -8,7 +8,7 @@ angular.module('outfit-view', ['utils', 'ui.router'])
         controller: 'OutfitViewController',
         templateUrl: 'app/outfit/view/view.html',
         resolve: {
-          resolveOutfit : ['$q', '$stateParams', 'Outfit', 'AlertService', function($q, $stateParams, Outfit, AlertService) {
+          resolveOutfit : ['$q', '$stateParams', 'Outfit', 'AlertService', 'WebSocketService', function($q, $stateParams, Outfit, AlertService, WebSocketService) {
             function getOutfitByAlias(aliasLower) {
               var query = { aliasLower : aliasLower };
               Outfit.findAll(query).then(function(response) {
@@ -31,7 +31,13 @@ angular.module('outfit-view', ['utils', 'ui.router'])
             var deferred = $q.defer();
 
             if($stateParams.aliasOrId.length <= 4) {
-              getOutfitByAlias($stateParams.aliasOrId.toLowerCase())
+              var aliasLower = $stateParams.aliasOrId.toLowerCase();
+
+              WebSocketService.subscribe("o:" + aliasLower, function(data) {
+                AlertService.alert(data, "ready!", "info")
+              });
+
+              getOutfitByAlias(aliasLower)
             } else {
               getOutfitById($stateParams.aliasOrId)
             }
