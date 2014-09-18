@@ -15,7 +15,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 deferred.resolve(response[0]);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert(err.status, err.statusText, "danger")
+                AlertService.alert(err.status, err.statusText, "danger", 2)
               });
             }
 
@@ -24,7 +24,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 deferred.resolve(response);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert(err.status, err.statusText, "danger")
+                AlertService.alert(err.status, err.statusText, "danger", 2)
               });
             }
 
@@ -34,7 +34,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
               var aliasLower = $stateParams.aliasOrId.toLowerCase();
 
               WebSocketService.subscribe("o:" + aliasLower, function(data) {
-                AlertService.alert(data, "ready!", "info")
+                AlertService.alertWithData({"type": "info", alias: data}, undefined, 'app/outfit/alert.outfit.tpl.html')
               });
 
               getOutfitByAlias(aliasLower)

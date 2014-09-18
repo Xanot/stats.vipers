@@ -11,14 +11,19 @@ angular.module('utils', ['constants'])
 
   .factory('AlertService', ['$alert', function($alert) {
     return {
-      alert : function(title, content, type) {
+      alert : function(title, content, type, duration, template, placement, container) {
         $alert({
           title: "" + title,
           content: content,
           type: type,
-          duration: 2,
-          placement: 'top-right'
+          duration: duration,
+          template: template || "app/alert.tpl.html",
+          placement: placement || 'stacked',
+          container: container || "#alerts"
         });
+      },
+      alertWithData : function(data, duration, template, placement, container) {
+        this.alert(undefined, undefined, data, duration, template, placement, container);
       }
     }
   }])

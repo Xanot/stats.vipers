@@ -1,0 +1,7 @@
+<div class="alert" ng-class="[type.type ? 'alert-' + type.type : null]">
+  <button type="button" class="close" ng-if="dismissable" ng-click="$hide()">&times;</button>
+  <a ui-sref="outfit-view({ aliasOrId : type.alias })">
+    <i class="fa fa-hand-o-right"></i>
+    <strong> {{ type.alias }} </strong> is ready
+  </a>
+</div>
