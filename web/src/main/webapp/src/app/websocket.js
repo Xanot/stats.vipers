@@ -18,17 +18,24 @@
   function publish(eventName, eventData) {
     var chain = subscribers[eventName];
     if(typeof chain == 'undefined') return;
-    for(var i = 0; i < chain.length; i++) {
-      chain[i](eventData);
-    }
+    chain(eventData);
   }
 
   function bind(eventName, callback) {
-    console.group("Binding callback to " + eventName + ": ");
-    console.log(callback);
-    console.groupEnd();
-    subscribers[eventName] = subscribers[eventName] || [];
-    subscribers[eventName].push(callback);
+    if(!subscribers[eventName]) {
+      console.group("Binding callback to " + eventName + ": ");
+      console.log(callback);
+      console.groupEnd();
+      subscribers[eventName] = callback;
+      return true
+    } else {
+      return false;
+    }
+  }
+
+  function unbind(eventName) {
+    var index = subscribers.indexOf(eventName);
+    subscribers.splice(index, 1);
   }
 
   function send(eventName, eventData){
@@ -57,21 +64,17 @@
 
       return {
         subscribe: function(eventName, callback) {
-          this.bind(eventName, callback);
-          if(isOpen) {
-            send("subscribe", eventName);
-          } else {
-            pending.push(eventName)
+          if(bind(eventName, callback)) {
+            if(isOpen) {
+              send("subscribe", eventName);
+            } else {
+              pending.push(eventName)
+            }
           }
         },
         unsubscribe: function(eventName, callback) {
-          this.unbind(eventName, callback);
+          unbind(eventName, callback);
           send("unsubscribe", eventName);
-        },
-        bind : bind,
-        unbind : function(eventName, callback) {
-          var index = subscribers[eventName].indexOf(callback);
-          subscribers[eventName].splice(index, 1);
         }
       };
     }]);

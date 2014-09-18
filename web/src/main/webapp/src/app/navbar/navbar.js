@@ -8,11 +8,5 @@ angular.module('navbar', ['mgcrea.ngStrap.navbar', 'websocket'])
   }])
 
   .controller("NavbarController", ['$scope', 'WebSocketService', function($scope, WebSocketService) {
-    WebSocketService.bind("onOpen", function() {
-      console.log("onOpen");
-    });
 
-    WebSocketService.bind("onClose", function() {
-      console.log("onClose");
-    });
 } ]);

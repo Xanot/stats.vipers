@@ -38,9 +38,7 @@ private[notifier] class NotifierSocket extends WebSocketAdapter with Logging {
   private def subscribe(event : String) : Unit = {
     import NotifierActor.listeners
     if(listeners.keySet.contains(event)) {
-      if(!listeners(event).contains(this)) {
-        listeners(event).add(this)
-      }
+      listeners(event).add(this)
     } else {
       listeners += (event -> new ConcurrentLinkedQueue[NotifierSocket])
       listeners(event).add(this)
