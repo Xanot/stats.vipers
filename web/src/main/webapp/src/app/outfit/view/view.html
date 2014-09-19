@@ -30,10 +30,26 @@
         <th class="table-input">
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;" ng-focus="limitRows = 50;">
         </th>
-        <th><a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">Outfit rank</a></th>
-        <th><a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">BR</a></th>
-        <th><a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse;">Last login</a></th>
-        <th><a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">Member since</a></th>
+        <th>
+          <a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse; sortedProperty = 'outfitRankOrdinal'">
+            Outfit rank <i ng-if="sortedProperty == 'outfitRankOrdinal'" class="fa" ng-class="{'fa-sort-amount-desc' : !reverse, 'fa-sort-amount-asc' : reverse}"></i>
+          </a>
+        </th>
+        <th>
+          <a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse; sortedProperty = 'battleRank'">
+            BR <i ng-if="sortedProperty == 'battleRank'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          </a>
+        </th>
+        <th>
+          <a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse; sortedProperty = 'lastLoginDate'">
+            Last login <i ng-if="sortedProperty == 'lastLoginDate'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          </a>
+        </th>
+        <th>
+          <a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse; sortedProperty = 'outfitMemberSinceDate'">
+            Member since <i ng-if="sortedProperty == 'outfitMemberSinceDate'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          </a>
+        </th>
       </tr>
       </thead>
       <tbody>
