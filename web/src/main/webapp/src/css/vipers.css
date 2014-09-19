@@ -82,7 +82,7 @@
 }
 
 /* Table header sort */
-th  a {
+th a {
     color: #FFF;
 }
 
@@ -98,7 +98,6 @@ td .progress .progress-bar span {
     display: block;
     width: 100%;
 
-    font-family: "Lato","Helvetica Neue",Helvetica,Arial,sans-serif;
     padding-top: 5px;
     padding-bottom: 5px;
     font-size: 15px;
@@ -111,4 +110,12 @@ td .progress .progress-bar span {
     right: 0;
     margin: 20px;
     width: 200px;
+}
+
+/* Websocket connectivity */
+.websocket-true {
+    color: lawngreen;
+}
+.websocket-false {
+    color: red;
 }

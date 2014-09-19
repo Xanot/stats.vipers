@@ -13,10 +13,15 @@
   <link rel="stylesheet" href="./css/vipers.css"/>
 </head>
 <body>
+  <!-- Navigation -->
   <div ng-include="'app/navbar/navbar.html'"></div>
+
+  <!-- Top view -->
   <div class="container">
     <div ui-view></div>
   </div>
+
+  <!-- Alert container -->
   <div id="alerts"></div>
 
   <script type="text/javascript" src="./lib/moment/min/moment.min.js"></script>

@@ -47,25 +47,27 @@
     .run(['Constants', function(Constants) {
       connect(Constants.WebSocket.PROTOCOL + "://" + Constants.WebSocket.HOST + ":" + Constants.WebSocket.PORT);
     }])
-    .factory('WebSocketService', [function() {
+    .factory('WebSocketService', ['$rootScope', function($rootScope) {
       var pending = [];
-      var isOpen = false;
+      $rootScope.isConnected = false;
 
       bind("onOpen", function() {
-        isOpen = true;
+        $rootScope.isConnected = true;
+        $rootScope.$apply();
         for(var i = 0; i < pending.length; i++) {
           send("subscribe", pending[i])
         }
       });
 
       bind("onClose", function() {
-        isOpen = false;
+        $rootScope.isConnected = false;
+        $rootScope.$apply();
       });
 
       return {
         subscribe: function(eventName, callback) {
           if(bind(eventName, callback)) {
-            if(isOpen) {
+            if($rootScope.isConnected) {
               send("subscribe", eventName);
             } else {
               pending.push(eventName)
