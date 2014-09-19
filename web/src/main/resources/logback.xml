@@ -1,7 +1,5 @@
 <configuration>
-    <logger name="scala.slick" level="WARN"/>
-    
-    <root level="ALL">
+    <root level="INFO">
         <appender class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
                 <pattern>%d{ISO8601} | %-5level | %thread | %logger{1} | %m%n</pattern>

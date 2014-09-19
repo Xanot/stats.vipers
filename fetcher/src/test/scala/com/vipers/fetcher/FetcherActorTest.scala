@@ -125,6 +125,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         contents._1.creationDate should be(1408310892)
         contents._2.size should be > 0
         contents._2(1)._1.battleRank.toInt should be > 0
+        response.request should be("VIPR")
       }
     }
     "return outfit info with leader(with faction) and member characters given id" in {
@@ -138,6 +139,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         contents._1.creationDate should be(1408310892)
         contents._2.size should be > 0
         contents._2(1)._1.battleRank.toInt should be > 0
+        response.request should be("37523756405021402")
       }
     }
     "return outfit member characters given id" in {

@@ -5,6 +5,7 @@ import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.notifier.NotifierActor._
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
+import org.eclipse.jetty.util.ConcurrentHashSet
 import org.eclipse.jetty.websocket.servlet.{WebSocketServletFactory, WebSocketServlet}
 import akka.actor.Actor
 import org.eclipse.jetty.server.{ServerConnector, Server}
@@ -36,7 +37,7 @@ class NotifierActor extends Actor with Logging {
 
   def receive = {
     case Start =>
-      listeners = new TrieMap[String, ConcurrentLinkedQueue[NotifierSocket]]
+      listeners = new TrieMap[String, ConcurrentHashSet[NotifierSocket]]
       connections = new ConcurrentLinkedQueue[NotifierSocket]()
       server.start()
     case Stop =>
@@ -66,7 +67,7 @@ class NotifierActor extends Actor with Logging {
 object NotifierActor {
   val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
 
-  private[notifier] var listeners : TrieMap[String, ConcurrentLinkedQueue[NotifierSocket]] = _
+  private[notifier] var listeners : TrieMap[String, ConcurrentHashSet[NotifierSocket]] = _
   private[notifier] var connections : ConcurrentLinkedQueue[NotifierSocket] = _
 
   private val server : Server = {
@@ -99,5 +100,5 @@ object NotifierActor {
   // Event types
   sealed abstract class NotifierEvent(val event : String, val data : String) extends NotifierMessage
   case class Notify(override val event : String, override val data : String) extends NotifierEvent(event, data)
-  case class OutfitBeingIndexed(outfitAliasLower : String) extends NotifierEvent(s"o:$outfitAliasLower", outfitAliasLower)
+  case class OutfitIndexed(outfitAliasLower : String) extends NotifierEvent(s"o:$outfitAliasLower", outfitAliasLower)
 }

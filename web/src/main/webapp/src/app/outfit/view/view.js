@@ -15,7 +15,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 deferred.resolve(response[0]);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert(err.status, err.statusText, "danger", 2)
+                AlertService.alert(aliasLower.toUpperCase(), "is being indexed, you will be notified if it exists", "warning", 5)
               });
             }
 
@@ -24,7 +24,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 deferred.resolve(response);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert(err.status, err.statusText, "danger", 2)
+                AlertService.alert(id, "is being indexed, you will be notified if it exists", "warning", 5)
               });
             }
 
@@ -50,22 +50,22 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
 
   .controller('OutfitViewController', ['$scope', '$state', 'Outfit', 'resolveOutfit',
     function($scope, $state, Outfit, resolveOutfit) {
-    $scope.limitRows = 50;
+      $scope.limitRows = 30;
 
-    Outfit.bindOne($scope, 'outfit', resolveOutfit.id);
+      $scope.increaseLimit = function() {
+        $scope.limitRows += 30;
+      };
 
-    $scope.leaderHref = function(id) {
-      return $state.href('player.view', {id: id})
-    };
+      $scope.$watch("filterName", function() {
+        $scope.limitRows = 30;
+      });
 
-    $scope.increaseLimit = function() {
-      $scope.limitRows += 30;
-    };
+      $scope.leaderHref = function(id) {
+        return $state.href('player.view', {id: id})
+      };
 
-    $scope.$watch("filterName", function() {
-      $scope.limitRows = 50;
-    });
-  }])
+      Outfit.bindOne($scope, 'outfit', resolveOutfit.id);
+    }])
 
   .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {
     return DS.defineResource({

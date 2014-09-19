@@ -87,8 +87,8 @@ class FetcherActor extends Actor {
                 list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
               }
               list
-            }))
-          case _ => FetchOutfitResponse(None)
+            }), alias.getOrElse(id.get))
+          case _ => FetchOutfitResponse(None, alias.getOrElse(id.get))
         }
       } pipeTo sender
     case FetchOutfitCharactersRequest(alias, id, page) =>
@@ -140,7 +140,7 @@ object FetcherActor {
   case class FetchSimpleMultipleOutfitsRequest(sort : Sort, page : Page)
 
   case class FetchOutfitRequest(alias : Option[String], id : Option[String])
-  case class FetchOutfitResponse(contents : Option[(Outfit, Seq[OutfitMember])])
+  case class FetchOutfitResponse(contents : Option[(Outfit, Seq[OutfitMember])], request : String)
 
   case class FetchOutfitCharactersRequest(alias : Option[String], id : Option[String], page : Page)
   case class FetchOutfitCharactersResponse(total : Int, characters : Seq[OutfitMember])

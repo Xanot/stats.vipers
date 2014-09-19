@@ -1,7 +1,7 @@
 package com.vipers.notifier
 
-import java.util.concurrent.ConcurrentLinkedQueue
 import com.vipers.Logging
+import org.eclipse.jetty.util.ConcurrentHashSet
 import org.eclipse.jetty.websocket.api.{WebSocketAdapter, Session}
 import org.json4s.JsonAST.{JObject, JString}
 import org.json4s.native.JsonMethods._
@@ -37,10 +37,10 @@ private[notifier] class NotifierSocket extends WebSocketAdapter with Logging {
 
   private def subscribe(event : String) : Unit = {
     import NotifierActor.listeners
-    if(listeners.keySet.contains(event)) {
+    if(listeners.contains(event)) {
       listeners(event).add(this)
     } else {
-      listeners += (event -> new ConcurrentLinkedQueue[NotifierSocket])
+      listeners += (event -> new ConcurrentHashSet[NotifierSocket])
       listeners(event).add(this)
     }
   }

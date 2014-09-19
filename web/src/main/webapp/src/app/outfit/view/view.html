@@ -30,10 +30,10 @@
         <th class="table-input">
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;" ng-focus="limitRows = 50;">
         </th>
-        <th><a ng-click="limitRows = 50; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">Outfit rank</a></th>
-        <th><a ng-click="limitRows = 50; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">BR</a></th>
-        <th><a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">Last login</a></th>
-        <th><a ng-click="limitRows = 50; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">Member since</a></th>
+        <th><a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">Outfit rank</a></th>
+        <th><a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">BR</a></th>
+        <th><a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse;">Last login</a></th>
+        <th><a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">Member since</a></th>
       </tr>
       </thead>
       <tbody>

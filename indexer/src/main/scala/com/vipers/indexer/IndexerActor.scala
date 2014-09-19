@@ -1,7 +1,7 @@
 package com.vipers.indexer
 
 import java.util.concurrent.TimeUnit
-import akka.actor.{Props, Actor}
+import akka.actor.{PoisonPill, ActorRef, Props, Actor}
 import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
@@ -10,7 +10,8 @@ import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import com.vipers.model.{Outfit, OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
-import com.vipers.notifier.NotifierActor.{Stop, Start, OutfitBeingIndexed}
+import com.vipers.notifier.NotifierActor.{Stop, Start, OutfitIndexed}
+import org.eclipse.jetty.util.ConcurrentHashSet
 import scala.concurrent.Future
 import akka.pattern.pipe
 
@@ -18,30 +19,39 @@ class IndexerActor extends Actor with Logging {
   import context.dispatcher
 
   private val db : SlickDBComponent = new SlickDBComponent
-  private val fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
-  private val notifierActor = context.actorOf(Props(classOf[NotifierActor]))
+  private var fetcherActor : ActorRef = _
+  private var notifierActor : ActorRef = _
+
+  private val outfitsBeingIndexed = new ConcurrentHashSet[String]
 
   override def preStart() : Unit = {
+    fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
+    notifierActor = context.actorOf(Props(classOf[NotifierActor]))
     notifierActor ! Start
   }
 
   override def postStop() : Unit = {
     notifierActor ! Stop
+    fetcherActor ! PoisonPill
+    notifierActor ! PoisonPill
   }
 
   def receive = {
-    case m : FetchOutfitResponse =>
+    case FetchOutfitResponse(contents, request) =>
       Future {
-        m.contents.map { case (outfit, members) =>
-          db.withTransaction { implicit s =>
-            // Index
-            db.characterDAO.createAll(members.map(_._1):_*)
-            db.outfitDAO.create(outfit)
-            db.outfitMembershipDAO.createAll(members.map(_._2):_*)
+        contents match {
+          case Some((outfit, members)) =>
+            db.withTransaction { implicit s =>
+              // Index
+              db.characterDAO.createAll(members.map(_._1):_*)
+              db.outfitDAO.create(outfit)
+              db.outfitMembershipDAO.createAll(members.map(_._2):_*)
 
-            // Notify actor
-            notifierActor ! OutfitBeingIndexed(outfit.aliasLower)
-          }
+              outfitsBeingIndexed.remove(request)
+              notifierActor ! OutfitIndexed(outfit.aliasLower) // Notify client
+              log.info(s"Outfit ${outfit.aliasLower} has been indexed")
+            }
+          case None => outfitsBeingIndexed.remove(request)
         }
       }
 
@@ -50,12 +60,20 @@ class IndexerActor extends Actor with Logging {
         db.withSession { implicit s =>
           if(alias.isDefined) {
             db.outfitDAO.findByAliasLower(alias.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
-              fetcherActor ! FetchOutfitRequest(alias, None)
+              if(!outfitsBeingIndexed.contains(alias.get)) {
+                log.info(s"Outfit ${alias.get} is being indexed")
+                outfitsBeingIndexed.add(alias.get)
+                fetcherActor ! FetchOutfitRequest(alias, None)
+              }
               BeingIndexed
             }
           } else if(id.isDefined) {
             db.outfitDAO.find(id.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
-              fetcherActor ! FetchOutfitRequest(None, id)
+              if(!outfitsBeingIndexed.contains(id.get)) {
+                log.info(s"Outfit ${id.get} is being indexed")
+                outfitsBeingIndexed.add(id.get)
+                fetcherActor ! FetchOutfitRequest(None, id)
+              }
               BeingIndexed
             }
           }
@@ -66,6 +84,13 @@ class IndexerActor extends Actor with Logging {
       Future {
         db.withSession { implicit s =>
           db.outfitDAO.findAll
+        }
+      } pipeTo sender
+
+    case GetCharacterRequest(nameLower) =>
+      Future {
+        db.withSession { implicit s =>
+
         }
       } pipeTo sender
 
@@ -89,6 +114,7 @@ object IndexerActor {
 
   // Received
   case class GetOutfitRequest(aliasLower : Option[String], id : Option[String]) extends IndexerMessage
+  case class GetCharacterRequest(nameLower : String) extends IndexerMessage
   case object GetMultipleOutfits extends IndexerMessage
 
   // Sent

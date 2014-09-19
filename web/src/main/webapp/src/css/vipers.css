@@ -114,7 +114,7 @@ td .progress .progress-bar span {
 
 /* Websocket connectivity */
 .websocket-true {
-    color: lawngreen;
+    color: #00dd26;
 }
 .websocket-false {
     color: red;
