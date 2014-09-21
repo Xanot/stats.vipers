@@ -60,8 +60,8 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         $scope.limitRows = 30;
       });
 
-      $scope.leaderHref = function(id) {
-        return $state.href('player.view', {id: id})
+      $scope.leaderHref = function(name) {
+        return $state.href('player.view', {name: name})
       };
 
       Outfit.bindOne($scope, 'outfit', resolveOutfit.id);

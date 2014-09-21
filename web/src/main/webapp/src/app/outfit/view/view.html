@@ -12,7 +12,7 @@
             <dd> {{ outfit.members.length }} </dd>
             <dt>Leader</dt>
             <dd>
-              <a href="{{ leaderHref(outfit.leader.id) }}" class="faction-{{outfit.factionId}}">
+              <a href="{{ leaderHref(outfit.leader.name) }}" class="faction-{{outfit.factionId}}">
                 {{ outfit.leader.name }}
               </a>
             </dd>
@@ -31,23 +31,23 @@
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;" ng-focus="limitRows = 50;">
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse; sortedProperty = 'outfitRankOrdinal'">
-            Outfit rank <i ng-if="sortedProperty == 'outfitRankOrdinal'" class="fa" ng-class="{'fa-sort-amount-desc' : !reverse, 'fa-sort-amount-asc' : reverse}"></i>
+          <a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">
+            Outfit rank
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse; sortedProperty = 'battleRank'">
-            BR <i ng-if="sortedProperty == 'battleRank'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          <a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
+            BR
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse; sortedProperty = 'lastLoginDate'">
-            Last login <i ng-if="sortedProperty == 'lastLoginDate'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          <a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse;">
+            Last login
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse; sortedProperty = 'outfitMemberSinceDate'">
-            Member since <i ng-if="sortedProperty == 'outfitMemberSinceDate'" class="fa" ng-class="{'fa-sort-amount-desc' : reverse, 'fa-sort-amount-asc' : !reverse}"></i>
+          <a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">
+            Member since
           </a>
         </th>
       </tr>
@@ -56,7 +56,7 @@
       <tr bindonce ng-repeat="member in outfit.members | filter: { name : filterName } | orderBy:predicate:reverse | limitTo:limitRows">
         <td> {{ $index + 1 }} </td>
         <td>
-          <a bo-href="'#/player/' + member.id" bo-class="{'faction-1' : outfit.factionId === 1, 'faction-2' : outfit.factionId === 2, 'faction-3' : outfit.factionId === 3}">
+          <a bo-href="'#/player/' + member.name" bo-class="{'faction-1' : outfit.factionId === 1, 'faction-2' : outfit.factionId === 2, 'faction-3' : outfit.factionId === 3}">
             <span bo-text="member.name"></span>
           </a>
         </td>

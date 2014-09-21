@@ -5,12 +5,12 @@ import akka.actor.{PoisonPill, ActorRef, Props, Actor}
 import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
-import com.vipers.fetcher.FetcherActor.{FetchOutfitResponse, FetchOutfitRequest}
+import com.vipers.fetcher.FetcherActor.{FetchCharacterResponse, FetchCharacterRequest, FetchOutfitResponse, FetchOutfitRequest}
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import com.vipers.model.{Outfit, OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
-import com.vipers.notifier.NotifierActor.{Stop, Start, OutfitIndexed}
+import com.vipers.notifier.NotifierActor.{CharacterIndexed, Stop, Start, OutfitIndexed}
 import org.eclipse.jetty.util.ConcurrentHashSet
 import scala.concurrent.Future
 import akka.pattern.pipe
@@ -23,6 +23,7 @@ class IndexerActor extends Actor with Logging {
   private var notifierActor : ActorRef = _
 
   private val outfitsBeingIndexed = new ConcurrentHashSet[String]
+  private val charactersBeingIndexed = new ConcurrentHashSet[String]
 
   override def preStart() : Unit = {
     fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
@@ -37,6 +38,9 @@ class IndexerActor extends Actor with Logging {
   }
 
   def receive = {
+    //================================================================================
+    // Fetcher response
+    //================================================================================
     case FetchOutfitResponse(contents, request) =>
       Future {
         contents match {
@@ -49,19 +53,39 @@ class IndexerActor extends Actor with Logging {
 
               outfitsBeingIndexed.remove(request)
               notifierActor ! OutfitIndexed(outfit.aliasLower) // Notify client
-              log.info(s"Outfit ${outfit.aliasLower} has been indexed")
+              log.debug(s"Outfit ${outfit.alias} has been indexed")
             }
           case None => outfitsBeingIndexed.remove(request)
         }
       }
 
+    case FetchCharacterResponse(contents, request) =>
+      Future {
+        contents match {
+          case Some(character) =>
+            db.withTransaction { implicit s =>
+              // Index
+              db.characterDAO.create(character)
+              // TODO: Handle outfit membership
+
+              charactersBeingIndexed.remove(request)
+              notifierActor ! CharacterIndexed(character.nameLower)// Notify client
+              log.debug(s"Character ${character.name} has been indexed")
+            }
+          case None => charactersBeingIndexed.remove(request)
+        }
+      }
+
+    //================================================================================
+    // Requests
+    //================================================================================
     case GetOutfitRequest(alias, id) =>
       Future {
         db.withSession { implicit s =>
           if(alias.isDefined) {
             db.outfitDAO.findByAliasLower(alias.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
               if(!outfitsBeingIndexed.contains(alias.get)) {
-                log.info(s"Outfit ${alias.get} is being indexed")
+                log.debug(s"Outfit ${alias.get} is being indexed")
                 outfitsBeingIndexed.add(alias.get)
                 fetcherActor ! FetchOutfitRequest(alias, None)
               }
@@ -70,7 +94,7 @@ class IndexerActor extends Actor with Logging {
           } else if(id.isDefined) {
             db.outfitDAO.find(id.get).map { outfit => getOutfitResponse(outfit) }.getOrElse {
               if(!outfitsBeingIndexed.contains(id.get)) {
-                log.info(s"Outfit ${id.get} is being indexed")
+                log.debug(s"Outfit ${id.get} is being indexed")
                 outfitsBeingIndexed.add(id.get)
                 fetcherActor ! FetchOutfitRequest(None, id)
               }
@@ -90,7 +114,18 @@ class IndexerActor extends Actor with Logging {
     case GetCharacterRequest(nameLower) =>
       Future {
         db.withSession { implicit s =>
-
+          db.characterDAO.findByNameLower(nameLower).map { c =>
+            val membership = db.outfitMembershipDAO.find(c.id)
+            CharacterWithMembership(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
+              c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.lastSaveDate, c.loginCount, c.minutesPlayed, membership)
+          }.getOrElse {
+            if(!charactersBeingIndexed.contains(nameLower)) {
+              log.debug(s"Character $nameLower is being indexed")
+              charactersBeingIndexed.add(nameLower)
+              fetcherActor ! FetchCharacterRequest(Some(nameLower), None)
+            }
+            BeingIndexed
+          }
         }
       } pipeTo sender
 
@@ -100,9 +135,9 @@ class IndexerActor extends Actor with Logging {
   private def getOutfitResponse(outfit : Outfit)(implicit s : db.Session) = {
     new GetOutfitResponse(outfit.name, outfit.nameLower, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId,
       outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, db.outfitDAO.findLeader(outfit.id).get,
-      db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id).map { s =>
-        CharacterWithMembership(s._1.name, s._1.nameLower, s._1.id, s._1.battleRank, s._1.battleRankPercent, s._1.availableCerts, s._1.earnedCerts, s._1.certPercent,
-          s._1.spentCerts, s._1.factionId, s._1.creationDate, s._1.lastLoginDate, s._1.lastSaveDate, s._1.loginCount : Int, s._1.minutesPlayed : Int, s._2)
+      db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id).map { c =>
+        CharacterWithMembership(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.availableCerts, c._1.earnedCerts, c._1.certPercent,
+          c._1.spentCerts, c._1.factionId, c._1.creationDate, c._1.lastLoginDate, c._1.lastSaveDate, c._1.loginCount, c._1.minutesPlayed, Some(c._2))
       })
   }
 }
@@ -123,20 +158,20 @@ object IndexerActor {
                           leaderCharacterId : String, memberCount : Int, factionId : Byte, id : String, creationDate : Long,
                           leader : Character, members : List[CharacterWithMembership]) extends IndexerMessage
 
-  private[indexer] case class CharacterWithMembership(name : String,
-                                                      nameLower : String,
-                                                      id : String,
-                                                      battleRank : Short,
-                                                      battleRankPercent : Short,
-                                                      availableCerts : Int,
-                                                      earnedCerts : Int,
-                                                      certPercent : Short,
-                                                      spentCerts : Int,
-                                                      factionId : Byte,
-                                                      creationDate : Long,
-                                                      lastLoginDate : Long,
-                                                      lastSaveDate : Long,
-                                                      loginCount : Int,
-                                                      minutesPlayed : Int,
-                                                      membership : OutfitMembership)
+  case class CharacterWithMembership(name : String,
+                                     nameLower : String,
+                                     id : String,
+                                     battleRank : Short,
+                                     battleRankPercent : Short,
+                                     availableCerts : Int,
+                                     earnedCerts : Int,
+                                     certPercent : Short,
+                                     spentCerts : Int,
+                                     factionId : Byte,
+                                     creationDate : Long,
+                                     lastLoginDate : Long,
+                                     lastSaveDate : Long,
+                                     loginCount : Int,
+                                     minutesPlayed : Int,
+                                     membership : Option[OutfitMembership])
 }

@@ -1,0 +1,7 @@
+<div class="alert" ng-class="[type.type ? 'alert-' + type.type : null]">
+  <button type="button" class="close" ng-if="dismissable" ng-click="$hide()">&times;</button>
+  <a ui-sref="player-view({ name : type.name })">
+    <i class="fa fa-hand-o-right"></i>
+    <strong> {{ type.name }} </strong> is ready
+  </a>
+</div>

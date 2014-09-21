@@ -31,8 +31,8 @@ class FetcherActor extends Actor {
           }
         }
         json \ "character_list" match {
-          case JArray(parent) if parent.nonEmpty =>  Some(parent(0).toCharacter.get)
-          case _ => None
+          case JArray(parent) if parent.nonEmpty => FetchCharacterResponse(Some(parent(0).toCharacter.get), name.getOrElse(id.get))
+          case _ => FetchCharacterResponse(None, name.getOrElse(id.get))
         }
       } pipeTo sender
     case FetchMultipleCharactersByIdRequest(ids @_*) =>
@@ -129,6 +129,7 @@ object FetcherActor {
   // Character request/response
   //================================================================================
   case class FetchCharacterRequest(characterName : Option[String], characterId : Option[String])
+  case class FetchCharacterResponse(character : Option[Character], request : String)
 
   case class FetchMultipleCharactersByIdRequest(characterIds : String*)
 

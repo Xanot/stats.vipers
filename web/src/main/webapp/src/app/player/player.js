@@ -10,23 +10,20 @@ angular.module('player', ['player.view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerController', ['$scope', '$stateParams', 'PlayerService', function($scope, $stateParams, PlayerService) {
-    $scope.itemsPerPage = 20;
-    $scope.curentPage = 1;
-
-    function getPlayers(page) {
-      PlayerService.getPlayers({limit : $scope.itemsPerPage, start: (page - 1) * $scope.itemsPerPage }).then(function(response) {
-        $scope.players = response.data
-      })
-    }
-
-//    getPlayers(1)
+  .controller('PlayerController', ['$scope', 'PlayerService', function($scope, PlayerService) {
+    $scope.search = function(name) {
+      if(name && name.length >= 3) {
+        return PlayerService.search(name.toLowerCase()).then(function(response) {
+          return response.data.character_name_list;
+        })
+      }
+    };
   }])
 
-  .factory('PlayerService', ['$http', 'UrlService', function($http, UrlService) {
+  .factory('PlayerService', ['$http', 'UrlService', function($http) {
     return {
-      getPlayers: function(alias, page) {
-        return $http.get(UrlService.url("/player/" + alias, page))
+      search: function(name, page) {
+        return $http.jsonp("http://census.soe.com/s:soe/get/ps2:v2/character_name/?name.first_lower=^" + name +"&c:limit=6&c:sort=name.first_lower&c:show=name.first,character_id&callback=JSON_CALLBACK")
       }
     }
   }]);

@@ -101,4 +101,5 @@ object NotifierActor {
   sealed abstract class NotifierEvent(val event : String, val data : String) extends NotifierMessage
   case class Notify(override val event : String, override val data : String) extends NotifierEvent(event, data)
   case class OutfitIndexed(outfitAliasLower : String) extends NotifierEvent(s"o:$outfitAliasLower", outfitAliasLower)
+  case class CharacterIndexed(nameLower : String) extends NotifierEvent(s"c:$nameLower", nameLower)
 }

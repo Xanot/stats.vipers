@@ -32,30 +32,35 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
     "return character given character name" in {
       // Valid name
       var request = FetchCharacterRequest(Some("Xanot"), None)
-      whenReady((fetcherActor ? request).mapTo[Option[Character]]) { character =>
-        character.get.id should be("5428035526967126513")
-        character.get.name should be("Xanot")
-        character.get.factionId should be(1)
+      whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
+        response.character.get.id should be("5428035526967126513")
+        response.character.get.name should be("Xanot")
+        response.character.get.factionId should be(1)
+        response.request should be("Xanot")
       }
 
       // non-existing name
       request = FetchCharacterRequest(Some("Xanotetqteqgq"), None)
-      whenReady((fetcherActor ? request).mapTo[Option[Character]]) { character =>
-        character should be(None)
+      whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
+        response.character should be(None)
+        response.request should be("Xanotetqteqgq")
       }
     }
     "return character given character id" in {
       // Valid id
       var request = FetchCharacterRequest(None, Some("5428035526967126513"))
-      whenReady((fetcherActor ? request).mapTo[Option[Character]]) { character =>
-        character.get.id should be("5428035526967126513")
-        character.get.name should be("Xanot")
+      whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
+        response.character.get.id should be("5428035526967126513")
+        response.character.get.name should be("Xanot")
+        response.character.get.factionId should be(1)
+        response.request should be("5428035526967126513")
       }
 
       // non-existing id
       request = FetchCharacterRequest(None, Some("1234"))
-      whenReady((fetcherActor ? request).mapTo[Option[Character]]) { character =>
-        character should be(None)
+      whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
+        response.character should be(None)
+        response.request should be("1234")
       }
     }
     "return multiple characters given character id" in {
