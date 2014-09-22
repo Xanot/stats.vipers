@@ -65,12 +65,6 @@ class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
       }
     }
 
-    "leader character retrieved" in {
-      withSession { implicit s =>
-        outfitDAO.findLeader("37523756405021402").get.name should be("TestLeader")
-      }
-    }
-
     "be retrieved by id" in {
       withSession { implicit s =>
         outfitDAO.find("37523756405021402").get.name should be("TheVipers")

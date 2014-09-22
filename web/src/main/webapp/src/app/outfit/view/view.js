@@ -61,7 +61,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
       });
 
       $scope.leaderHref = function(name) {
-        return $state.href('player.view', {name: name})
+        return $state.href('player-view', {name: name})
       };
 
       Outfit.bindOne($scope, 'outfit', resolveOutfit.id);

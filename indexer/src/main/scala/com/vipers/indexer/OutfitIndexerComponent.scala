@@ -48,7 +48,7 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
 
     def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : Option[(Outfit, Character, List[OutfitMember])] = {
       def outfitResponse(outfit : Outfit)(implicit s : db.Session) : (Outfit, Character, List[OutfitMember]) = {
-        (outfit, db.outfitDAO.findLeader(outfit.id).get, db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id))
+        (outfit, db.characterDAO.find(outfit.leaderCharacterId).get, db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id))
       }
 
       db.withSession { implicit s =>

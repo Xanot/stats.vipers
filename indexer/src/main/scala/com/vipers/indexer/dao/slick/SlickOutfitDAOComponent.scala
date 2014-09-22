@@ -16,14 +16,7 @@ private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with Ou
 
     private val findByNameLowerCompiled = Compiled((nameLower : Column[String]) => table.filter(_.nameLower === nameLower))
     private val findByAliasLowerCompiled = Compiled((aliasLower : Column[String]) => table.filter(_.aliasLower === aliasLower))
-    private val findLeaderCompiled = Compiled((outfitId : Column[String]) => {
-      for {
-        outfit <- table if outfit.id === outfitId
-        character <- characterDAO.table if character.id === outfit.leaderCharacterId
-      } yield character
-    })
 
-    def findLeader(outfitId : String)(implicit s : Session) : Option[Character] = findLeaderCompiled(outfitId).firstOption
     override def findByNameLower(nameLower: String)(implicit s : Session) : Option[Outfit] = findByNameLowerCompiled(nameLower).firstOption
     override def findByAliasLower(aliasLower: String)(implicit s : Session): Option[Outfit] = findByAliasLowerCompiled(aliasLower).firstOption
 

@@ -21,7 +21,6 @@ private[indexer] object DAOs {
     val outfitDAO : OutfitDAO
 
     trait OutfitDAO { this: DAO[Outfit] =>
-      def findLeader(outfitId : String)(implicit s : Session) : Option[Character]
       def findByNameLower(nameLower : String)(implicit s : Session) : Option[Outfit]
       def findByAliasLower(aliasLower : String)(implicit s : Session) : Option[Outfit]
     }
