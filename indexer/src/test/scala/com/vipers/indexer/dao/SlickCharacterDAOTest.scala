@@ -1,11 +1,12 @@
 package com.vipers.indexer.dao
 
 import com.vipers.dao.DAOTest
-import com.vipers.indexer.dao.slick.SlickCharacterDAOComponent
+import com.vipers.indexer.dao.slick.{SlickOutfitDAOComponent, SlickOutfitMembershipDAOComponent, SlickCharacterDAOComponent}
 import com.vipers.model.Character
 import org.scalatest.WordSpecLike
 
-class SlickCharacterDAOTest extends WordSpecLike with DAOTest with SlickDBTest with SlickCharacterDAOComponent {
+class SlickCharacterDAOTest extends WordSpecLike with DAOTest with SlickDBTest
+  with SlickCharacterDAOComponent with SlickOutfitMembershipDAOComponent with SlickOutfitDAOComponent {
   import driver.simple._
 
   override def beforeAll(): Unit = {
@@ -37,7 +38,8 @@ class SlickCharacterDAOTest extends WordSpecLike with DAOTest with SlickDBTest w
         System.currentTimeMillis(),
         System.currentTimeMillis(),
         100,
-        15000
+        15000,
+        System.currentTimeMillis()
       )
 
       withTransaction { implicit s =>
@@ -74,7 +76,8 @@ class SlickCharacterDAOTest extends WordSpecLike with DAOTest with SlickDBTest w
           System.currentTimeMillis(),
           System.currentTimeMillis(),
           100,
-          15000
+          15000,
+          System.currentTimeMillis()
         )
         characterDAO.update(char.copy(name = "NewName")) should be(true)
         characterDAO.find("id").get.name should be("NewName")

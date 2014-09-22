@@ -2,7 +2,6 @@ package com.vipers.fetcher.util
 
 import com.vipers.model._
 import org.json4s.JsonAST._
-import scala.collection.mutable
 
 private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
@@ -22,7 +21,7 @@ private[fetcher] object Wrapper {
           )
         }
 
-        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, factionId.toByte, id, timeCreatedDate.toLong)
+        Outfit(name, nameLower, alias, aliasLower, leaderCharacterId, memberCount.toInt, factionId.toByte, id, timeCreatedDate.toLong, System.currentTimeMillis())
       }
     }
 
@@ -74,7 +73,8 @@ private[fetcher] object Wrapper {
           lastLoginDate.toLong,
           lastSaveDate.toLong,
           loginCount.toInt,
-          minutesPlayed.toInt)
+          minutesPlayed.toInt,
+          System.currentTimeMillis())
       }
     }
 

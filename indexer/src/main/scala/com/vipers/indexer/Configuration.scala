@@ -1,5 +1,6 @@
 package com.vipers.indexer
 
+import java.util.concurrent.TimeUnit
 import com.typesafe.config.ConfigException.Missing
 import com.typesafe.config.ConfigFactory
 
@@ -18,4 +19,8 @@ private[indexer] object Configuration {
       catch { case _ : Missing => None }
     }
   }
+
+  private lazy val config = ConfigFactory.load("indexer.conf")
+  val characterStaleAfter = config.getDuration("character-stale-after", TimeUnit.MILLISECONDS)
+  val outfitStaleAfter = config.getDuration("outfit-stale-after", TimeUnit.MILLISECONDS)
 }

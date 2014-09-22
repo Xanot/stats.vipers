@@ -4,7 +4,7 @@ import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.CharacterDAOComponent
 import com.vipers.model.Character
 
-private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent with SlickDAOComponent { this: SlickDB =>
+private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent with SlickDAOComponent { this: SlickDB with SlickOutfitMembershipDAOComponent =>
   import driver.simple._
 
   override lazy val characterDAO = new SlickCharacterDAO
@@ -14,7 +14,13 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
 
     private val findByNameLowerCompiled = Compiled((nameLower : Column[String]) => table.filter(_.nameLower === nameLower))
 
+    private val deleteAllByOutfitIdCompiled = Compiled((outfitId : Column[String]) => {
+      table.filter(c => c.id in outfitMembershipDAO.table.map(_.outfitId))
+    })
+
     override def findByNameLower(nameLower: String)(implicit s : Session) : Option[Character] = findByNameLowerCompiled(nameLower).firstOption
+
+    override def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean = deleteAllByOutfitIdCompiled(outfitId).delete > 0
 
     sealed class Characters(tag : Tag) extends TableWithID(tag, "character") {
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))
@@ -36,8 +42,10 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
       def loginCount = column[Int]("login_count", O.NotNull)
       def minutesPlayed = column[Int]("minutes_played", O.NotNull)
 
+      def lastIndexedOn = column[Long]("last_indexed_on", O.NotNull)
+
       def * = (name, nameLower, id, battleRank, battleRankPercent, certsAvailable, certsEarned, certPercent,
-        certsSpent, factionId, creationDate, lastLoginDate, lastSaveDate, loginCount, minutesPlayed) <> (Character.tupled, Character.unapply)
+        certsSpent, factionId, creationDate, lastLoginDate, lastSaveDate, loginCount, minutesPlayed, lastIndexedOn) <> (Character.tupled, Character.unapply)
     }
   }
 }

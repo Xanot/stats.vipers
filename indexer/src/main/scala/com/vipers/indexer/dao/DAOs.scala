@@ -13,6 +13,7 @@ private[indexer] object DAOs {
       def createAll(models : T*)(implicit s : Session) : Boolean
       def update(model: T)(implicit s : Session) : Boolean
       def deleteById(id: String)(implicit s : Session) : Boolean
+      def exists(id : String)(implicit s : Session) : Boolean
     }
   }
 
@@ -31,6 +32,7 @@ private[indexer] object DAOs {
 
     trait CharacterDAO { this: DAO[Character] =>
       def findByNameLower(name : String)(implicit s : Session) : Option[Character]
+      def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
   }
 
@@ -39,6 +41,7 @@ private[indexer] object DAOs {
 
     trait OutfitMembershipDAO { this: DAO[OutfitMembership] =>
       def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember]
+      def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
   }
 }

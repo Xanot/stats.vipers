@@ -32,14 +32,13 @@ private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with Ou
       def nameLower = column[String]("name_lower", O.NotNull, O.DBType("VARCHAR(100)"))
       def alias = column[String]("alias", O.DBType("VARCHAR(4)"))
       def aliasLower = column[String]("alias_lower", O.DBType("VARCHAR(4)"))
-      def leaderCharacterId = column[String]("leader_character_id", O.NotNull, O.DBType("VARCHAR(20)"))
+      def leaderCharacterId = column[String]("leader_character_id", O.DBType("VARCHAR(30)"))
       def creationDate = column[Long]("creation_date", O.NotNull)
       def memberCount = column[Int]("member_count", O.NotNull)
       def factionId = column[Byte]("faction_id", O.NotNull)
+      def lastIndexedOn = column[Long]("last_indexed_on", O.NotNull)
 
-      def leaderCharacter = foreignKey(s"fk_${tableName}_leader_character_id", leaderCharacterId, characterDAO.table)(_.id)
-
-      def * = (name, nameLower, alias, aliasLower, leaderCharacterId, memberCount, factionId, id, creationDate) <> (Outfit.tupled, Outfit.unapply)
+      def * = (name, nameLower, alias, aliasLower, leaderCharacterId, memberCount, factionId, id, creationDate, lastIndexedOn) <> (Outfit.tupled, Outfit.unapply)
     }
   }
 }

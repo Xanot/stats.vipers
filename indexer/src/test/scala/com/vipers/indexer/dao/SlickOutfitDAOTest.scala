@@ -4,11 +4,11 @@ import java.sql.SQLException
 
 import com.vipers.dao.DAOTest
 import com.vipers.model.{Character, Outfit}
-import com.vipers.indexer.dao.slick.{SlickCharacterDAOComponent, SlickOutfitDAOComponent}
+import com.vipers.indexer.dao.slick.{SlickOutfitMembershipDAOComponent, SlickCharacterDAOComponent, SlickOutfitDAOComponent}
 import org.scalatest.WordSpecLike
 
 class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
-  with SlickOutfitDAOComponent with SlickCharacterDAOComponent {
+  with SlickOutfitDAOComponent with SlickCharacterDAOComponent with SlickOutfitMembershipDAOComponent {
 
   import driver.simple._
 
@@ -41,25 +41,26 @@ class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
         System.currentTimeMillis(),
         System.currentTimeMillis(),
         100,
-        15000
+        15000,
+        System.currentTimeMillis()
       )
 
       withTransaction { implicit s =>
         characterDAO.create(char)
-        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892, System.currentTimeMillis())) should be(true)
       }
 
       // duplicate id
       intercept[SQLException] {
         withTransaction { implicit s =>
-          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892))
+          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892, System.currentTimeMillis()))
         }
       }
     }
 
     "s be retrieved" in {
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, 1, "test", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, 1, "test", 1408310892, System.currentTimeMillis())) should be(true)
         outfitDAO.findAll.length should be(2)
       }
     }

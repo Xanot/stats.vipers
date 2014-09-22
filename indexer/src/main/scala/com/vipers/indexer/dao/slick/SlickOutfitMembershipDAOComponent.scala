@@ -22,7 +22,10 @@ private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershi
       } yield (character, membership)
     })
 
+    private val deleteAllMembershipsByOutfitIdCompiled = Compiled((outfitId : Column[String]) => { table.filter(_.outfitId === outfitId) })
+
     override def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember] = findAllCharactersByOutfitIdCompiled(outfitId).list
+    override def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean = deleteAllMembershipsByOutfitIdCompiled(outfitId).delete > 0
 
     sealed class OutfitMemberships(tag : Tag) extends TableWithID(tag, "outfit_member") {
       def outfitId = column[String]("outfit_id", O.NotNull, O.DBType("VARCHAR(30)"))
@@ -30,7 +33,6 @@ private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershi
       def rankOrdinal = column[Byte]("rank_ordinal", O.NotNull)
       def memberSinceDate = column[Long]("member_since_date", O.NotNull)
 
-      def character = foreignKey(s"fk_${tableName}_character_id", id, characterDAO.table)(_.id)
       def outfit = foreignKey(s"fk_${tableName}_outfit_id", outfitId, outfitDAO.table)(_.id)
 
       def * = (outfitId, id, rank, rankOrdinal, memberSinceDate) <> (OutfitMembership.tupled, OutfitMembership.unapply)

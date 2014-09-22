@@ -40,11 +40,12 @@ class SlickOutfitMembershipDAOTest extends WordSpecLike with DAOTest with SlickD
           System.currentTimeMillis(),
           System.currentTimeMillis(),
           100,
-          15000
+          15000,
+          System.currentTimeMillis()
         )
 
         characterDAO.create(char) should be(true)
-        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "id", 126, 1, "37523756405021402", 1408310892)) should be(true)
+        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "id", 126, 1, "37523756405021402", 1408310892, System.currentTimeMillis())) should be(true)
         outfitMembershipDAO.create(OutfitMembership("37523756405021402", "id", "outfit-rank", 2, System.currentTimeMillis())) should be(true)
 
         // Same character cannot be in another outfit
@@ -64,7 +65,7 @@ class SlickOutfitMembershipDAOTest extends WordSpecLike with DAOTest with SlickD
 
     "be updated in" in {
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("test", "test", "tt", "tt", "id", 0, 1, "outfitId", System.currentTimeMillis())) should be(true)
+        outfitDAO.create(Outfit("test", "test", "tt", "tt", "id", 0, 1, "outfitId", System.currentTimeMillis(), System.currentTimeMillis())) should be(true)
 
         val m = OutfitMembership("37523756405021402", "id", "outfit-rank", 2, System.currentTimeMillis())
         outfitMembershipDAO.update(m.copy(outfitId = "outfitId")) should be(true)
