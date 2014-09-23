@@ -1,21 +1,13 @@
-<nav class="navbar navbar-default navbar-static-top" role="navigation" bs-navbar ng-controller="NavbarController">
-  <div class="container">
-    <div class="navbar-header">
-      <button class="navbar-toggle" type="button" data-template="app/navbar/aside.tpl.html" data-animation="am-fade-and-slide-left" data-placement="left" data-container="body" title="Menu" bs-aside>
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" ui-sref="home">
-        <span class="websocket-{{ isConnected }}" title="Websocket connection: {{ isConnected }}">stats.vipers</span>
-      </a>
-    </div>
-    <div class="collapse navbar-collapse">
-      <ul class="nav navbar-nav">
-        <li data-match-route="/outfit.*"><a ui-sref="outfit"><i class="fa fa-users"></i> Outfit</a></li>
-        <li data-match-route="/player.*"><a ui-sref="player"><i class="fa fa-user"></i> Player</a></li>
-      </ul>
-    </div>
+<div id="sidebar" class="navbar navbar-default" ng-controller="NavbarController">
+  <div class="navbar-header">
+    <ul class="nav">
+      <li>
+        <a ui-sref="home">
+          <i class="fa fa-globe websocket-{{ isConnected }}"></i>
+        </a>
+      </li>
+      <li><a ui-sref="player"><i class="fa fa-user"></i></a></li>
+      <li><a ui-sref="outfit"><i class="fa fa-users"></i></a></li>
+    </ul>
   </div>
-</nav>
+</div>

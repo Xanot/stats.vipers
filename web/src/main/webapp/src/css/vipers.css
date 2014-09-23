@@ -1,16 +1,28 @@
-/* Navbar */
-@media (max-width: 767px) {
-    .navbar-toggle {
-        margin-left: 15px;
-        display: block !important;
-        float: left;
-    }
+/* Sidebar */
+#sidebar {
+    background-color: #555555;
+    border: none;
+    border-radius: 0;
+    height: 100%;
+    margin: 0;
+    position: absolute;
+    z-index: 100;
+    font-size: 20px;
 }
 
-/* Prevent radius */
-* {
-    border-radius: 0 !important;
-    -moz-border-radius: 0 !important;
+/* Content wrapper */
+#content {
+    left: 0;
+    height: 100%;
+    overflow: auto;
+    padding-left: 40px;
+    padding-top: 40px;
+    position: absolute;
+    width: 100%;
+}
+#content .container-fluid {
+    margin-left: 25px;
+    margin-right: 25px;
 }
 
 /* Faction colors */
@@ -53,10 +65,12 @@
 #loading-bar-spinner {
     top: 20px;
     left: auto;
-    right: 20px;
+    right: 60px;
     float: right;
 }
 #loading-bar-spinner .spinner-icon {
+    border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
     border-top-color:  #00dd26;
     border-left-color: #00dd26;
 }

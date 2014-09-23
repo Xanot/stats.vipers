@@ -13,12 +13,14 @@
   <link rel="stylesheet" href="./css/vipers.css"/>
 </head>
 <body>
-  <!-- Navigation -->
-  <div ng-include="'app/navbar/navbar.html'"></div>
+  <div>
+    <!-- Navigation -->
+    <div ng-include="'app/navbar/navbar.html'"></div>
 
-  <!-- Top view -->
-  <div class="container">
-    <div ui-view></div>
+    <!-- view -->
+    <div id="content">
+      <div class="container-fluid" ui-view></div>
+    </div>
   </div>
 
   <!-- Alert container -->
