@@ -8,26 +8,8 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         controller: 'OutfitViewController',
         templateUrl: 'app/outfit/view/view.html',
         resolve: {
-          resolveOutfit : ['$q', '$stateParams', 'Outfit', 'AlertService', 'WebSocketService', function($q, $stateParams, Outfit, AlertService, WebSocketService) {
-            function getOutfitByAlias(aliasLower) {
-              var query = { aliasLower : aliasLower };
-              Outfit.findAll(query).then(function(response) {
-                deferred.resolve(response[0]);
-              }).catch(function(err) {
-                deferred.reject();
-                AlertService.alert(aliasLower.toUpperCase(), "is being indexed, you will be notified if it exists", "warning", 5)
-              });
-            }
-
-            function getOutfitById(id) {
-              Outfit.find(id).then(function(response) {
-                deferred.resolve(response);
-              }).catch(function(err) {
-                deferred.reject();
-                AlertService.alert(id, "is being indexed, you will be notified if it exists", "warning", 5)
-              });
-            }
-
+          resolveOutfit : ['$q', '$stateParams', 'OutfitService', 'AlertService', 'WebSocketService',
+            function($q, $stateParams, OutfitService, AlertService, WebSocketService) {
             var deferred = $q.defer();
 
             if($stateParams.aliasOrId.length <= 4) {
@@ -37,9 +19,22 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 AlertService.alertWithData({"type": "info", alias: data}, undefined, 'app/outfit/alert.outfit.tpl.html')
               });
 
-              getOutfitByAlias(aliasLower)
+              OutfitService.get(aliasLower).then(function(response) {
+                if(response.data.updateTime < new Date().getTime()) {
+                  AlertService.alert(response.data.alias, "is being updated, you will be notified when it is ready", "warning", 5);
+                }
+                deferred.resolve(response.data);
+              }).catch(function(err) {
+                deferred.reject();
+                AlertService.alert(aliasLower.toUpperCase(), "is being indexed, you will be notified if it exists", "warning", 5)
+              });
             } else {
-              getOutfitById($stateParams.aliasOrId)
+              OutfitService.get($stateParams.aliasOrId).then(function(response) {
+                deferred.resolve(response.data);
+              }).catch(function(err) {
+                deferred.reject();
+                AlertService.alert($stateParams.aliasOrId, "is being indexed, you will be notified if it exists", "warning", 5)
+              });
             }
 
             return deferred.promise;
@@ -48,8 +43,8 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
       })
   }])
 
-  .controller('OutfitViewController', ['$scope', '$state', 'Outfit', 'resolveOutfit',
-    function($scope, $state, Outfit, resolveOutfit) {
+  .controller('OutfitViewController', ['$scope', '$state', 'OutfitService', 'resolveOutfit', 'WebSocketService', 'AlertService',
+    function($scope, $state, OutfitService, resolveOutfit, WebSocketService, AlertService) {
       $scope.limitRows = 30;
 
       $scope.increaseLimit = function() {
@@ -64,12 +59,12 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         return $state.href('player-view', {name: name})
       };
 
-      Outfit.bindOne($scope, 'outfit', resolveOutfit.id);
-    }])
+      $scope.outfit = resolveOutfit;
 
-  .factory('Outfit', ['DS', 'UrlService', function(DS, UrlService) {
-    return DS.defineResource({
-      name: "outfit",
-      baseUrl: UrlService.url("/")
-    });
-  }]);
+      WebSocketService.subscribe("o:" + resolveOutfit.aliasLower, function(data) {
+        OutfitService.get(resolveOutfit.aliasLower).then(function(response) {
+          $scope.outfit = response.data;
+        });
+        AlertService.alertWithData({"type": "info", alias: data}, undefined, 'app/outfit/alert.outfit.tpl.html')
+      });
+    }]);

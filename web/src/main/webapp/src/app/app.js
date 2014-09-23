@@ -2,7 +2,7 @@
 
 angular.module('main', ['websocket', 'navbar', 'home', 'outfit', 'player',
   'ui.router', 'ngSanitize', 'ngAnimate', 'mgcrea.ngStrap', 'angularMoment', 'hc.marked',
-  'angular-data.DS', 'angular-data.DSCacheFactory', 'angular-loading-bar', 'pasvaz.bindonce',
+  'angular-loading-bar', 'pasvaz.bindonce',
   'infinite-scroll'])
 
   .config(['$urlRouterProvider', function($urlRouterProvider){

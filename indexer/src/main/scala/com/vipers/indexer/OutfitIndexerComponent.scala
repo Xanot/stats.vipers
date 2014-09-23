@@ -53,17 +53,13 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
 
       db.withSession { implicit s =>
         if(outfitAlias.isDefined) {
-          val o = db.outfitDAO.findByAliasLower(outfitAlias.get)
-          if(o.isDefined) {
-            val outfit = o.get
+          db.outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
             if(isStale(outfit.lastIndexedOn)) {
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
-              None
-            } else {
-              Some(outfitResponse(outfit))
             }
-          } else {
-            if (!outfitsBeingIndexed.contains(outfitAlias.get)) {
+            outfitResponse(outfit)
+          }.orElse {
+            if(!outfitsBeingIndexed.contains(outfitAlias.get)) {
               log.debug(s"Outfit ${outfitAlias.get} is being indexed")
               outfitsBeingIndexed.add(outfitAlias.get)
               fetcherActor ! FetchOutfitRequest(outfitAlias, None)
@@ -71,16 +67,12 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
             None
           }
         } else if(outfitId.isDefined) {
-          val o = db.outfitDAO.find(outfitId.get)
-          if(o.isDefined) {
-            val outfit = o.get
+          db.outfitDAO.find(outfitId.get).map { outfit =>
             if(isStale(outfit.lastIndexedOn)) {
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
-              None
-            } else {
-              Some(outfitResponse(outfit))
             }
-          } else {
+            outfitResponse(outfit)
+          }.orElse {
             if(!outfitsBeingIndexed.contains(outfitId.get)) {
               log.debug(s"Outfit ${outfitId.get} is being indexed")
               outfitsBeingIndexed.add(outfitId.get)

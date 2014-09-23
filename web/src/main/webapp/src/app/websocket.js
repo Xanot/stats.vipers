@@ -22,13 +22,15 @@
   }
 
   function bind(eventName, callback) {
+    console.group("Binding callback to " + eventName + ": ");
+    console.log(callback);
+    console.groupEnd();
+
     if(!subscribers[eventName]) {
-      console.group("Binding callback to " + eventName + ": ");
-      console.log(callback);
-      console.groupEnd();
       subscribers[eventName] = callback;
       return true
     } else {
+      subscribers[eventName] = callback;
       return false;
     }
   }

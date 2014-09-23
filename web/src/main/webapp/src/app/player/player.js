@@ -20,10 +20,13 @@ angular.module('player', ['player.view', 'utils', 'ui.router'])
     };
   }])
 
-  .factory('PlayerService', ['$http', 'UrlService', function($http) {
+  .factory('PlayerService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       search: function(name, page) {
         return $http.jsonp("http://census.soe.com/s:soe/get/ps2:v2/character_name/?name.first_lower=^" + name +"&c:limit=6&c:sort=name.first_lower&c:show=name.first,character_id&callback=JSON_CALLBACK")
+      },
+      getByName: function(name) {
+        return $http.get(UrlService.url("/player/" + name))
       }
     }
   }]);

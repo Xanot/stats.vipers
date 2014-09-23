@@ -8,7 +8,7 @@ angular.module('player.view', ['utils', 'ui.router'])
         controller: 'PlayerViewController',
         templateUrl: 'app/player/view/view.html',
         resolve: {
-          resolvePlayer : ['$q', '$stateParams', 'Player', 'AlertService', 'WebSocketService', function($q, $stateParams, Player, AlertService, WebSocketService) {
+          resolvePlayer : ['$q', '$stateParams', 'PlayerService', 'AlertService', 'WebSocketService', function($q, $stateParams, PlayerService, AlertService, WebSocketService) {
             var deferred = $q.defer();
             var nameLower = $stateParams.name.toLowerCase();
 
@@ -16,8 +16,8 @@ angular.module('player.view', ['utils', 'ui.router'])
               AlertService.alertWithData({"type": "info", name: data}, undefined, 'app/player/alert.player.tpl.html')
             });
 
-            Player.find(nameLower).then(function(response) {
-              deferred.resolve(response);
+            PlayerService.getByName(nameLower).then(function(response) {
+              deferred.resolve(response.data);
             }).catch(function(err) {
               deferred.reject();
               AlertService.alert($stateParams.name, "is being indexed, you will be notified if it exists", "warning", 5)
@@ -29,16 +29,6 @@ angular.module('player.view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerViewController', ['$scope', 'Player', 'resolvePlayer',
-    function($scope, Player, resolvePlayer) {
-      Player.bindOne($scope, 'player', resolvePlayer.nameLower);
-    }
-  ])
-
-  .factory('Player', ['DS', 'UrlService', function(DS, UrlService) {
-    return DS.defineResource({
-      name: "player",
-      baseUrl: UrlService.url("/"),
-      idAttribute: 'nameLower'
-    });
+  .controller('PlayerViewController', ['$scope', 'resolvePlayer', function($scope, resolvePlayer) {
+    $scope.player = resolvePlayer;
   }]);

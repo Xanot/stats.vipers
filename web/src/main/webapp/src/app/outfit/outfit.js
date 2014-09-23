@@ -10,10 +10,11 @@ angular.module('outfit', ['outfit-view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitController', ['$scope', '$state', 'OutfitBasic', 'OutfitService', function($scope, $state, OutfitBasic, OutfitService) {
+  .controller('OutfitController', ['$scope', '$state', 'OutfitService', function($scope, $state, OutfitService) {
     function getOutfits(page) {
-      OutfitBasic.findAll({});
-      OutfitBasic.bindAll($scope, 'outfits', {});
+      OutfitService.getAll().then(function(response) {
+        $scope.outfits = response.data
+      });
     }
 
     $scope.outfitHref = function(outfit) {
@@ -49,18 +50,16 @@ angular.module('outfit', ['outfit-view', 'utils', 'ui.router'])
     getOutfits(1)
   }])
 
-  .factory('OutfitBasic', ['DS', 'UrlService', function(DS, UrlService) {
-    return DS.defineResource({
-      name: "outfitBasic",
-      endpoint: "outfit",
-      baseUrl: UrlService.url("/")
-    });
-  }])
-
-  .factory('OutfitService', ['$http', function($http) {
+  .factory('OutfitService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       search: function(name, page) {
         return $http.jsonp("http://census.soe.com/s:soe/get/ps2:v2/outfit/?name_lower=^" + name +"&c:limit=6&c:sort=name_lower&c:show=name,alias,outfit_id&callback=JSON_CALLBACK")
+      },
+      get: function(aliasOrId) {
+        return $http.get(UrlService.url("/outfit/" + aliasOrId))
+      },
+      getAll: function() {
+        return $http.get(UrlService.url("/outfit"))
       }
     }
   }]);

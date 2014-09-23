@@ -15,33 +15,23 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
     pathPrefix("outfit") {
       pathEnd {
         get {
-          parameter("aliasLower".?) { aliasLower =>
-            encodeResponse(Gzip) {
-              if(!aliasLower.isDefined) {
-                onComplete((indexerActor ? GetMultipleOutfits).mapTo[List[Outfit]]) {
-                  case Success(outfits) => complete(outfits)
-                  case Failure(m) => complete(InternalServerError, m.toString)
-                }
-              } else {
-                onComplete(indexerActor ? GetOutfitRequest(aliasLower, None)) {
-                  case Success(response) =>
-                    complete {
-                      response match {
-                        case m: GetOutfitResponse => List(m)
-                        case BeingIndexed => NotFound
-                      }
-                    }
-                  case Failure(m) => complete(InternalServerError, m.toString)
-                }
-              }
+          encodeResponse(Gzip) {
+            onComplete((indexerActor ? GetMultipleOutfits).mapTo[List[Outfit]]) {
+              case Success(outfits) => complete(outfits)
+              case Failure(m) => complete(InternalServerError, m.toString)
             }
           }
         }
       } ~
-      path(Segment) { id =>
+      path(Segment) { aliasOrId =>
         get {
           encodeResponse(Gzip) {
-            onComplete(indexerActor ? GetOutfitRequest(None, Some(id))) {
+            val request = if(aliasOrId.length <= 4) {
+              indexerActor ? GetOutfitRequest(Some(aliasOrId), None)
+            } else {
+              indexerActor ? GetOutfitRequest(None, Some(aliasOrId))
+            }
+            onComplete(request) {
               case Success(response) =>
                 complete {
                   response match {
