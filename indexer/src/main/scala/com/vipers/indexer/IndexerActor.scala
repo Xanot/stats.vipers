@@ -52,12 +52,12 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
     //================================================================================
     case GetOutfitRequest(alias, id) =>
       Future {
-        outfitIndexer.retrieve(alias, id).map { case (outfit, leader, members) =>
+        outfitIndexer.retrieve(alias, id).map { case (outfit, leader, members, updateTime) =>
           new GetOutfitResponse(outfit.name, outfit.nameLower, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId,
-            outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn,
+            outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
             members.map { c =>
               CharacterWithMembership(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.availableCerts, c._1.earnedCerts, c._1.certPercent,
-                c._1.spentCerts, c._1.factionId, c._1.creationDate, c._1.lastLoginDate, c._1.lastSaveDate, c._1.loginCount, c._1.minutesPlayed, c._1.lastIndexedOn, Some(c._2))
+                c._1.spentCerts, c._1.factionId, c._1.creationDate, c._1.lastLoginDate, c._1.lastSaveDate, c._1.loginCount, c._1.minutesPlayed, c._1.lastIndexedOn, None, Some(c._2))
             }
           )
         }.getOrElse(BeingIndexed)
@@ -72,9 +72,9 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
 
     case GetCharacterRequest(nameLower) =>
       Future {
-        characterIndexer.retrieve(nameLower).map { case (c, membership) =>
+        characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime) =>
           CharacterWithMembership(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.lastSaveDate, c.loginCount, c.minutesPlayed, c.lastIndexedOn, membership)
+            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.lastSaveDate, c.loginCount, c.minutesPlayed, c.lastIndexedOn, Some(updateTime), membership)
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
@@ -96,7 +96,7 @@ object IndexerActor {
   case object BeingIndexed extends IndexerMessage
   case class GetOutfitResponse(name : String, nameLower : String, alias : String, aliasLower : String,
                           leaderCharacterId : String, memberCount : Int, factionId : Byte, id : String, creationDate : Long,
-                          leader : Character, lastIndexedOn : Long, members : List[CharacterWithMembership]) extends IndexerMessage
+                          leader : Character, lastIndexedOn : Long, updateTime : Long, members : List[CharacterWithMembership]) extends IndexerMessage
 
   case class CharacterWithMembership(name : String,
                                      nameLower : String,
@@ -114,5 +114,6 @@ object IndexerActor {
                                      loginCount : Int,
                                      minutesPlayed : Int,
                                      lastIndexedOn : Long,
+                                     updateTime : Option[Long],
                                      membership : Option[OutfitMembership])
 }

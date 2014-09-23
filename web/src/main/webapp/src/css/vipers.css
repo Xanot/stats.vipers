@@ -119,3 +119,9 @@ td .progress .progress-bar span {
 .websocket-false {
     color: red;
 }
+
+/* info snippets */
+dt, dd {
+    font-size: 11px;
+    line-height: 1.2;
+}

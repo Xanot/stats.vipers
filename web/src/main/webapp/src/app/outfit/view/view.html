@@ -1,26 +1,32 @@
-<div bindonce="outfit">
+<div ng-if="outfit" bindonce="outfit">
   <!-- Header -->
-  <div>
-    <div>
+  <div class="row">
+    <div class="col-xs-5">
       <h4 class="faction-{{outfit.factionId}}">
         {{ outfit.name }} <span ng-if="outfit.alias">[{{ outfit.alias }}]</span>
-        <small class="pull-right">
-          <dl class="dl-horizontal">
-            <dt>Created</dt>
-            <dd><span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span></dd>
-            <dt>Members</dt>
-            <dd> {{ outfit.members.length }} </dd>
-            <dt>Leader</dt>
-            <dd>
-              <a href="{{ leaderHref(outfit.leader.name) }}" class="faction-{{outfit.factionId}}">
-                {{ outfit.leader.name }}
-              </a>
-            </dd>
-            <dt>Indexed</dt>
-            <dd><span am-time-ago="outfit.lastIndexedOn" am-preprocess="null"></span></dd>
-          </dl>
-        </small>
       </h4>
+    </div>
+    <div class="col-xs-3">
+      <dl class="dl-horizontal pull-right">
+        <dt>Created</dt>
+        <dd><span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span></dd>
+        <dt>Members</dt>
+        <dd> {{ outfit.members.length }} </dd>
+        <dt>Leader</dt>
+        <dd>
+          <a href="{{ leaderHref(outfit.leader.name) }}" class="faction-{{outfit.factionId}}">
+            {{ outfit.leader.name }}
+          </a>
+        </dd>
+      </dl>
+    </div>
+    <div class="col-xs-4">
+      <dl class="dl-horizontal">
+        <dt>Indexed</dt>
+        <dd><span am-time-ago="outfit.lastIndexedOn" am-preprocess="null"></span></dd>
+        <dt>Update eligible</dt>
+        <dd><span am-time-ago="outfit.updateTime" am-preprocess="null"></span></dd>
+      </dl>
     </div>
   </div>
   <!-- Members -->
@@ -91,4 +97,7 @@
       </tbody>
     </table>
   </div>
+</div>
+<div ng-if="!outfit" class="text-center">
+  <i class="fa fa-cog fa-spin fa-5x"></i>
 </div>

@@ -46,20 +46,24 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
       }
     }
 
-    def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : Option[(Outfit, Character, List[OutfitMember])] = {
-      def outfitResponse(outfit : Outfit)(implicit s : db.Session) : (Outfit, Character, List[OutfitMember]) = {
-        (outfit, db.characterDAO.find(outfit.leaderCharacterId).get, db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id))
+    def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : Option[(Outfit, Character, List[OutfitMember], Long)] = {
+      def outfitResponse(outfit : Outfit)(implicit s : db.Session) : (Outfit, Character, List[OutfitMember], Long) = {
+        (outfit, db.characterDAO.find(outfit.leaderCharacterId).get, db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id), outfit.lastIndexedOn + Configuration.outfitStaleAfter)
       }
 
       db.withSession { implicit s =>
         if(outfitAlias.isDefined) {
-          db.outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
+          val o = db.outfitDAO.findByAliasLower(outfitAlias.get)
+          if(o.isDefined) {
+            val outfit = o.get
             if(isStale(outfit.lastIndexedOn)) {
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
+              None
+            } else {
+              Some(outfitResponse(outfit))
             }
-            outfitResponse(outfit)
-          }.orElse {
-            if(!outfitsBeingIndexed.contains(outfitAlias.get)) {
+          } else {
+            if (!outfitsBeingIndexed.contains(outfitAlias.get)) {
               log.debug(s"Outfit ${outfitAlias.get} is being indexed")
               outfitsBeingIndexed.add(outfitAlias.get)
               fetcherActor ! FetchOutfitRequest(outfitAlias, None)
@@ -67,12 +71,16 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
             None
           }
         } else if(outfitId.isDefined) {
-          db.outfitDAO.find(outfitId.get).map { outfit =>
+          val o = db.outfitDAO.find(outfitId.get)
+          if(o.isDefined) {
+            val outfit = o.get
             if(isStale(outfit.lastIndexedOn)) {
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
+              None
+            } else {
+              Some(outfitResponse(outfit))
             }
-            outfitResponse(outfit)
-          }.orElse {
+          } else {
             if(!outfitsBeingIndexed.contains(outfitId.get)) {
               log.debug(s"Outfit ${outfitId.get} is being indexed")
               outfitsBeingIndexed.add(outfitId.get)

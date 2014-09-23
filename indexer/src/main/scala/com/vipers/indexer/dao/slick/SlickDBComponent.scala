@@ -17,6 +17,10 @@ private[indexer] class SlickDBComponent extends SlickDB
 
       val ds : BoneCPDataSource = new BoneCPDataSource
       ds.setDriverClass(driver)
+
+      Configuration.Database.user.map { u => ds.setUser(u) }
+      Configuration.Database.password.map { p => ds.setPassword(p) }
+
       ds.setJdbcUrl(dbUrl)
       ds.setPartitionCount(3)
       ds.setMinConnectionsPerPartition(5)

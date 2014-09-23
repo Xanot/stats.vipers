@@ -15,7 +15,7 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
     private val findByNameLowerCompiled = Compiled((nameLower : Column[String]) => table.filter(_.nameLower === nameLower))
 
     private val deleteAllByOutfitIdCompiled = Compiled((outfitId : Column[String]) => {
-      table.filter(c => c.id in outfitMembershipDAO.table.map(_.outfitId))
+      table.filter(c => c.id in outfitMembershipDAO.table.filter(_.outfitId === outfitId).map(_.id))
     })
 
     override def findByNameLower(nameLower: String)(implicit s : Session) : Option[Character] = findByNameLowerCompiled(nameLower).firstOption

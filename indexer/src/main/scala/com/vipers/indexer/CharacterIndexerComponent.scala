@@ -39,7 +39,7 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: Indexer
       }
     }
 
-    def retrieve(nameLower : String) : Option[(Character, Option[OutfitMembership])] = {
+    def retrieve(nameLower : String) : Option[(Character, Option[OutfitMembership], Long)] = {
       def indexChar(nameLower : String) {
         if(!charactersBeingIndexed.contains(nameLower)) {
           log.debug(s"Character $nameLower is being indexed")
@@ -54,7 +54,7 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: Indexer
             indexChar(nameLower)
           }
 
-          (c, db.outfitMembershipDAO.find(c.id))
+          (c, db.outfitMembershipDAO.find(c.id), c.lastIndexedOn + Configuration.characterStaleAfter)
         }.orElse {
           indexChar(nameLower)
           None
