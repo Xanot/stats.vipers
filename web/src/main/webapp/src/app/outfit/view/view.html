@@ -1,4 +1,4 @@
-<div ng-if="outfit" bindonce="outfit">
+<div>
   <!-- Header -->
   <div class="row">
     <div class="col-xs-5">
@@ -39,22 +39,22 @@
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;" ng-focus="limitRows = 50;">
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">
+          <a ng-click="limitRows = 50; predicate='membership.outfitRankOrdinal'; reverse=!reverse;">
             Outfit rank
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
+          <a ng-click="limitRows = 50; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
             BR
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='lastLoginDate'; reverse=!reverse;">
+          <a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">
             Last login
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 30; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">
+          <a ng-click="limitRows = 50; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">
             Member since
           </a>
         </th>
@@ -97,7 +97,4 @@
       </tbody>
     </table>
   </div>
-</div>
-<div ng-if="!outfit" class="text-center">
-  <i class="fa fa-cog fa-spin fa-5x"></i>
 </div>

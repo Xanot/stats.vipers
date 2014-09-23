@@ -45,14 +45,14 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
 
   .controller('OutfitViewController', ['$scope', '$state', 'OutfitService', 'resolveOutfit', 'WebSocketService', 'AlertService',
     function($scope, $state, OutfitService, resolveOutfit, WebSocketService, AlertService) {
-      $scope.limitRows = 30;
+      $scope.limitRows = 50;
 
       $scope.increaseLimit = function() {
         $scope.limitRows += 30;
       };
 
       $scope.$watch("filterName", function() {
-        $scope.limitRows = 30;
+        $scope.limitRows = 50;
       });
 
       $scope.leaderHref = function(name) {
