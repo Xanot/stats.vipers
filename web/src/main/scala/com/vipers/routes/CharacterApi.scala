@@ -1,11 +1,11 @@
 package com.vipers.routes
 
 import akka.pattern.ask
-import com.vipers.indexer.IndexerActor.{BeingIndexed, GetCharacterRequest}
+import com.vipers.indexer.IndexerActor._
+import com.vipers.model.Character
 import com.vipers.{ApiActor, JsonRoute}
 import scala.util.{Success, Failure}
 import spray.http.StatusCodes._
-import com.vipers.indexer.IndexerActor.CharacterWithMembership
 
 trait CharacterApi extends JsonRoute { this: ApiActor =>
   import context.dispatcher
@@ -14,8 +14,9 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
     pathPrefix("player") {
       pathEnd {
         get {
-          complete {
-            "ok"
+          onComplete((indexerActor ? GetAllIndexedCharacters).mapTo[List[Character]]) {
+            case Success(characters) => complete{ characters }
+            case Failure(e) => complete(InternalServerError, e.toString)
           }
         }
       } ~

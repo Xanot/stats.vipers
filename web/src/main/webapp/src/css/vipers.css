@@ -7,7 +7,28 @@
     margin: 0;
     position: absolute;
     z-index: 100;
+}
+#sidebar .nav {
+    height: 100%;
+    margin: 0;
+    width: 40px;
+}
+#sidebar.navbar li i {
     font-size: 20px;
+    line-height: 50px;
+    padding: 0 11px;
+    vertical-align: middle;
+    width: 40px;
+}
+#sidebar a {
+    padding: 0;
+    color: #41f024;
+}
+.home-link {
+    background-color: #5752ba;
+}
+.home-link:hover {
+    background-color: #5752ba !important;
 }
 
 /* Content wrapper */
@@ -16,7 +37,7 @@
     height: 100%;
     overflow: auto;
     padding-left: 40px;
-    padding-top: 40px;
+    padding-top: 20px;
     position: absolute;
     width: 100%;
 }
@@ -120,7 +141,7 @@ td .progress .progress-bar span {
 /* Alert container */
 #alerts {
     position: fixed;
-    top: 60px;
+    top: 20px;
     right: 0;
     margin: 20px;
     width: 200px;

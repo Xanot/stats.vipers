@@ -16,7 +16,7 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
       pathEnd {
         get {
           encodeResponse(Gzip) {
-            onComplete((indexerActor ? GetMultipleOutfits).mapTo[List[Outfit]]) {
+            onComplete((indexerActor ? GetAllIndexedOutfits).mapTo[List[Outfit]]) {
               case Success(outfits) => complete(outfits)
               case Failure(m) => complete(InternalServerError, m.toString)
             }

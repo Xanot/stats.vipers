@@ -11,22 +11,18 @@ angular.module('player', ['player.view', 'utils', 'ui.router'])
   }])
 
   .controller('PlayerController', ['$scope', 'PlayerService', function($scope, PlayerService) {
-    $scope.search = function(name) {
-      if(name && name.length >= 3) {
-        return PlayerService.search(name.toLowerCase()).then(function(response) {
-          return response.data.character_name_list;
-        })
-      }
-    };
+    PlayerService.getAllCharacters().then(function(response) {
+      $scope.players = response.data
+    });
   }])
 
   .factory('PlayerService', ['$http', 'UrlService', function($http, UrlService) {
     return {
-      search: function(name, page) {
-        return $http.jsonp("http://census.soe.com/s:soe/get/ps2:v2/character_name/?name.first_lower=^" + name +"&c:limit=6&c:sort=name.first_lower&c:show=name.first,character_id&callback=JSON_CALLBACK")
-      },
       getByName: function(name) {
         return $http.get(UrlService.url("/player/" + name))
+      },
+      getAllCharacters: function() {
+        return $http.get(UrlService.url("/player"))
       }
     }
   }]);

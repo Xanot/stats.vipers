@@ -63,7 +63,7 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
-    case GetMultipleOutfits =>
+    case GetAllIndexedOutfits =>
       Future {
         db.withSession { implicit s =>
           db.outfitDAO.findAll
@@ -78,6 +78,13 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
+    case GetAllIndexedCharacters =>
+      Future {
+        db.withSession { implicit s =>
+          db.characterDAO.findAll
+        }
+      } pipeTo sender
+
     case e : AnyRef => log.error(e.toString)
   }
 }
@@ -90,7 +97,8 @@ object IndexerActor {
   // Received
   case class GetOutfitRequest(aliasLower : Option[String], id : Option[String]) extends IndexerMessage
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
-  case object GetMultipleOutfits extends IndexerMessage
+  case object GetAllIndexedOutfits extends IndexerMessage
+  case object GetAllIndexedCharacters extends IndexerMessage
 
   // Sent
   case object BeingIndexed extends IndexerMessage

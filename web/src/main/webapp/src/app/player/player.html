@@ -1,7 +1,22 @@
 <div class="row">
-  <div class="col-md-3">
-    <input type="text" class="form-control" ng-model="selectedPlayer" ng-options="player.name.first for player in search($viewValue)" placeholder="Search" bs-typeahead>
-  </div>
-  <div class="col-md-9">Player List</div>
+  <!--Players -->
+  <table class="table table-striped table-bordered table-responsive">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="player in players | limitTo:10" bindonce>
+      <td> {{ $index + 1 }}</td>
+      <td>
+        <a bo-href="'#/player/' + player.name" bo-class="{'faction-1' : player.factionId === 1, 'faction-2' : player.factionId === 2, 'faction-3' : player.factionId === 3}">
+          <span bo-text="player.name"></span>
+        </a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
 </div>
 
