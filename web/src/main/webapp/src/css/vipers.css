@@ -1,3 +1,8 @@
+/* Body */
+body {
+    background: #FFFFFF url(../img/bg.png);
+}
+
 /* Sidebar */
 #sidebar {
     background-color: #555555;
@@ -98,7 +103,7 @@
 
 /* Table header input */
 .table-input input, textarea{
-    background-color:#222222;
+    background-color: transparent;
     color: #FFF;
     padding: 0;
     margin-bottom: -10px;

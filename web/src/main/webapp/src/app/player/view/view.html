@@ -6,8 +6,7 @@
         {{ player.name }}
         <span ng-if="player.membership">
           [{{ player.membership.rankOrdinal | outfitRank }} of
-          <a class="faction-{{player.factionId}}" ui-sref="outfit-view({aliasOrId : player.membership.outfitAlias})">{{ player.membership.outfitName }}</a>
-          ]
+          <a class="faction-{{player.factionId}}" ui-sref="outfit-view({aliasOrId : player.membership.outfitAlias})">{{ player.membership.outfitName }}</a>]
         </span>
         <small>last logged in <span am-time-ago="player.lastLoginDate" data-type="info" data-title="{{ player.creationDate | amCalendar }}" bs-tooltip></span></small>
       </h4>

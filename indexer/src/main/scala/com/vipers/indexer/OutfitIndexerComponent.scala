@@ -54,7 +54,7 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
       db.withSession { implicit s =>
         if(outfitAlias.isDefined) {
           db.outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
-            if(isStale(outfit.lastIndexedOn)) {
+            if(isStale(outfit.lastIndexedOn) && !outfitsBeingIndexed.contains(outfitAlias.get)) {
               log.debug(s"Outfit ${outfitAlias.get} is being updated")
               outfitsBeingIndexed.add(outfitAlias.get)
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
@@ -70,9 +70,9 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
           }
         } else if(outfitId.isDefined) {
           db.outfitDAO.find(outfitId.get).map { outfit =>
-            if(isStale(outfit.lastIndexedOn)) {
+            if(isStale(outfit.lastIndexedOn) && !outfitsBeingIndexed.contains(outfitId.get)) {
               log.debug(s"Outfit ${outfit.alias} is being updated")
-              outfitsBeingIndexed.add(outfit.alias)
+              outfitsBeingIndexed.add(outfit.id)
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
             }
             outfitResponse(outfit)
