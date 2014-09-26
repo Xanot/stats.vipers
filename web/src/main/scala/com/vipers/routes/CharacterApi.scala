@@ -25,7 +25,7 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
           onComplete(indexerActor ? GetCharacterRequest(characterName.toLowerCase)) {
             case Success(response) => complete {
               response match {
-                case m : CharacterWithMembership => m
+                case m : GetCharacterResponse => m
                 case BeingIndexed => NotFound
               }
             }

@@ -29,6 +29,14 @@ angular.module('player.view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerViewController', ['$scope', 'resolvePlayer', function($scope, resolvePlayer) {
-    $scope.player = resolvePlayer;
+  .controller('PlayerViewController', ['$scope', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'AlertService',
+    function($scope, PlayerService, resolvePlayer, WebSocketService, AlertService) {
+      $scope.player = resolvePlayer;
+
+      WebSocketService.subscribe("c:" + resolvePlayer.nameLower, function(data) {
+        PlayerService.getByName(data).then(function(response) {
+          $scope.player = response.data;
+        });
+        AlertService.alertWithData({"type": "info", name: data}, undefined, 'app/player/alert.player.tpl.html')
+      });
   }]);

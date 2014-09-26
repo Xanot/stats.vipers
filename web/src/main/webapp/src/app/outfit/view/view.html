@@ -1,4 +1,4 @@
-<div>
+<div bindonce="outfit">
   <!-- Header -->
   <div class="row">
     <div class="col-xs-5">
@@ -44,13 +44,18 @@
           </a>
         </th>
         <th>
-          <a ng-click="limitRows = 50; predicate='battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
+          <a ng-click="limitRows = 50; predicate='battleRank == 100 ? earnedCerts : battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
             BR
           </a>
         </th>
         <th>
           <a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">
             Last login
+          </a>
+        </th>
+        <th>
+          <a ng-click="limitRows = 50; predicate='minutesPlayed'; reverse=!reverse;">
+            Time played
           </a>
         </th>
         <th>
@@ -89,6 +94,9 @@
         </td>
         <td>
           <span am-time-ago="member.lastLoginDate" bs-tooltip  data-type="info" data-title="{{ member.lastLoginDate | amCalendar }}" data-container="body"></span>
+        </td>
+        <td>
+          <span bo-text="member.minutesPlayed | minuteDuration"></span>
         </td>
         <td>
           <span am-time-ago="member.membership.outfitMemberSinceDate" bs-tooltip data-type="info" data-title="{{ member.membership.outfitMemberSinceDate | amCalendar }}" data-container="body"></span>

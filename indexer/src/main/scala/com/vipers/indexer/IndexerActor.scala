@@ -53,11 +53,11 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
     case GetOutfitRequest(alias, id) =>
       Future {
         outfitIndexer.retrieve(alias, id).map { case (outfit, leader, members, updateTime) =>
-          new GetOutfitResponse(outfit.name, outfit.nameLower, outfit.alias, outfit.aliasLower, outfit.leaderCharacterId,
+          GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
             outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
             members.map { c =>
-              CharacterWithMembership(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.availableCerts, c._1.earnedCerts, c._1.certPercent,
-                c._1.spentCerts, c._1.factionId, c._1.creationDate, c._1.lastLoginDate, c._1.lastSaveDate, c._1.loginCount, c._1.minutesPlayed, c._1.lastIndexedOn, None, Some(c._2))
+              GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
+                c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
             }
           )
         }.getOrElse(BeingIndexed)
@@ -73,8 +73,8 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
     case GetCharacterRequest(nameLower) =>
       Future {
         characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime) =>
-          CharacterWithMembership(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.lastSaveDate, c.loginCount, c.minutesPlayed, c.lastIndexedOn, Some(updateTime), membership)
+          GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
+            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership)
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
@@ -102,26 +102,50 @@ object IndexerActor {
 
   // Sent
   case object BeingIndexed extends IndexerMessage
-  case class GetOutfitResponse(name : String, nameLower : String, alias : String, aliasLower : String,
-                          leaderCharacterId : String, memberCount : Int, factionId : Byte, id : String, creationDate : Long,
-                          leader : Character, lastIndexedOn : Long, updateTime : Long, members : List[CharacterWithMembership]) extends IndexerMessage
 
-  case class CharacterWithMembership(name : String,
-                                     nameLower : String,
-                                     id : String,
-                                     battleRank : Short,
-                                     battleRankPercent : Short,
-                                     availableCerts : Int,
-                                     earnedCerts : Int,
-                                     certPercent : Short,
-                                     spentCerts : Int,
-                                     factionId : Byte,
-                                     creationDate : Long,
-                                     lastLoginDate : Long,
-                                     lastSaveDate : Long,
-                                     loginCount : Int,
-                                     minutesPlayed : Int,
-                                     lastIndexedOn : Long,
-                                     updateTime : Option[Long],
-                                     membership : Option[OutfitMembership])
+  case class GetOutfitResponse(name : String,
+                               alias : String,
+                               aliasLower : String,
+                               memberCount : Int,
+                               factionId : Byte,
+                               id : String,
+                               creationDate : Long,
+                               leader : Character,
+                               lastIndexedOn : Long,
+                               updateTime : Long,
+                               members : List[GetOutfitResponseCharacter]) extends IndexerMessage
+
+  case class GetOutfitResponseCharacter(name : String,
+                                        nameLower : String,
+                                        id : String,
+                                        battleRank : Short,
+                                        battleRankPercent : Short,
+                                        earnedCerts : Int,
+                                        creationDate : Long,
+                                        lastLoginDate : Long,
+                                        minutesPlayed : Int,
+                                        membership : OutfitMembership)
+
+  case class GetCharacterResponse(name : String,
+                                  nameLower : String,
+                                  id : String,
+                                  battleRank : Short,
+                                  battleRankPercent : Short,
+                                  availableCerts : Int,
+                                  earnedCerts : Int,
+                                  certPercent : Short,
+                                  spentCerts : Int,
+                                  factionId : Byte,
+                                  creationDate : Long,
+                                  lastLoginDate : Long,
+                                  minutesPlayed : Int,
+                                  lastIndexedOn : Long,
+                                  updateTime : Long,
+                                  membership : Option[GetCharacterResponseOutfitMembership])
+
+  case class GetCharacterResponseOutfitMembership(rank : String,
+                                                  rankOrdinal : Byte,
+                                                  memberSinceDate : Long,
+                                                  outfitAlias : String,
+                                                  outfitName : String)
 }

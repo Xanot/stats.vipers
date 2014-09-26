@@ -1,1 +1,26 @@
-<span am-time-ago="player.lastIndexedOn" am-preprocess="null"></span>
+<div bindonce="player">
+  <!-- Header -->
+  <div class="row">
+    <div class="col-xs-7">
+      <h4 class="faction-{{player.factionId}}">
+        {{ player.name }}
+        <span ng-if="player.membership">
+          [{{ player.membership.rankOrdinal | outfitRank }} of
+          <a class="faction-{{player.factionId}}" ui-sref="outfit-view({aliasOrId : player.membership.outfitAlias})">{{ player.membership.outfitName }}</a>
+          ]
+        </span>
+        <small>last logged in <span am-time-ago="player.lastLoginDate" data-type="info" data-title="{{ player.creationDate | amCalendar }}" bs-tooltip></span></small>
+      </h4>
+    </div>
+    <div class="col-xs-5">
+      <dl class="dl-horizontal">
+        <dt>Created</dt>
+        <dd><span am-time-ago="player.creationDate" data-type="info" data-title="{{ player.creationDate | amCalendar }}" bs-tooltip></span></dd>
+        <dt>Indexed</dt>
+        <dd><span am-time-ago="player.lastIndexedOn" am-preprocess="null"></span></dd>
+        <dt>Update eligible</dt>
+        <dd><span am-time-ago="player.updateTime" am-preprocess="null"></span></dd>
+      </dl>
+    </div>
+  </div>
+</div>

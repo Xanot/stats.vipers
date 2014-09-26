@@ -48,5 +48,11 @@ angular.module('utils', ['constants'])
           break;
       }
     };
+  })
+
+  .filter('minuteDuration', function() {
+    return function(minutes) {
+      return moment.duration(minutes, "minutes").format("d[d] h[h]")
+    };
   });
 
