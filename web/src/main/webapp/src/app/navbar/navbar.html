@@ -3,11 +3,12 @@
     <ul class="nav">
       <li>
         <a ui-sref="home" class="home-link">
-          <i class="fa fa-globe"></i>
+          <i class="fa fa-globe text-center websocket-{{ isConnected }}"></i>
         </a>
       </li>
-      <li><a ui-sref="player"><i class="fa fa-user"></i></a></li>
-      <li><a ui-sref="outfit"><i class="fa fa-users"></i></a></li>
+      <li><a ui-sref="player"><i class="fa fa-user text-center"></i></a></li>
+      <li><a ui-sref="outfit"><i class="fa fa-users text-center"></i></a></li>
+      <li class="settings-link"><a ui-sref="settings"><i class="fa fa-wrench text-center"></i></a></li>
     </ul>
   </div>
 </div>

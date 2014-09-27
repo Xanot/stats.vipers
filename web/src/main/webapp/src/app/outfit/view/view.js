@@ -8,32 +8,32 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         controller: 'OutfitViewController',
         templateUrl: 'app/outfit/view/view.html',
         resolve: {
-          resolveOutfit : ['$q', '$stateParams', 'OutfitService', 'AlertService', 'WebSocketService',
-            function($q, $stateParams, OutfitService, AlertService, WebSocketService) {
+          resolveOutfit : ['$q', '$stateParams', 'OutfitService', 'NotificationService', 'WebSocketService',
+            function($q, $stateParams, OutfitService, NotificationService, WebSocketService) {
             var deferred = $q.defer();
 
             if($stateParams.aliasOrId.length <= 4) {
               var aliasLower = $stateParams.aliasOrId.toLowerCase();
 
               WebSocketService.subscribe("o:" + aliasLower, function(data) {
-                AlertService.alertWithData({"type": "info", alias: data}, undefined, 'app/outfit/alert.outfit.tpl.html')
+                NotificationService.outfitIndexed(data)
               });
 
               OutfitService.get(aliasLower).then(function(response) {
                 if(response.data.updateTime < new Date().getTime()) {
-                  AlertService.alert(response.data.alias, "is being updated, you will be notified when it is ready", "warning", 5);
+                  NotificationService.outfitBeingIndexed(response.data.alias)
                 }
                 deferred.resolve(response.data);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert(aliasLower.toUpperCase(), "is being indexed, you will be notified if it exists", "warning", 5)
+                NotificationService.outfitBeingIndexed(aliasLower);
               });
             } else {
               OutfitService.get($stateParams.aliasOrId).then(function(response) {
                 deferred.resolve(response.data);
               }).catch(function(err) {
                 deferred.reject();
-                AlertService.alert($stateParams.aliasOrId, "is being indexed, you will be notified if it exists", "warning", 5)
+                NotificationService.outfitBeingIndexed($stateParams.aliasOrId);
               });
             }
 
@@ -43,8 +43,8 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
       })
   }])
 
-  .controller('OutfitViewController', ['$scope', '$state', 'OutfitService', 'resolveOutfit', 'WebSocketService', 'AlertService',
-    function($scope, $state, OutfitService, resolveOutfit, WebSocketService, AlertService) {
+  .controller('OutfitViewController', ['$scope', '$state', 'OutfitService', 'resolveOutfit', 'WebSocketService', 'NotificationService',
+    function($scope, $state, OutfitService, resolveOutfit, WebSocketService, NotificationService) {
       $scope.limitRows = 50;
 
       $scope.increaseLimit = function() {
@@ -65,6 +65,6 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         OutfitService.get(resolveOutfit.aliasLower).then(function(response) {
           $scope.outfit = response.data;
         });
-        AlertService.alertWithData({"type": "info", alias: data}, undefined, 'app/outfit/alert.outfit.tpl.html')
+        NotificationService.outfitIndexed(data)
       });
     }]);

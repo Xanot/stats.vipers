@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('home', ['ui.router'])
+angular.module('home', ['ui.router', 'hc.marked'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider.state('home', {
       url: '/home',

@@ -35,6 +35,11 @@ body {
 .home-link:hover {
     background-color: #5752ba !important;
 }
+.settings-link {
+    position: absolute !important;
+    left: auto;
+    bottom: 10px;
+}
 
 /* Content wrapper */
 #content {
@@ -145,11 +150,9 @@ td .progress .progress-bar span {
 
 /* Alert container */
 #alerts {
-    position: fixed;
-    top: 20px;
-    right: 0;
-    margin: 20px;
-    width: 200px;
+    bottom: 0;
+    left: 50px;
+    position: absolute;
 }
 
 /* Websocket connectivity */
@@ -164,4 +167,20 @@ td .progress .progress-bar span {
 dt, dd {
     font-size: 11px;
     line-height: 1.2;
+}
+
+/* Settings */
+.settings .fa {
+    vertical-align: middle
+}
+.settings .fa:hover {
+    cursor: pointer;
+    color: white;
+}
+.settings .fa-disabled {
+    color: grey;
+}
+.settings .fa-disabled:hover {
+    cursor: auto;
+    color: grey;
 }

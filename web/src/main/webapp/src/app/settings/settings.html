@@ -1,0 +1,79 @@
+<div class="settings">
+  <div class="row">
+    <!-- Automatic update -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Real-time Updates<small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setRealTimeDefaults()"></i></small></h3>
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <tbody>
+            <tr>
+              <td>Enabled</td>
+              <td>
+                <i class="fa fa-2x" ng-class="{'fa-toggle-on': realTime.enabled, 'fa-toggle-off': !realTime.enabled}"
+                   ng-click="realTime.enabled = !realTime.enabled"></i>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Notifications -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Notifications <small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setNotificationDefaults()"></i></small></h3>
+        </div>
+        <div class="panel-body">
+          <div ng-model="notificationTabs.activeTab" bs-tabs>
+            <div ng-repeat="tab in notificationTabs" title="{{ tab.title }}" bs-pane></div>
+            <div ng-include src="notificationTabs[notificationTabs.activeTab].page"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/ng-template" id="being-indexed.html">
+  <table class="table">
+    <tbody>
+    <tr>
+      <td>Enabled</td>
+      <td>
+        <i class="fa fa-2x" ng-class="{'fa-toggle-on': notification.beingIndexedEnabled, 'fa-toggle-off': !notification.beingIndexedEnabled}"
+           ng-click="notification.beingIndexedEnabled = !notification.beingIndexedEnabled"></i>
+      </td>
+    </tr>
+    <tr>
+      <td>Expire After (seconds)</td>
+      <td>
+        <input ng-disabled="!notification.beingIndexedEnabled" type="number" class="form-control input-sm" ng-model="notification.beingIndexedExpireAfter">
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</script>
+
+<script type="text/ng-template" id="indexed.html">
+  <table class="table">
+    <tbody>
+    <tr>
+      <td>Enabled</td>
+      <td>
+        <i class="fa fa-2x" ng-class="{'fa-toggle-on': notification.indexedEnabled, 'fa-toggle-off': !notification.indexedEnabled, 'fa-disabled': !realTime.enabled}"
+           ng-click="notification.indexedEnabled = !notification.indexedEnabled"></i>
+      </td>
+    </tr>
+    <tr>
+      <td>Expire After (seconds)</td>
+      <td>
+        <input ng-disabled="!realTime.enabled || !notification.indexedEnabled" type="number" class="form-control input-sm" ng-model="notification.indexedExpireAfter">
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</script>

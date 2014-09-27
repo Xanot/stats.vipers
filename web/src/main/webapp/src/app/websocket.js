@@ -5,6 +5,7 @@
   var subscribers = [];
 
   function connect(address) {
+    if(conn) conn.close();
     conn = new WebSocket(address);
     conn.onmessage = function(evt) {
       var json = JSON.parse(evt.data);
@@ -13,6 +14,10 @@
     conn.onclose = function() { publish('onClose', null); };
     conn.onopen = function()  { publish('onOpen',  null); };
     conn.onerror = function() { publish('onError', null); };
+  }
+
+  function close() {
+    if(conn) conn.close();
   }
 
   function publish(eventName, eventData) {
@@ -46,8 +51,14 @@
   }
 
   angular.module('websocket', ['constants'])
-    .run(['Constants', function(Constants) {
-      connect(Constants.WebSocket.PROTOCOL + "://" + Constants.WebSocket.HOST + ":" + Constants.WebSocket.PORT);
+    .run(['Constants', '$rootScope', function(Constants, $rootScope) {
+      $rootScope.$watch("realTime.enabled", function(newVal) {
+        if(newVal) {
+          connect(Constants.WebSocket.PROTOCOL + "://" + Constants.WebSocket.HOST + ":" + Constants.WebSocket.PORT);
+        } else {
+          close();
+        }
+      });
     }])
     .factory('WebSocketService', ['$rootScope', function($rootScope) {
       var pending = [];
