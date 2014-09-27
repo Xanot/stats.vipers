@@ -56,7 +56,7 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
           db.outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
             if(isStale(outfit.lastIndexedOn) && !outfitsBeingIndexed.contains(outfitAlias.get)) {
               log.debug(s"Outfit ${outfitAlias.get} is being updated")
-              outfitsBeingIndexed.add(outfitAlias.get)
+              outfitsBeingIndexed.add(outfit.id)
               fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
             }
             outfitResponse(outfit)

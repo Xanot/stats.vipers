@@ -33,10 +33,18 @@ angular.module('player.view', ['utils', 'ui.router'])
     function($scope, PlayerService, resolvePlayer, WebSocketService, NotificationService) {
       $scope.player = resolvePlayer;
 
+      // Retrieve the character if it is updated
       WebSocketService.subscribe("c:" + resolvePlayer.nameLower, function(data) {
         PlayerService.getByName(data).then(function(response) {
           $scope.player = response.data;
         });
         NotificationService.characterIndexed(data)
+      });
+
+      // Don't retrieve the character if we are out of this state
+      $scope.$on('$destroy', function() {
+        WebSocketService.subscribe("c:" + resolvePlayer.nameLower, function(data) {
+          NotificationService.characterIndexed(data)
+        });
       });
   }]);
