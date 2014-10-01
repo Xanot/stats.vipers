@@ -75,8 +75,6 @@ class CensusQueryTest extends WordSpecLike with Test {
           command should be("c:join")
           v should be ("weapon^inject_at:my_weapon^list:0^on:weapon_id^to:some_other_weapon_id^terms:termKey=termValue'termKey2=termValue2^hide:hideField'hideField2^show:showField'showField2^outer:0(character^inject_at:character^outer:1),faction^inject_at:faction")
       }
-
-
     }
   }
   "CensusQuery" should {

@@ -43,4 +43,10 @@ private[indexer] object DAOs {
       def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
   }
+
+  trait WeaponDAOComponent extends DAOComponent { this : DB =>
+    val weaponDAO : WeaponDAO
+
+    trait WeaponDAO { this: DAO[Weapon] => }
+  }
 }

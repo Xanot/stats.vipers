@@ -111,6 +111,15 @@ class FetcherActor extends Actor {
           case _ => None
         }
       } pipeTo sender
+    case FetchAllWeaponsRequest =>
+      Future {
+        val JArray(weaponList) = sendRequest(ApiUrlBuilder.getAllWeapons) \ "weapon_list"
+        val list = mutable.ListBuffer.empty[Weapon]
+        weaponList.foreach { json =>
+          list += json.toWeapon.get
+        }
+        FetchAllWeaponsResponse(list)
+      } pipeTo sender
   }
 
   private def sendRequest(r : Uri) : JValue = {
@@ -145,4 +154,10 @@ object FetcherActor {
 
   case class FetchOutfitCharactersRequest(alias : Option[String], id : Option[String], page : Page)
   case class FetchOutfitCharactersResponse(total : Int, characters : Seq[OutfitMember])
+
+  //================================================================================
+  // Weapon request/response
+  //================================================================================
+  case object FetchAllWeaponsRequest
+  case class FetchAllWeaponsResponse(weapons : Seq[Weapon])
 }

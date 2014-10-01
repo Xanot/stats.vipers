@@ -81,6 +81,14 @@ private[fetcher] object ApiUrlBuilder {
   }
 
   //================================================================================
+  // Weapon
+  //================================================================================
+  def getAllWeapons : Uri = {
+    val params = CensusQuery(None, Limit(10000), Join(ItemToWeaponJoin(nested = Some(ItemJoin())))).construct
+    construct(Uri.Path("weapon"), params.toMap)
+  }
+
+  //================================================================================
   // Utility
   //================================================================================
   private def construct(path : Uri.Path, params : Map[String, String]) : Uri = {

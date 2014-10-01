@@ -107,4 +107,16 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.query.get("c:lang").get should be("en")
     uri.query.get("name.first_lower").get should be("xanot")
   }
+
+  //================================================================================
+  // Weapon
+  //================================================================================
+  "getAllWeapons uri" should "be constructed" in {
+    val uri = ApiUrlBuilder.getAllWeapons
+    uri.path.tail.toString().endsWith("weapon") should be(right = true)
+    uri.query.length should be(3)
+    uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:limit").get should be("10000")
+    uri.query.get("c:join").get should be("item_to_weapon^inject_at:item_to_weapon(item^inject_at:item)")
+  }
 }

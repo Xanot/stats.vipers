@@ -93,6 +93,55 @@ private[fetcher] object Wrapper {
       }
     }
 
+    def toWeapon : Option[Weapon] = {
+      implicit val jsonFormats = org.json4s.DefaultFormats
+      check {
+        val item = json \ "item_to_weapon" \ "item"
+        val itemName = item \ "name" \ "en"
+        val itemDescription = item \ "description" \ "en"
+        val (JString(weaponId), JString(name), description, factionId, JString(imagePath), JString(isVehicleWeapon),
+          JString(moveModifier), JString(turnModifier)) = {
+          (
+            json \ "weapon_id",
+            itemName,
+            itemDescription,
+            item \ "faction_id",
+            item \ "image_path",
+            item \ "is_vehicle_weapon",
+            json \ "move_modifier",
+            json \ "turn_modifier"
+          )
+        }
+
+        val (equipMs, fromIronSightsMs, toIronSightsMs, unEquipMs, sprintRecoveryMs) = {(
+          json \ "equip_ms",
+          json \ "from_iron_sights_ms",
+          json \ "to_iron_sights_ms",
+          json \ "unequip_ms",
+          json \ "sprint_recovery_ms"
+        )}
+
+        val (heatBleedOffRate, heatCapacity, heatOverheatPenaltyMs) = {(
+          json \ "heat_bleed_off_rate",
+          json \ "heat_capacity",
+          json \ "heat_overheat_penalty_ms"
+        )}
+
+        Weapon(weaponId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
+          equipMs.toOption.map(_.extract[String].toInt),
+          fromIronSightsMs.toOption.map(_.extract[String].toInt),
+          toIronSightsMs.toOption.map(_.extract[String].toInt),
+          unEquipMs.toOption.map(_.extract[String].toInt),
+          sprintRecoveryMs.toOption.map(_.extract[String].toInt),
+          moveModifier.toFloat,
+          turnModifier.toFloat,
+          heatBleedOffRate.toOption.map(_.extract[String].toFloat),
+          heatCapacity.toOption.map(_.extract[String].toInt),
+          heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt),
+          System.currentTimeMillis())
+      }
+    }
+
     private def check[T](f : => T) : Option[T] = {
       if(json != JNothing) {
         Some(f)

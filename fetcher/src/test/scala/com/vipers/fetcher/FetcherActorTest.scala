@@ -185,4 +185,16 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       }
     }
   }
+
+  //================================================================================
+  // Weapon
+  //================================================================================
+  "Fetcher actor" should {
+    "return all weapons" in {
+      whenReady((fetcherActor ? FetchAllWeaponsRequest).mapTo[FetchAllWeaponsResponse]) { response =>
+        response.weapons.length should be > 100
+        response.weapons.filter(_.id == "1")(0).name should be("NS AutoBlade")
+      }
+    }
+  }
 }
