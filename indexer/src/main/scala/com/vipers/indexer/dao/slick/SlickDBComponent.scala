@@ -3,12 +3,16 @@ package com.vipers.indexer.dao.slick
 import com.jolbox.bonecp.BoneCPDataSource
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.Configuration
+import com.vipers.indexer.dao.DBComponent
 import scala.slick.driver._
 import scala.slick.jdbc.JdbcBackend
 import scala.slick.jdbc.JdbcBackend.Database
 
-private[indexer] class SlickDBComponent extends SlickDB
-  with SlickOutfitDAOComponent with SlickCharacterDAOComponent with SlickOutfitMembershipDAOComponent {
+private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
+  with SlickOutfitDAOComponent
+  with SlickCharacterDAOComponent
+  with SlickOutfitMembershipDAOComponent
+  with SlickWeaponDAOComponent {
 
   override protected val db: JdbcBackend.Database = {
     Database.forDataSource {

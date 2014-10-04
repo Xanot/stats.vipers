@@ -5,19 +5,18 @@ import akka.actor.{PoisonPill, ActorRef, Props, Actor}
 import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
-import com.vipers.fetcher.FetcherActor.{FetchCharacterResponse, FetchOutfitResponse}
+import com.vipers.fetcher.FetcherActor._
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import com.vipers.model.{OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
-import com.vipers.notifier.NotifierActor.{Stop, Start}
+import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop, Start}
 import scala.concurrent.Future
 import akka.pattern.pipe
 
-class IndexerActor extends Actor with Logging with OutfitIndexerComponent with CharacterIndexerComponent {
+class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitIndexerComponent with CharacterIndexerComponent {
   import context.dispatcher
 
-  protected val db : SlickDBComponent = new SlickDBComponent
   protected var fetcherActor : ActorRef = _
   protected var notifierActor : ActorRef = _
 
@@ -39,12 +38,16 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
     //================================================================================
     case r : FetchOutfitResponse =>
       Future {
-        outfitIndexer.index(r)
+        outfitIndexer.index(r).map { outfit =>
+          notifierActor ! OutfitIndexed(outfit.aliasLower) // Notify client
+        }
       }
 
     case r : FetchCharacterResponse =>
       Future {
-        characterIndexer.index(r)
+        characterIndexer.index(r).map { character =>
+          notifierActor ! CharacterIndexed(character.nameLower) // Notify client
+        }
       }
 
     //================================================================================
@@ -52,36 +55,50 @@ class IndexerActor extends Actor with Logging with OutfitIndexerComponent with C
     //================================================================================
     case GetOutfitRequest(alias, id) =>
       Future {
-        outfitIndexer.retrieve(alias, id).map { case (outfit, leader, members, updateTime) =>
-          GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
-            outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
-            members.map { c =>
-              GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
-                c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
+        outfitIndexer.retrieve(alias, id) match {
+          case (needsIndexing, retrievedInfo) =>
+            if(needsIndexing) {
+              fetcherActor ! FetchOutfitRequest(alias, id)
             }
-          )
-        }.getOrElse(BeingIndexed)
+
+            retrievedInfo.map { case (outfit, leader, members, updateTime) =>
+              GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
+                outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
+                members.map { c =>
+                  GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
+                    c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
+                }
+              )
+            }.getOrElse(BeingIndexed)
+        }
       } pipeTo sender
 
     case GetAllIndexedOutfits =>
       Future {
-        db.withSession { implicit s =>
-          db.outfitDAO.findAll
+        withSession { implicit s =>
+          outfitDAO.findAll
         }
       } pipeTo sender
 
     case GetCharacterRequest(nameLower) =>
       Future {
-        characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime) =>
-          GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership)
-        }.getOrElse(BeingIndexed)
+        characterIndexer.retrieve(nameLower) match {
+          case (needsIndexing, retrievedInfo) =>
+            if(needsIndexing) {
+              fetcherActor ! FetchCharacterRequest(Some(nameLower), None)
+            }
+
+            retrievedInfo.map { case (c, membership, updateTime) =>
+              GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
+                c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership)
+            }.getOrElse(BeingIndexed)
+        }
       } pipeTo sender
 
     case GetAllIndexedCharacters =>
       Future {
-        db.withSession { implicit s =>
-          db.characterDAO.findAll
+        withSession { implicit s =>
+          characterDAO.findAll
         }
       } pipeTo sender
 

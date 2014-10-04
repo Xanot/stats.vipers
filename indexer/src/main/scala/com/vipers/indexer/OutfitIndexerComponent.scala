@@ -1,13 +1,13 @@
 package com.vipers.indexer
 
 import com.vipers.Logging
-import com.vipers.fetcher.FetcherActor.{FetchOutfitRequest, OutfitMember, FetchOutfitResponse}
+import com.vipers.fetcher.FetcherActor.{OutfitMember, FetchOutfitResponse}
+import com.vipers.indexer.dao.DBComponent
 import com.vipers.model.Outfit
-import com.vipers.notifier.NotifierActor.OutfitIndexed
 import org.eclipse.jetty.util.ConcurrentHashSet
 import com.vipers.model.Character
 
-private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerActor =>
+private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponent =>
   val outfitIndexer : OutfitIndexer = new OutfitIndexer
 
   class OutfitIndexer {
@@ -15,76 +15,70 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: IndexerAct
 
     private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.outfitStaleAfter
 
-    def index(response : FetchOutfitResponse) {
+    def index(response : FetchOutfitResponse) : Option[Outfit] = {
       response.contents match {
         case Some((outfit, members)) =>
-          try {
-            db.withTransaction { implicit s =>
-              // Update or create the outfit
-              if(db.outfitDAO.exists(outfit.id)) {
-                db.outfitDAO.update(outfit)
-              } else {
-                db.outfitDAO.create(outfit)
-              }
+          withTransaction { implicit s =>
+            outfitDAO.createOrUpdate(outfit)
 
-              // Remove characters and memberships, seems to be easier and more efficient than diffing
-              db.characterDAO.deleteAllByOutfitId(outfit.id)
-              db.outfitMembershipDAO.deleteAllByOutfitId(outfit.id)
+            // Remove characters and memberships, seems to be easier and more efficient than diffing
+            characterDAO.deleteAllByOutfitId(outfit.id)
+            outfitMembershipDAO.deleteAllByOutfitId(outfit.id)
 
-              // create characters and memberships
-              db.characterDAO.createAll(members.map(_._1):_*)
-              db.outfitMembershipDAO.createAll(members.map(_._2):_*)
+            // create characters and memberships
+            characterDAO.createAll(members.map(_._1):_*)
+            outfitMembershipDAO.createAll(members.map(_._2):_*)
 
-              log.debug(s"Outfit ${outfit.alias} has been indexed")
-              notifierActor ! OutfitIndexed(outfit.aliasLower) // Notify client
-              outfitsBeingIndexed.remove(response.request)
-            }
-          } catch {
-            case e : Exception => e.printStackTrace()
+            log.debug(s"Outfit ${outfit.alias} has been indexed")
+            outfitsBeingIndexed.remove(response.request)
+            Some(outfit)
           }
-        case None => outfitsBeingIndexed.remove(response.request)
+        case None =>
+          outfitsBeingIndexed.remove(response.request)
+          None
       }
     }
 
-    def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : Option[(Outfit, Character, List[OutfitMember], Long)] = {
-      def outfitResponse(outfit : Outfit)(implicit s : db.Session) : (Outfit, Character, List[OutfitMember], Long) = {
-        (outfit, db.characterDAO.find(outfit.leaderCharacterId).get, db.outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id), outfit.lastIndexedOn + Configuration.outfitStaleAfter)
+    def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : (Boolean, Option[(Outfit, Character, List[OutfitMember], Long)]) = {
+      def outfitResponse(outfit : Outfit)(implicit s : Session) : (Outfit, Character, List[OutfitMember], Long) = {
+        (outfit, characterDAO.find(outfit.leaderCharacterId).get, outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id), outfit.lastIndexedOn + Configuration.outfitStaleAfter)
       }
 
-      db.withSession { implicit s =>
+      def indexOutfit(aliasOrId : String) : Boolean = {
+        if(!outfitsBeingIndexed.contains(aliasOrId)) {
+          log.debug(s"Outfit $aliasOrId is being indexed")
+          outfitsBeingIndexed.add(aliasOrId)
+        } else {
+          false
+        }
+      }
+
+      withSession { implicit s =>
         if(outfitAlias.isDefined) {
-          db.outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
-            if(isStale(outfit.lastIndexedOn) && !outfitsBeingIndexed.contains(outfitAlias.get)) {
-              log.debug(s"Outfit ${outfitAlias.get} is being updated")
-              outfitsBeingIndexed.add(outfit.id)
-              fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
+          outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
+            val needsIndexing = if (isStale(outfit.lastIndexedOn)) {
+              indexOutfit(outfitAlias.get)
+            } else {
+              false
             }
-            outfitResponse(outfit)
-          }.orElse {
-            if(!outfitsBeingIndexed.contains(outfitAlias.get)) {
-              log.debug(s"Outfit ${outfitAlias.get} is being indexed")
-              outfitsBeingIndexed.add(outfitAlias.get)
-              fetcherActor ! FetchOutfitRequest(outfitAlias, None)
-            }
-            None
+
+            (needsIndexing, Some(outfitResponse(outfit)))
+          }.getOrElse {
+            (indexOutfit(outfitAlias.get), None)
           }
         } else if(outfitId.isDefined) {
-          db.outfitDAO.find(outfitId.get).map { outfit =>
-            if(isStale(outfit.lastIndexedOn) && !outfitsBeingIndexed.contains(outfitId.get)) {
-              log.debug(s"Outfit ${outfit.alias} is being updated")
-              outfitsBeingIndexed.add(outfit.id)
-              fetcherActor ! FetchOutfitRequest(None, Some(outfit.id))
+          outfitDAO.find(outfitId.get).map { outfit =>
+            val needsIndexing = if (isStale(outfit.lastIndexedOn)) {
+              indexOutfit(outfitId.get)
+            } else {
+              false
             }
-            outfitResponse(outfit)
-          }.orElse {
-            if(!outfitsBeingIndexed.contains(outfitId.get)) {
-              log.debug(s"Outfit ${outfitId.get} is being indexed")
-              outfitsBeingIndexed.add(outfitId.get)
-              fetcherActor ! FetchOutfitRequest(None, outfitId)
-            }
-            None
+
+            (needsIndexing, Some(outfitResponse(outfit)))
+          }.getOrElse {
+            (indexOutfit(outfitId.get), None)
           }
-        } else { None }
+        } else { (false, None) }
       }
     }
   }

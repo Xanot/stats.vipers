@@ -1,13 +1,13 @@
 package com.vipers.indexer
 
 import com.vipers.Logging
-import com.vipers.fetcher.FetcherActor.{FetchCharacterRequest, FetchCharacterResponse}
+import com.vipers.fetcher.FetcherActor.FetchCharacterResponse
 import com.vipers.indexer.IndexerActor.GetCharacterResponseOutfitMembership
-import com.vipers.model.{Character, OutfitMembership}
-import com.vipers.notifier.NotifierActor.CharacterIndexed
+import com.vipers.indexer.dao.DBComponent
+import com.vipers.model.Character
 import org.eclipse.jetty.util.ConcurrentHashSet
 
-private[indexer] trait CharacterIndexerComponent extends Logging { this: IndexerActor =>
+private[indexer] trait CharacterIndexerComponent extends Logging { this: DBComponent =>
   val characterIndexer : CharacterIndexer = new CharacterIndexer
 
   class CharacterIndexer {
@@ -15,56 +15,52 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: Indexer
 
     private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.characterStaleAfter
 
-    def index(response : FetchCharacterResponse) {
+    def index(response : FetchCharacterResponse) : Option[Character] = {
       response.character match {
         case Some(character) =>
-          try {
-            db.withTransaction { implicit s =>
-              // Index
-              if(db.characterDAO.exists(character.id)) {
-                db.characterDAO.update(character)
-              } else {
-                db.characterDAO.create(character)
-              }
+          withTransaction { implicit s =>
+            // Index
+            characterDAO.createOrUpdate(character)
 
-              // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
+            // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
+            log.debug(s"Character ${character.name} has been indexed")
+            charactersBeingIndexed.remove(response.request)
 
-              charactersBeingIndexed.remove(response.request)
-              notifierActor ! CharacterIndexed(character.nameLower)// Notify client
-              log.debug(s"Character ${character.name} has been indexed")
-            }
-          } catch {
-            case e : Exception => e.printStackTrace()
+            Some(character)
           }
-        case None => charactersBeingIndexed.remove(response.request)
+        case None =>
+          charactersBeingIndexed.remove(response.request)
+          None
       }
     }
 
-    def retrieve(nameLower : String) : Option[(Character, Option[GetCharacterResponseOutfitMembership], Long)] = {
-      def indexChar(nameLower : String) {
+    def retrieve(nameLower : String) : (Boolean, Option[(Character, Option[GetCharacterResponseOutfitMembership], Long)]) = {
+      def indexChar(nameLower : String) : Boolean = {
         if(!charactersBeingIndexed.contains(nameLower)) {
           log.debug(s"Character $nameLower is being indexed")
           charactersBeingIndexed.add(nameLower)
-          fetcherActor ! FetchCharacterRequest(Some(nameLower), None)
+        } else {
+          false
         }
       }
 
-      db.withSession { implicit s =>
-        db.characterDAO.findByNameLower(nameLower).map { c =>
-          if(isStale(c.lastIndexedOn)) {
+      withSession { implicit s =>
+        characterDAO.findByNameLower(nameLower).map { c =>
+          val needsIndexing = if(isStale(c.lastIndexedOn)) {
             indexChar(nameLower)
+          } else {
+            false
           }
 
-          val membership = db.outfitMembershipDAO.find(c.id).flatMap { m =>
-            db.outfitDAO.find(m.outfitId).map { o =>
+          val membership = outfitMembershipDAO.find(c.id).flatMap { m =>
+            outfitDAO.find(m.outfitId).map { o =>
               GetCharacterResponseOutfitMembership(m.outfitRank, m.outfitRankOrdinal, m.outfitMemberSinceDate, o.alias, o.name)
             }
           }
 
-          (c, membership, c.lastIndexedOn + Configuration.characterStaleAfter)
-        }.orElse {
-          indexChar(nameLower)
-          None
+          (needsIndexing, Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter))
+        }.getOrElse {
+          (indexChar(nameLower), None)
         }
       }
     }

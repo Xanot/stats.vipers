@@ -11,6 +11,7 @@ private[indexer] object DAOs {
       def findAll(implicit s : Session) : List[T]
       def create(model: T)(implicit s : Session) : Boolean
       def createAll(models : T*)(implicit s : Session) : Boolean
+      def createOrUpdate(model : T)(implicit s : Session) : Boolean
       def update(model: T)(implicit s : Session) : Boolean
       def deleteById(id: String)(implicit s : Session) : Boolean
       def exists(id : String)(implicit s : Session) : Boolean
@@ -20,7 +21,7 @@ private[indexer] object DAOs {
   trait OutfitDAOComponent extends DAOComponent { this: DB =>
     val outfitDAO : OutfitDAO
 
-    trait OutfitDAO { this: DAO[Outfit] =>
+    trait OutfitDAO extends DAO[Outfit] {
       def findByNameLower(nameLower : String)(implicit s : Session) : Option[Outfit]
       def findByAliasLower(aliasLower : String)(implicit s : Session) : Option[Outfit]
     }
@@ -29,7 +30,7 @@ private[indexer] object DAOs {
   trait CharacterDAOComponent extends DAOComponent { this: DB =>
     val characterDAO : CharacterDAO
 
-    trait CharacterDAO { this: DAO[Character] =>
+    trait CharacterDAO extends DAO[Character] {
       def findByNameLower(name : String)(implicit s : Session) : Option[Character]
       def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
@@ -38,7 +39,7 @@ private[indexer] object DAOs {
   trait OutfitMembershipDAOComponent extends DAOComponent { this: DB =>
     val outfitMembershipDAO : OutfitMembershipDAO
 
-    trait OutfitMembershipDAO { this: DAO[OutfitMembership] =>
+    trait OutfitMembershipDAO extends DAO[OutfitMembership] {
       def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember]
       def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
@@ -47,6 +48,6 @@ private[indexer] object DAOs {
   trait WeaponDAOComponent extends DAOComponent { this : DB =>
     val weaponDAO : WeaponDAO
 
-    trait WeaponDAO { this: DAO[Weapon] => }
+    trait WeaponDAO extends DAO[Weapon] {}
   }
 }
