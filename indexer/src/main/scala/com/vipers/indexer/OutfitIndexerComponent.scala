@@ -18,20 +18,26 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponen
     def index(response : FetchOutfitResponse) : Option[Outfit] = {
       response.contents match {
         case Some((outfit, members)) =>
-          withTransaction { implicit s =>
-            outfitDAO.createOrUpdate(outfit)
+          try {
+            withTransaction { implicit s =>
+              outfitDAO.createOrUpdate(outfit)
 
-            // Remove characters and memberships, seems to be easier and more efficient than diffing
-            characterDAO.deleteAllByOutfitId(outfit.id)
-            outfitMembershipDAO.deleteAllByOutfitId(outfit.id)
+              outfitMembershipDAO.deleteAllByOutfitId(outfit.id)
 
-            // create characters and memberships
-            characterDAO.createAll(members.map(_._1):_*)
-            outfitMembershipDAO.createAll(members.map(_._2):_*)
+              members.foreach { case (character, membership) =>
+                characterDAO.createOrUpdate(character)
+                outfitMembershipDAO.createOrUpdate(membership)
+              }
 
-            log.debug(s"Outfit ${outfit.alias} has been indexed")
-            outfitsBeingIndexed.remove(response.request)
-            Some(outfit)
+              log.debug(s"Outfit ${outfit.alias} has been indexed")
+              outfitsBeingIndexed.remove(response.request)
+              Some(outfit)
+            }
+          } catch {
+            case e : Exception =>
+              e.printStackTrace()
+              outfitsBeingIndexed.remove(response.request)
+              None
           }
         case None =>
           outfitsBeingIndexed.remove(response.request)

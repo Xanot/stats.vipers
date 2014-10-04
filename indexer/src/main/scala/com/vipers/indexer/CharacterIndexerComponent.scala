@@ -18,15 +18,21 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
     def index(response : FetchCharacterResponse) : Option[Character] = {
       response.character match {
         case Some(character) =>
-          withTransaction { implicit s =>
-            // Index
-            characterDAO.createOrUpdate(character)
+          try {
+            withTransaction { implicit s =>
+              // Index
+              characterDAO.createOrUpdate(character)
 
-            // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
-            log.debug(s"Character ${character.name} has been indexed")
-            charactersBeingIndexed.remove(response.request)
-
-            Some(character)
+              // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
+              log.debug(s"Character ${character.name} has been indexed")
+              charactersBeingIndexed.remove(response.request)
+              Some(character)
+            }
+          } catch {
+            case e : Exception =>
+              e.printStackTrace()
+              charactersBeingIndexed.remove(response.request)
+              None
           }
         case None =>
           charactersBeingIndexed.remove(response.request)

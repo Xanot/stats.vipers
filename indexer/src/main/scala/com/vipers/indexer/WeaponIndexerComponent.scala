@@ -16,11 +16,17 @@ private[indexer] trait WeaponIndexerComponent extends Logging { this: DBComponen
     private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.weaponsStaleAfter
 
     def index(response : FetchAllWeaponsResponse) {
-      withTransaction { implicit s =>
-        weaponDAO.deleteAll
-        weaponDAO.createAll(response.weapons:_*)
-        log.debug("Weapons have been indexed")
-        weaponsBeingIndexed.compareAndSet(true, false)
+      try {
+        withTransaction { implicit s =>
+          weaponDAO.deleteAll
+          weaponDAO.createAll(response.weapons: _*)
+          log.debug("Weapons have been indexed")
+          weaponsBeingIndexed.compareAndSet(true, false)
+        }
+      } catch {
+        case e : Exception =>
+          e.printStackTrace()
+          weaponsBeingIndexed.compareAndSet(true, false)
       }
     }
 
