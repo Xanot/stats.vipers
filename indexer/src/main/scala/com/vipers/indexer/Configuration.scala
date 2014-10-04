@@ -23,4 +23,5 @@ private[indexer] object Configuration {
   private lazy val config = ConfigFactory.load("indexer.conf")
   val characterStaleAfter = config.getDuration("character-stale-after", TimeUnit.MILLISECONDS)
   val outfitStaleAfter = config.getDuration("outfit-stale-after", TimeUnit.MILLISECONDS)
+  val weaponsStaleAfter = config.getDuration("weapons-stale-after", TimeUnit.MILLISECONDS)
 }

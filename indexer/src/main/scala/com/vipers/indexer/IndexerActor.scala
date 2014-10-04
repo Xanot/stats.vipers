@@ -14,7 +14,7 @@ import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop,
 import scala.concurrent.Future
 import akka.pattern.pipe
 
-class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitIndexerComponent with CharacterIndexerComponent {
+class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitIndexerComponent with CharacterIndexerComponent with WeaponIndexerComponent {
   import context.dispatcher
 
   protected var fetcherActor : ActorRef = _
@@ -48,6 +48,11 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         characterIndexer.index(r).map { character =>
           notifierActor ! CharacterIndexed(character.nameLower) // Notify client
         }
+      }
+
+    case r : FetchAllWeaponsResponse =>
+      Future {
+        weaponIndexer.index(r)
       }
 
     //================================================================================
@@ -102,6 +107,18 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         }
       } pipeTo sender
 
+    case GetAllWeapons =>
+      Future {
+        weaponIndexer.retrieve match {
+          case (needsIndexing, retrievedInfo) =>
+            if(needsIndexing) {
+              fetcherActor ! FetchAllWeaponsRequest
+            }
+
+            retrievedInfo.getOrElse(BeingIndexed)
+        }
+      } pipeTo sender
+
     case e : AnyRef => log.error(e.toString)
   }
 }
@@ -116,6 +133,7 @@ object IndexerActor {
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
   case object GetAllIndexedOutfits extends IndexerMessage
   case object GetAllIndexedCharacters extends IndexerMessage
+  case object GetAllWeapons extends IndexerMessage
 
   // Sent
   case object BeingIndexed extends IndexerMessage

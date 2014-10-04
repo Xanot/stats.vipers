@@ -14,6 +14,7 @@ private[indexer] object DAOs {
       def createOrUpdate(model : T)(implicit s : Session) : Boolean
       def update(model: T)(implicit s : Session) : Boolean
       def deleteById(id: String)(implicit s : Session) : Boolean
+      def deleteAll(implicit s : Session) : Boolean
       def exists(id : String)(implicit s : Session) : Boolean
     }
   }

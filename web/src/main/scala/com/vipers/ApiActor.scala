@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{Props, Actor}
 import akka.util.Timeout
 import com.vipers.indexer.IndexerActor
-import com.vipers.routes.{UI, OutfitApi, CharacterApi}
+import com.vipers.routes.{WeaponApi, UI, OutfitApi, CharacterApi}
 import org.json4s.DefaultFormats
 import spray.http.HttpHeaders.RawHeader
 import spray.httpx.Json4sSupport
@@ -26,10 +26,11 @@ trait JsonRoute extends Route with Json4sSupport {
   implicit val json4sFormats = DefaultFormats
 }
 
-trait Api extends CharacterApi with OutfitApi with UI { this: ApiActor =>
+trait Api extends CharacterApi with OutfitApi with WeaponApi with UI { this: ApiActor =>
   protected lazy val route = {
     uiRoute ~
     outfitRoute ~
-    characterRoute
+    characterRoute ~
+    weaponRoute
   }
 }
