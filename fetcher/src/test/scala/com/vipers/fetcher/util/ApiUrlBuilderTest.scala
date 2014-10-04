@@ -95,16 +95,18 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   "getCharactersById uri" should "be constructed" in {
     val uri = ApiUrlBuilder.getCharactersById("1", "2", "3", "4")
     uri.path.tail.toString().endsWith("character") should be(right = true)
-    uri.query.length should be(2)
+    uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0")
     uri.query.get("character_id").get should be("1,2,3,4")
   }
 
   "getCharacterByName uri" should "be constructed" in {
     val uri = ApiUrlBuilder.getCharacterByName("xanot")
     uri.path.tail.toString().endsWith("character") should be(right = true)
-    uri.query.length should be(2)
+    uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0")
     uri.query.get("name.first_lower").get should be("xanot")
   }
 

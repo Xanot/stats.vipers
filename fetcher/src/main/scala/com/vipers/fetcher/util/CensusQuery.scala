@@ -135,7 +135,8 @@ private[fetcher] object CensusQuery {
                                 hide : Option[Seq[String]] = None,
                                 show : Option[Seq[String]] = None,
                                 nested : Option[JoinQuery] = None,
-                                isOuter : Option[Boolean] = None) extends JoinQuery("outfit_member", injectAt, Some(true), on, to, terms, hide, show ,nested, isOuter)
+                                isList : Option[Boolean] = Some(true),
+                                isOuter : Option[Boolean] = None) extends JoinQuery("outfit_member", injectAt, isList, on, to, terms, hide, show ,nested, isOuter)
 
     case class CharacterJoin(injectAt : String = "character",
                              on : Option[String] = None,

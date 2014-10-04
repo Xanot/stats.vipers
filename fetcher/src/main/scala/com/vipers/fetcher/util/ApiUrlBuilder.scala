@@ -69,7 +69,7 @@ private[fetcher] object ApiUrlBuilder {
   // Character
   //================================================================================
   private def getCharacters(s : Search, ids : String*) : Uri = {
-    val params = CensusQuery(Some(s)).construct
+    val params = CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct
     construct(Uri.Path("character"), params.toMap)
   }
 

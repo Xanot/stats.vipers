@@ -33,16 +33,17 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       // Valid name
       var request = FetchCharacterRequest(Some("Xanot"), None)
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
-        response.character.get.id should be("5428035526967126513")
-        response.character.get.name should be("Xanot")
-        response.character.get.factionId should be(1)
+        response.contents.get._1.id should be("5428035526967126513")
+        response.contents.get._1.name should be("Xanot")
+        response.contents.get._1.factionId should be(1)
+        response.contents.get._2 should not be(None)
         response.request should be("Xanot")
       }
 
       // non-existing name
       request = FetchCharacterRequest(Some("Xanotetqteqgq"), None)
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
-        response.character should be(None)
+        response.contents should be(None)
         response.request should be("Xanotetqteqgq")
       }
     }
@@ -50,16 +51,16 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       // Valid id
       var request = FetchCharacterRequest(None, Some("5428035526967126513"))
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
-        response.character.get.id should be("5428035526967126513")
-        response.character.get.name should be("Xanot")
-        response.character.get.factionId should be(1)
+        response.contents.get._1.id should be("5428035526967126513")
+        response.contents.get._1.name should be("Xanot")
+        response.contents.get._1.factionId should be(1)
         response.request should be("5428035526967126513")
       }
 
       // non-existing id
       request = FetchCharacterRequest(None, Some("1234"))
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
-        response.character should be(None)
+        response.contents should be(None)
         response.request should be("1234")
       }
     }

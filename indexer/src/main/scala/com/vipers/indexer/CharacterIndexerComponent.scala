@@ -16,12 +16,12 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
     private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.characterStaleAfter
 
     def index(response : FetchCharacterResponse) : Option[Character] = {
-      response.character match {
-        case Some(character) =>
+      response.contents match {
+        case Some((character, membership)) =>
           try {
             withTransaction { implicit s =>
-              // Index
               characterDAO.createOrUpdate(character)
+              membership.map { m => outfitMembershipDAO.createOrUpdate(m) }
 
               // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
               log.debug(s"Character ${character.name} has been indexed")
