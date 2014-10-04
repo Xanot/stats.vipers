@@ -59,3 +59,10 @@ case class Weapon(override val id : String,
                   heatCapacity : Option[Int],
                   heatOverheatPenaltyMs : Option[Int],
                   lastIndexedOn : Long) extends WithID
+
+case class WeaponStat(characterId : String,
+                      weaponId : String,
+                      fireCount : Long,
+                      hitCount : Long,
+                      headshotCount : Long,
+                      timestamp : Long)

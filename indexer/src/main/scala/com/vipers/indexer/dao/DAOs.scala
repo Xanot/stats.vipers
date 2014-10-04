@@ -33,7 +33,6 @@ private[indexer] object DAOs {
 
     trait CharacterDAO extends DAO[Character] {
       def findByNameLower(name : String)(implicit s : Session) : Option[Character]
-      def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean
     }
   }
 
@@ -50,5 +49,15 @@ private[indexer] object DAOs {
     val weaponDAO : WeaponDAO
 
     trait WeaponDAO extends DAO[Weapon] {}
+  }
+
+  trait WeaponStatDAOComponent extends DAOComponent { this : DB =>
+    val weaponStatDAO : WeaponStatDAO
+
+    trait WeaponStatDAO {
+      def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
+      def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[WeaponStat]
+      def getCharactersWeaponProgress(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
+    }
   }
 }

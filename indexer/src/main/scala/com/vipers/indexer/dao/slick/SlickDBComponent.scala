@@ -12,7 +12,8 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
   with SlickOutfitDAOComponent
   with SlickCharacterDAOComponent
   with SlickOutfitMembershipDAOComponent
-  with SlickWeaponDAOComponent {
+  with SlickWeaponDAOComponent
+  with SlickWeaponStatDAOComponent {
 
   override protected val db: JdbcBackend.Database = {
     Database.forDataSource {
@@ -47,7 +48,12 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
     import driver.simple._
     try {
       withTransaction { implicit s =>
-        (characterDAO.table.ddl ++ outfitDAO.table.ddl ++ outfitMembershipDAO.table.ddl ++ weaponDAO.table.ddl).create
+        (characterDAO.table.ddl ++
+          outfitDAO.table.ddl ++
+          outfitMembershipDAO.table.ddl ++
+          weaponDAO.table.ddl ++
+          weaponStatDAO.weaponStatsTable.ddl ++
+          weaponStatDAO.weaponStatsTimeSeriesTable.ddl).create
       }
     } catch {
       case _ : Exception => // Tables already created

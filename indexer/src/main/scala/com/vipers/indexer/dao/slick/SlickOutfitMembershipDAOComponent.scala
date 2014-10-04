@@ -6,7 +6,7 @@ import com.vipers.indexer.dao.DAOs.OutfitMembershipDAOComponent
 import com.vipers.model.OutfitMembership
 
 private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershipDAOComponent  with SlickDAOComponent {
-  this: SlickDB with SlickCharacterDAOComponent with SlickOutfitDAOComponent =>
+  this: SlickDB with SlickCharacterDAOComponent =>
 
   import driver.simple._
 
@@ -21,10 +21,9 @@ private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershi
         character <- characterDAO.table if character.id === membership.id
       } yield (character, membership)
     })
+    override def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember] = findAllCharactersByOutfitIdCompiled(outfitId).list
 
     private val deleteAllMembershipsByOutfitIdCompiled = Compiled((outfitId : Column[String]) => { table.filter(_.outfitId === outfitId) })
-
-    override def findAllCharactersByOutfitId(outfitId: String)(implicit s : Session) : List[OutfitMember] = findAllCharactersByOutfitIdCompiled(outfitId).list
     override def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean = deleteAllMembershipsByOutfitIdCompiled(outfitId).delete > 0
 
     sealed class OutfitMemberships(tag : Tag) extends TableWithID(tag, "outfit_member") {

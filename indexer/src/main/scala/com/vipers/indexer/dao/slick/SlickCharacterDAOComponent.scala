@@ -4,7 +4,7 @@ import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.CharacterDAOComponent
 import com.vipers.model.Character
 
-private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent with SlickDAOComponent { this: SlickDB with SlickOutfitMembershipDAOComponent =>
+private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent with SlickDAOComponent { this: SlickDB =>
   import driver.simple._
 
   override lazy val characterDAO = new SlickCharacterDAO
@@ -13,14 +13,7 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
     override val table = TableQuery[Characters]
 
     private val findByNameLowerCompiled = Compiled((nameLower : Column[String]) => table.filter(_.nameLower === nameLower))
-
-    private val deleteAllByOutfitIdCompiled = Compiled((outfitId : Column[String]) => {
-      table.filter(c => c.id in outfitMembershipDAO.table.filter(_.outfitId === outfitId).map(_.id))
-    })
-
     override def findByNameLower(nameLower: String)(implicit s : Session) : Option[Character] = findByNameLowerCompiled(nameLower).firstOption
-
-    override def deleteAllByOutfitId(outfitId : String)(implicit s : Session) : Boolean = deleteAllByOutfitIdCompiled(outfitId).delete > 0
 
     sealed class Characters(tag : Tag) extends TableWithID(tag, "character") {
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))

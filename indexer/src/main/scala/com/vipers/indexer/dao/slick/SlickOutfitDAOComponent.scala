@@ -4,9 +4,7 @@ import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.OutfitDAOComponent
 import com.vipers.model.Outfit
 
-private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with OutfitDAOComponent {
-  this: SlickDB with SlickCharacterDAOComponent =>
-
+private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with OutfitDAOComponent { this: SlickDB =>
   import driver.simple._
 
   override lazy val outfitDAO = new SlickOutfitDAO
@@ -15,9 +13,9 @@ private[indexer] trait SlickOutfitDAOComponent extends SlickDAOComponent with Ou
     override val table = TableQuery[Outfits]
 
     private val findByNameLowerCompiled = Compiled((nameLower : Column[String]) => table.filter(_.nameLower === nameLower))
-    private val findByAliasLowerCompiled = Compiled((aliasLower : Column[String]) => table.filter(_.aliasLower === aliasLower))
-
     override def findByNameLower(nameLower: String)(implicit s : Session) : Option[Outfit] = findByNameLowerCompiled(nameLower).firstOption
+
+    private val findByAliasLowerCompiled = Compiled((aliasLower : Column[String]) => table.filter(_.aliasLower === aliasLower))
     override def findByAliasLower(aliasLower: String)(implicit s : Session): Option[Outfit] = findByAliasLowerCompiled(aliasLower).firstOption
 
     sealed class Outfits(tag : Tag) extends TableWithID(tag, "outfit") {
