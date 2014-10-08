@@ -124,7 +124,7 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
 }
 
 object IndexerActor {
-  val timeout = Timeout(15000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(30000, TimeUnit.MILLISECONDS)
 
   sealed trait IndexerMessage
 

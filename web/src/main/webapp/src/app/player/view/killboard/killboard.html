@@ -1,0 +1,3 @@
+<div ng-repeat="entry in history | filter:{ table_type: 'deaths'}">
+  {{ entry.attacker.name.first }} killed {{ entry.character.name.first }} with {{ entry.attacker_weapon_id }}
+</div>

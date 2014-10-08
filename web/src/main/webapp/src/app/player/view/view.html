@@ -8,7 +8,7 @@
           [{{ player.membership.rankOrdinal | outfitRank }} of
           <a class="faction-{{player.factionId}}" ui-sref="outfit-view({aliasOrId : player.membership.outfitAlias})">{{ player.membership.outfitName }}</a>]
         </span>
-        <small>last logged in <span am-time-ago="player.lastLoginDate" data-type="info" data-title="{{ player.creationDate | amCalendar }}" bs-tooltip></span></small>
+        <small>last logged in <span am-time-ago="player.lastLoginDate" data-type="info" data-title="{{ player.lastLoginDate | amCalendar }}" bs-tooltip></span></small>
       </h4>
     </div>
     <div class="col-xs-5">
@@ -20,6 +20,17 @@
         <dt>Update eligible</dt>
         <dd><span am-time-ago="player.updateTime" am-preprocess="null"></span></dd>
       </dl>
+    </div>
+  </div>
+  <!-- Content -->
+  <div class="row">
+    <div class="col-xs-12 col-sm-2">
+      <div class="list-group">
+        <a ui-sref=".killboard" class="list-group-item">Killboard</a>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-10">
+      <div ui-view></div>
     </div>
   </div>
 </div>

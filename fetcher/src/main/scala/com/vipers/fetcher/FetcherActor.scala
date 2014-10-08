@@ -130,7 +130,7 @@ class FetcherActor extends Actor {
 }
 
 object FetcherActor {
-  val timeout = Timeout(15000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(30000, TimeUnit.MILLISECONDS)
   import com.vipers.model.Sort.Sort
 
   type OutfitMember = (Character, OutfitMembership)

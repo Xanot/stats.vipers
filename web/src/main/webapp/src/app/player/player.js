@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('player', ['player.view', 'utils', 'ui.router'])
+angular.module('player', ['player-view', 'utils', 'ui.router'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('player', {

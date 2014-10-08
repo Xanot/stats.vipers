@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('player.view', ['utils', 'ui.router'])
+angular.module('player-view', ['utils', 'ui.router', 'player-killboard'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('player-view', {
@@ -17,6 +17,9 @@ angular.module('player.view', ['utils', 'ui.router'])
             });
 
             PlayerService.getByName(nameLower).then(function(response) {
+              if(response.data.updateTime < new Date().getTime()) {
+                NotificationService.characterBeingIndexed(response.data.name)
+              }
               deferred.resolve(response.data);
             }).catch(function(err) {
               deferred.reject();
