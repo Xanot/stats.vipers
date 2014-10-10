@@ -102,11 +102,21 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   }
 
   "getCharacterByName uri" should "be constructed" in {
-    val uri = ApiUrlBuilder.getCharacterByName("xanot")
+    // Without stats
+    var uri = ApiUrlBuilder.getCharacterByName("xanot", false)
     uri.path.tail.toString().endsWith("character") should be(right = true)
     uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0")
+    uri.query.get("name.first_lower").get should be("xanot")
+
+    // With stats
+    uri = ApiUrlBuilder.getCharacterByName("xanot", true)
+    uri.path.tail.toString().endsWith("character") should be(right = true)
+    uri.query.length should be(4)
+    uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0")
+    uri.query.get("c:resolve").get should be("weapon_stat,weapon_stat_by_faction")
     uri.query.get("name.first_lower").get should be("xanot")
   }
 

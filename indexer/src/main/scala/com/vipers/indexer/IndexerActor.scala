@@ -8,7 +8,7 @@ import com.vipers.fetcher.FetcherActor
 import com.vipers.fetcher.FetcherActor._
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
-import com.vipers.model.{OutfitMembership, Character}
+import com.vipers.model.{WeaponStat, OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
 import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop, Start}
 import scala.concurrent.Future
@@ -90,12 +90,12 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         characterIndexer.retrieve(nameLower) match {
           case (needsIndexing, retrievedInfo) =>
             if(needsIndexing) {
-              fetcherActor ! FetchCharacterRequest(Some(nameLower), None)
+              fetcherActor ! FetchCharacterRequest(Some(nameLower), None, withStats = true)
             }
 
-            retrievedInfo.map { case (c, membership, updateTime) =>
+            retrievedInfo.map { case (c, membership, updateTime, mostRecentWeaponStats) =>
               GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-                c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership)
+                c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
             }.getOrElse(BeingIndexed)
         }
       } pipeTo sender
@@ -176,7 +176,8 @@ object IndexerActor {
                                   minutesPlayed : Int,
                                   lastIndexedOn : Long,
                                   updateTime : Long,
-                                  membership : Option[GetCharacterResponseOutfitMembership])
+                                  membership : Option[GetCharacterResponseOutfitMembership],
+                                  weaponStats : List[WeaponStat])
 
   case class GetCharacterResponseOutfitMembership(rank : String,
                                                   rankOrdinal : Byte,

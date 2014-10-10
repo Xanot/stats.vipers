@@ -4,7 +4,7 @@ import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor.FetchCharacterResponse
 import com.vipers.indexer.IndexerActor.GetCharacterResponseOutfitMembership
 import com.vipers.indexer.dao.DBComponent
-import com.vipers.model.Character
+import com.vipers.model.{WeaponStat, Character}
 import org.eclipse.jetty.util.ConcurrentHashSet
 
 private[indexer] trait CharacterIndexerComponent extends Logging { this: DBComponent =>
@@ -17,11 +17,15 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
     def index(response : FetchCharacterResponse) : Option[Character] = {
       response.contents match {
-        case Some((character, membership)) =>
+        case Some((character, membership, weaponStats)) =>
           try {
             withTransaction { implicit s =>
               characterDAO.createOrUpdate(character)
               membership.map { m => outfitMembershipDAO.createOrUpdate(m) }
+              weaponStats.map { ws =>
+                weaponStatDAO.deleteCharactersStats(character.id)
+                weaponStatDAO.createAll(ws:_*)
+              }
 
               // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
               log.debug(s"Character ${character.name} has been indexed")
@@ -40,7 +44,7 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
       }
     }
 
-    def retrieve(nameLower : String) : (Boolean, Option[(Character, Option[GetCharacterResponseOutfitMembership], Long)]) = {
+    def retrieve(nameLower : String) : (Boolean, Option[(Character, Option[GetCharacterResponseOutfitMembership], Long, List[WeaponStat])]) = {
       def indexChar(nameLower : String) : Boolean = {
         if(!charactersBeingIndexed.contains(nameLower)) {
           log.debug(s"Character $nameLower is being indexed")
@@ -64,7 +68,9 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
             }
           }
 
-          (needsIndexing, Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter))
+          val weaponStats = weaponStatDAO.getCharactersMostRecentWeaponStats(c.id)
+
+          (needsIndexing, Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter, weaponStats))
         }.getOrElse {
           (indexChar(nameLower), None)
         }

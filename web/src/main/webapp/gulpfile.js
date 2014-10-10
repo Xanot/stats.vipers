@@ -57,7 +57,7 @@ gulp.task('minify-app-js', function () {
 });
 
 gulp.task('minify-app-css', function() {
-    return gulp.src('./src/css/*.css')
+    return gulp.src('./src/css/**/*.css')
       .pipe(concat("vipers.min.css"))
       .pipe(minifycss())
       .pipe(gulp.dest(buildDest + '/css'))

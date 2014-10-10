@@ -68,16 +68,22 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   // Character
   //================================================================================
-  private def getCharacters(s : Search, ids : String*) : Uri = {
-    val params = CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct
+  private def getCharacters(s : Search, withStats : Boolean) : Uri = {
+    val params = {
+      if(withStats) {
+        CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false))), Resolve("weapon_stat", "weapon_stat_by_faction")).construct
+      } else {
+        CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct
+      }
+    }
     construct(Uri.Path("character"), params.toMap)
   }
 
   def getCharactersById(ids : String*) : Uri = {
-    getCharacters(Search("character_id", ids.mkString(",")))
+    getCharacters(Search("character_id", ids.mkString(",")), false)
   }
-  def getCharacterByName(name : String) : Uri = {
-    getCharacters(Search("name.first_lower", name.toLowerCase))
+  def getCharacterByName(name : String, withStats : Boolean) : Uri = {
+    getCharacters(Search("name.first_lower", name.toLowerCase), withStats)
   }
 
   //================================================================================

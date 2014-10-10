@@ -16,8 +16,11 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
     val weaponStatsTimeSeriesTable = TableQuery[WeaponStatsTimeSeries]
     private lazy val weaponStatsTimeSeriesTableCompiled = Compiled(weaponStatsTimeSeriesTable)
 
+    private lazy val deleteCharactersStatsCompiled = Compiled((characterId : Column[String]) => weaponStatsTable.filter(_.characterId === characterId))
+    override def deleteCharactersStats(characterId : String)(implicit s : Session) = deleteCharactersStatsCompiled(characterId).delete > 0
+
     override def createAll(weaponStats : WeaponStat*)(implicit s : Session) = {
-      weaponStats.foreach(stat => weaponStatsTableCompiled.insertOrUpdate(stat))
+      weaponStatsTableCompiled.insertAll(weaponStats:_*)
       weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*)
     }
 
@@ -29,28 +32,30 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
     }
 
     private lazy val getCharactersWeaponProgressCompiled = Compiled((characterId : Column[String], weaponId : Column[String]) => {
-      weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.weaponId === weaponId)
+      weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId)
     })
     override def getCharactersWeaponProgress(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat] = {
       getCharactersWeaponProgressCompiled(characterId, weaponId).list
     }
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {
-      def pk = primaryKey(s"pk_$tableName", (characterId, weaponId))
-      def * = (characterId, weaponId, fireCount, hitCount, headshotCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def pk = primaryKey(s"pk_$tableName", (characterId, itemId))
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed class WeaponStatsTimeSeries(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats_time_series") with WeaponStatColumns {
-      def pk = primaryKey(s"pk_$tableName", (characterId, weaponId, timestamp))
-      def * = (characterId, weaponId, fireCount, hitCount, headshotCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def pk = primaryKey(s"pk_$tableName", (characterId, itemId, timestamp))
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed trait WeaponStatColumns { this: Table[WeaponStat] =>
       def characterId = column[String]("character_id", O.NotNull, O.DBType("VARCHAR(30)"))
-      def weaponId = column[String]("weapon_id", O.NotNull, O.DBType("VARCHAR(20)"))
+      def itemId = column[String]("item_id", O.NotNull, O.DBType("VARCHAR(20)"))
       def fireCount = column[Long]("fire_count", O.NotNull)
       def hitCount = column[Long]("hit_count", O.NotNull)
       def headshotCount = column[Long]("headshot_count", O.NotNull)
+      def killCount = column[Long]("kill_count", O.NotNull)
+      def deathCount = column[Long]("death_count", O.NotNull)
       def timestamp = column[Long]("timestamp", O.NotNull)
     }
   }

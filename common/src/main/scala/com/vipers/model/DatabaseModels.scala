@@ -42,7 +42,7 @@ case class OutfitMembership(outfitId : String,
                             outfitRankOrdinal : Byte,
                             outfitMemberSinceDate : Long) extends WithID
 
-case class Weapon(override val id : String,
+case class Weapon(override val id : String, // Item id
                   name : String,
                   description : Option[String],
                   factionId : Option[Byte],
@@ -61,8 +61,10 @@ case class Weapon(override val id : String,
                   lastIndexedOn : Long) extends WithID
 
 case class WeaponStat(characterId : String,
-                      weaponId : String,
+                      itemId : String,
                       fireCount : Long,
                       hitCount : Long,
                       headshotCount : Long,
+                      killCount : Long,
+                      deathCount : Long,
                       timestamp : Long)

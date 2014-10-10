@@ -20,19 +20,22 @@ class FetcherActor extends Actor {
   import context.dispatcher
   import FetcherActor._
 
+  implicit val jsonFormats = org.json4s.DefaultFormats
+
   def receive = {
-    case FetchCharacterRequest(name, id) =>
+    case FetchCharacterRequest(name, id, withStats) =>
       Future {
         val json = {
           if(id.isDefined) {
             sendRequest(ApiUrlBuilder.getCharactersById(id.get))
           } else {
-            sendRequest(ApiUrlBuilder.getCharacterByName(name.get))
+            sendRequest(ApiUrlBuilder.getCharacterByName(name.get, withStats))
           }
         }
         json \ "character_list" match {
           case JArray(parent) if parent.nonEmpty =>
-            FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership)), name.getOrElse(id.get))
+            FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership,
+              (parent(0) \ "stats").toWeaponStats((parent(0) \ "character_id").extract[String]))), name.getOrElse(id.get))
           case _ => FetchCharacterResponse(None, name.getOrElse(id.get))
         }
       } pipeTo sender
@@ -138,8 +141,8 @@ object FetcherActor {
   //================================================================================
   // Character request/response
   //================================================================================
-  case class FetchCharacterRequest(characterName : Option[String], characterId : Option[String])
-  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership])], request : String)
+  case class FetchCharacterRequest(characterName : Option[String], characterId : Option[String], withStats : Boolean)
+  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership], Option[List[WeaponStat]])], request : String)
 
   case class FetchMultipleCharactersByIdRequest(characterIds : String*)
 

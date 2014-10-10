@@ -2,6 +2,7 @@ package com.vipers.fetcher.util
 
 import com.vipers.model._
 import org.json4s.JsonAST._
+import scala.collection.mutable
 
 private[fetcher] object Wrapper {
   implicit class ApiDeserializer(val json : JValue) extends AnyVal {
@@ -102,7 +103,7 @@ private[fetcher] object Wrapper {
         val (JString(weaponId), JString(name), description, factionId, JString(imagePath), JString(isVehicleWeapon),
           JString(moveModifier), JString(turnModifier)) = {
           (
-            json \ "weapon_id",
+            item \ "item_id",
             itemName,
             itemDescription,
             item \ "faction_id",
@@ -139,6 +140,76 @@ private[fetcher] object Wrapper {
           heatCapacity.toOption.map(_.extract[String].toInt),
           heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt),
           System.currentTimeMillis())
+      }
+    }
+
+    def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
+      check {
+        val map = mutable.Map[String, mutable.ListBuffer[(String, Long)]]().empty
+
+        val JArray(weaponStat) = json \ "weapon_stat"
+        weaponStat.foreach { stat =>
+          val JString(itemId) = stat \ "item_id"
+          val JString(statName) = stat \ "stat_name"
+          val JString(value) = stat \ "value"
+          val JString(vehicleId) = stat \ "vehicle_id"
+
+          if(vehicleId == "0") {
+            if(map.contains(itemId)) {
+              map(itemId) += ((statName, value.toLong))
+            } else {
+              map += (itemId -> mutable.ListBuffer((statName, value.toLong)))
+            }
+          }
+        }
+
+        val JArray(weaponStatByFaction) = json \ "weapon_stat_by_faction"
+        weaponStatByFaction.foreach { stat =>
+          val JString(itemId) = stat \ "item_id"
+          val JString(statName) = stat \ "stat_name"
+          val JString(valueNc) = stat \ "value_nc"
+          val JString(valueTr) = stat \ "value_tr"
+          val JString(valueVs) = stat \ "value_vs"
+          val JString(vehicleId) = stat \ "vehicle_id"
+
+          // TODO: Don't count teamkills (or count as different column)
+          if(vehicleId == "0") {
+            if(map.contains(itemId)) {
+              map(itemId) += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
+            } else {
+              map += (itemId -> mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong)))
+            }
+          }
+        }
+
+        val list = new mutable.ListBuffer[WeaponStat]
+
+        for((itemId, stats) <- map) {
+          var fireCount = 0L
+          var hitCount = 0L
+          var hsCount = 0L
+          var killCount = 0L
+          var deathCount = 0L
+
+          for((statName, value) <- stats) {
+            if (statName == "weapon_hit_count") {
+              hitCount = value
+            } else if(statName == "weapon_headshots") {
+              hsCount = value
+            } else if(statName == "weapon_fire_count") {
+              fireCount = value
+            } else if(statName == "weapon_kills") {
+              killCount = value
+            } else if(statName == "weapon_deaths") {
+              deathCount = value
+            }
+          }
+
+          if(fireCount > 0 && killCount > 0) {
+            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, System.currentTimeMillis())
+          }
+        }
+        list.toList
       }
     }
 

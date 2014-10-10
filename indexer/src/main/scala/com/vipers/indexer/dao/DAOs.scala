@@ -55,6 +55,7 @@ private[indexer] object DAOs {
     val weaponStatDAO : WeaponStatDAO
 
     trait WeaponStatDAO {
+      def deleteCharactersStats(characterId : String)(implicit s : Session) : Boolean
       def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
       def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[WeaponStat]
       def getCharactersWeaponProgress(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
