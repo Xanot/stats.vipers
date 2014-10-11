@@ -23,6 +23,9 @@ angular.module('player', ['player-view', 'utils', 'ui.router'])
       },
       getAllCharacters: function() {
         return $http.get(UrlService.url("/player"))
+      },
+      getCharactersWeaponStatHistory: function(charId, itemId) {
+        return $http.get(UrlService.url("/player/" + charId + "/stats/" + itemId))
       }
     }
   }]);

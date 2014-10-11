@@ -145,20 +145,21 @@ private[fetcher] object Wrapper {
 
     def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
       check {
-        val map = mutable.Map[String, mutable.ListBuffer[(String, Long)]]().empty
+        val map = mutable.Map[String, (Long, mutable.ListBuffer[(String, Long)])]().empty
 
         val JArray(weaponStat) = json \ "weapon_stat"
         weaponStat.foreach { stat =>
           val JString(itemId) = stat \ "item_id"
           val JString(statName) = stat \ "stat_name"
           val JString(value) = stat \ "value"
-          val JString(vehicleId) = stat \ "vehicle_id"
 
-          if(vehicleId == "0") {
-            if(map.contains(itemId)) {
-              map(itemId) += ((statName, value.toLong))
-            } else {
-              map += (itemId -> mutable.ListBuffer((statName, value.toLong)))
+          if(map.contains(itemId)) {
+            map(itemId)._2 += ((statName, value.toLong))
+          } else {
+            val JString(vehicleId) = stat \ "vehicle_id"
+            if(vehicleId == "0") {
+              val JString(lastSave) = stat \ "last_save"
+              map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
             }
           }
         }
@@ -170,21 +171,23 @@ private[fetcher] object Wrapper {
           val JString(valueNc) = stat \ "value_nc"
           val JString(valueTr) = stat \ "value_tr"
           val JString(valueVs) = stat \ "value_vs"
-          val JString(vehicleId) = stat \ "vehicle_id"
 
           // TODO: Don't count teamkills (or count as different column)
-          if(vehicleId == "0") {
-            if(map.contains(itemId)) {
-              map(itemId) += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
-            } else {
-              map += (itemId -> mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong)))
+
+          if(map.contains(itemId)) {
+            map(itemId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
+          } else {
+            val JString(vehicleId) = stat \ "vehicle_id"
+            if(vehicleId == "0") {
+              val JString(lastSave) = stat \ "last_save"
+              map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
             }
           }
         }
 
         val list = new mutable.ListBuffer[WeaponStat]
 
-        for((itemId, stats) <- map) {
+        for((itemId, (lastSave, stats)) <- map) {
           var fireCount = 0L
           var hitCount = 0L
           var hsCount = 0L
@@ -206,7 +209,7 @@ private[fetcher] object Wrapper {
           }
 
           if(fireCount > 0 && killCount > 0) {
-            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, System.currentTimeMillis())
+            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, lastSave)
           }
         }
         list.toList

@@ -57,8 +57,8 @@ private[indexer] object DAOs {
     trait WeaponStatDAO {
       def deleteCharactersStats(characterId : String)(implicit s : Session) : Boolean
       def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
-      def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[WeaponStat]
-      def getCharactersWeaponProgress(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
+      def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)]
+      def getCharactersWeaponStatHistory(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
     }
   }
 }

@@ -23,14 +23,67 @@
     </div>
   </div>
   <!-- Content -->
-  <div class="row">
-    <div class="col-xs-12 col-sm-2">
-      <div class="list-group">
-        <a ui-sref=".killboard" class="list-group-item">Killboard</a>
-      </div>
-    </div>
-    <div class="col-xs-12 col-sm-10">
-      <div ui-view></div>
-    </div>
+  <div class="row" ng-if="player.weaponStats.length > 0">
+    <table class="table table-bordered table-responsive">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th class="table-input">
+          <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
+        </th>
+        <th>
+          <a ng-click="predicate='_1.killCount'; reverse=!reverse;">
+            Kills
+          </a>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.killCount / _1.deathCount'; reverse=!reverse;">
+            K/D
+          </a>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.hitCount / _1.fireCount'; reverse=!reverse;">
+            ACC
+          </a>
+          <i class="fa fa-bullseye"></i>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.headshotCount / _1.killCount'; reverse=!reverse;">
+            HSR
+          </a>
+          <i class="fa fa-bullseye"></i>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr bindonce ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | orderBy:predicate:reverse">
+        <td> {{ $index + 1 }} </td>
+        <td>
+          <a class="pull-right" ng-click="showHistory(stat)"><i class="fa fa-line-chart"></i></a>
+          <div ng-if="stat.history">
+            <highchart id="chart1" config="stat.history"></highchart>
+          </div>
+          <span ng-if="!stat.history">
+            <img class="item-img" bo-src="'http://census.soe.com/' + stat._2.imagePath" />
+            <a bo-href="'#/weapon/' + stat._2.id">
+              <span bo-text="stat._2.name"></span>
+            </a>
+          </span>
+        </td>
+        <td>
+          <span bo-text="stat._1.killCount"></span>
+        </td>
+        <td>
+          <span bo-text="(stat._1.killCount / stat._1.deathCount) | number:2"></span>
+        </td>
+        <td>
+          <span bo-text="((stat._1.hitCount / stat._1.fireCount) * 100) | number:2"></span> %
+        </td>
+        <td>
+          <span bo-text="((stat._1.headshotCount / stat._1.killCount) * 100) | number:2"></span> %
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </div>

@@ -2,9 +2,9 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.WeaponStatDAOComponent
-import com.vipers.model.WeaponStat
+import com.vipers.model.{Weapon, WeaponStat}
 
-private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponent { this: SlickDB =>
+private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponent { this: SlickDB with SlickWeaponDAOComponent =>
   import driver.simple._
 
   override lazy val weaponStatDAO = new SlickWeaponStatDAO
@@ -21,31 +21,38 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
 
     override def createAll(weaponStats : WeaponStat*)(implicit s : Session) = {
       weaponStatsTableCompiled.insertAll(weaponStats:_*)
-      weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*)
+      try {
+        weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*)
+      } catch {
+        case _ : Exception =>
+      }
     }
 
     private lazy val getCharactersMostRecentWeaponStatsCompiled = Compiled((characterId : Column[String]) => {
-      weaponStatsTable.filter(r => r.characterId === characterId)
+      for {
+        weaponStat <- weaponStatsTable if weaponStat.characterId === characterId
+        weapon <- weaponDAO.table if weapon.id === weaponStat.itemId
+      } yield (weaponStat, weapon)
     })
-    override def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[WeaponStat] = {
+    override def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)] = {
       getCharactersMostRecentWeaponStatsCompiled(characterId).list
     }
 
     private lazy val getCharactersWeaponProgressCompiled = Compiled((characterId : Column[String], weaponId : Column[String]) => {
-      weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId)
+      weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId).sortBy(_.lastSaved.asc)
     })
-    override def getCharactersWeaponProgress(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat] = {
-      getCharactersWeaponProgressCompiled(characterId, weaponId).list
+    override def getCharactersWeaponStatHistory(characterId : String, itemId : String)(implicit s : Session) : List[WeaponStat] = {
+      getCharactersWeaponProgressCompiled(characterId, itemId).list
     }
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {
       def pk = primaryKey(s"pk_$tableName", (characterId, itemId))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed class WeaponStatsTimeSeries(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats_time_series") with WeaponStatColumns {
-      def pk = primaryKey(s"pk_$tableName", (characterId, itemId, timestamp))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, timestamp) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def pk = primaryKey(s"pk_$tableName", (characterId, itemId, lastSaved))
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed trait WeaponStatColumns { this: Table[WeaponStat] =>
@@ -56,7 +63,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       def headshotCount = column[Long]("headshot_count", O.NotNull)
       def killCount = column[Long]("kill_count", O.NotNull)
       def deathCount = column[Long]("death_count", O.NotNull)
-      def timestamp = column[Long]("timestamp", O.NotNull)
+      def lastSaved = column[Long]("last_saved", O.NotNull)
     }
   }
 }

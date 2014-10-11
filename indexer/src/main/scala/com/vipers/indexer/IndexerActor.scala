@@ -8,7 +8,7 @@ import com.vipers.fetcher.FetcherActor
 import com.vipers.fetcher.FetcherActor._
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
-import com.vipers.model.{WeaponStat, OutfitMembership, Character}
+import com.vipers.model.{Weapon, WeaponStat, OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
 import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop, Start}
 import scala.concurrent.Future
@@ -119,6 +119,13 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         }
       } pipeTo sender
 
+    case GetCharactersWeaponStatHistory(characterId, itemId) =>
+      Future {
+        withSession { implicit s =>
+          weaponStatDAO.getCharactersWeaponStatHistory(characterId, itemId)
+        }
+      } pipeTo sender
+
     case e : AnyRef => log.error(e.toString)
   }
 }
@@ -134,6 +141,7 @@ object IndexerActor {
   case object GetAllIndexedOutfits extends IndexerMessage
   case object GetAllIndexedCharacters extends IndexerMessage
   case object GetAllWeapons extends IndexerMessage
+  case class GetCharactersWeaponStatHistory(characterId : String, itemId : String) extends IndexerMessage
 
   // Sent
   case object BeingIndexed extends IndexerMessage
@@ -177,7 +185,7 @@ object IndexerActor {
                                   lastIndexedOn : Long,
                                   updateTime : Long,
                                   membership : Option[GetCharacterResponseOutfitMembership],
-                                  weaponStats : List[WeaponStat])
+                                  weaponStats : List[(WeaponStat, Weapon)])
 
   case class GetCharacterResponseOutfitMembership(rank : String,
                                                   rankOrdinal : Byte,

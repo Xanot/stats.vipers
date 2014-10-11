@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('player-view', ['utils', 'ui.router', 'player-killboard'])
+angular.module('player-view', ['utils', 'ui.router'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('player-view', {
@@ -35,6 +35,71 @@ angular.module('player-view', ['utils', 'ui.router', 'player-killboard'])
   .controller('PlayerViewController', ['$scope', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService',
     function($scope, PlayerService, resolvePlayer, WebSocketService, NotificationService) {
       $scope.player = resolvePlayer;
+
+      // Default stat order
+      $scope.predicate = '_1.killCount';
+      $scope.reverse = !$scope.reverse;
+
+      $scope.showHistory = function(stat) {
+        if(stat.history) {
+          delete stat.history
+        } else {
+          PlayerService.getCharactersWeaponStatHistory(resolvePlayer.id, stat._2.id).then(function(response) {
+            stat.history = {
+              options: {
+                title: {
+                  text: stat._2.name
+                },
+                tooltip: {
+                  valueSuffix: "%",
+                  style: {
+                    padding: 10,
+                    fontWeight: 'bold'
+                  }
+                },
+                legend: {
+                  layout: 'vertical',
+                  align: 'right',
+                  verticalAlign: 'middle',
+                  borderWidth: 0
+                }
+              },
+
+              size: {
+                width: 512,
+                height: 300
+              },
+
+              xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: {
+                  month: '%e. %b',
+                  year: '%b'
+                },
+                title: {
+                  text: 'Date'
+                }
+              },
+
+              yAxis: {
+                title: {text: 'Value'}
+              },
+
+              series: [{
+                name: 'ACC',
+                data: $.map(response.data, function(s) {
+                  return [[s.lastSaveDate * 1000, parseFloat(((s.hitCount / s.fireCount) * 100).toFixed(2))]]
+                })
+              }, {
+                name: 'HSR',
+                data: $.map(response.data, function(s) {
+                  return [[s.lastSaveDate * 1000, parseFloat(((stat._1.headshotCount / stat._1.killCount) * 100 ).toFixed(2))]];
+                })
+              }]
+            };
+          });
+        }
+      };
 
       // Retrieve the character if it is updated
       WebSocketService.subscribe("c:" + resolvePlayer.nameLower, function(data) {
