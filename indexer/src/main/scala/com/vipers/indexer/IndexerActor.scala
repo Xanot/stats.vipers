@@ -13,12 +13,23 @@ import com.vipers.notifier.NotifierActor
 import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop, Start}
 import scala.concurrent.Future
 import akka.pattern.pipe
+import scala.concurrent.duration.FiniteDuration
 
 class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitIndexerComponent with CharacterIndexerComponent with WeaponIndexerComponent {
   import context.dispatcher
 
   protected var fetcherActor : ActorRef = _
   protected var notifierActor : ActorRef = _
+
+  val weaponSchedule = context.system.scheduler.schedule(FiniteDuration(0, TimeUnit.MILLISECONDS),
+    FiniteDuration(Configuration.weaponsStaleAfter + 10000, TimeUnit.MILLISECONDS)) {
+    weaponIndexer.retrieve match {
+      case (needsIndexing, _) =>
+        if(needsIndexing) {
+          fetcherActor ! FetchAllWeaponsRequest
+        }
+    }
+  }
 
   override def preStart() : Unit = {
     fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
@@ -27,6 +38,7 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
   }
 
   override def postStop() : Unit = {
+    weaponSchedule.cancel()
     notifierActor ! Stop
     fetcherActor ! PoisonPill
     notifierActor ! PoisonPill
@@ -107,18 +119,6 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         }
       } pipeTo sender
 
-    case GetAllWeapons =>
-      Future {
-        weaponIndexer.retrieve match {
-          case (needsIndexing, retrievedInfo) =>
-            if(needsIndexing) {
-              fetcherActor ! FetchAllWeaponsRequest
-            }
-
-            retrievedInfo.getOrElse(BeingIndexed)
-        }
-      } pipeTo sender
-
     case GetCharactersWeaponStatHistory(characterId, itemId) =>
       Future {
         withSession { implicit s =>
@@ -140,7 +140,6 @@ object IndexerActor {
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
   case object GetAllIndexedOutfits extends IndexerMessage
   case object GetAllIndexedCharacters extends IndexerMessage
-  case object GetAllWeapons extends IndexerMessage
   case class GetCharactersWeaponStatHistory(characterId : String, itemId : String) extends IndexerMessage
 
   // Sent

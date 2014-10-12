@@ -43,7 +43,7 @@
             Outfit rank
           </a>
         </th>
-        <th>
+        <th class="text-center">
           <a ng-click="limitRows = 50; predicate='battleRank == 100 ? earnedCerts : battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
             BR
           </a>
@@ -52,16 +52,19 @@
           <a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">
             Last login
           </a>
+          <i class="fa fa-clock-o"></i>
         </th>
         <th>
           <a ng-click="limitRows = 50; predicate='minutesPlayed'; reverse=!reverse;">
             Time played
           </a>
+          <i class="fa fa-clock-o"></i>
         </th>
         <th>
           <a ng-click="limitRows = 50; predicate='membership.outfitMemberSinceDate'; reverse=!reverse;">
             Member since
           </a>
+          <i class="fa fa-clock-o"></i>
         </th>
       </tr>
       </thead>
