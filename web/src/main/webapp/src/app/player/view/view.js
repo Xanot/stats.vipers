@@ -32,8 +32,8 @@ angular.module('player-view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerViewController', ['$scope', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService',
-    function($scope, PlayerService, resolvePlayer, WebSocketService, NotificationService) {
+  .controller('PlayerViewController', ['$scope', '$filter', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService',
+    function($scope, $filter, PlayerService, resolvePlayer, WebSocketService, NotificationService) {
       $scope.player = resolvePlayer;
 
       // Default stat order
@@ -51,7 +51,7 @@ angular.module('player-view', ['utils', 'ui.router'])
                   text: stat._2.name
                 },
                 tooltip: {
-                  valueSuffix: "%",
+                  valueDecimals: 2,
                   style: {
                     padding: 10,
                     fontWeight: 'bold'
@@ -88,12 +88,36 @@ angular.module('player-view', ['utils', 'ui.router'])
               series: [{
                 name: 'ACC',
                 data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, parseFloat(((s.hitCount / s.fireCount) * 100).toFixed(2))]]
-                })
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'acc')]]
+                }),
+                tooltip: {
+                  valueSuffix: '%'
+                }
               }, {
                 name: 'HSR',
                 data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, parseFloat(((stat._1.headshotCount / stat._1.killCount) * 100 ).toFixed(2))]];
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'hsr')]];
+                }),
+                tooltip: {
+                  valueSuffix: '%'
+                }
+              }, {
+                name: 'KDR',
+                visible: false,
+                data: $.map(response.data, function(s) {
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kdr')]];
+                })
+              }, {
+                name: 'KPM',
+                visible: false,
+                data: $.map(response.data, function(s) {
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kpm')]];
+                })
+              }, {
+                name: 'SPM',
+                visible: false,
+                data: $.map(response.data, function(s) {
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'spm')]];
                 })
               }]
             };

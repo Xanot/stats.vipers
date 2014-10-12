@@ -66,16 +66,13 @@ gulp.task('minify-app-css', function() {
 });
 
 gulp.task('build', ['clean'], function() {
-  // Copy libraries to build
   gulp.src(jsLibs).pipe(concat("vipers.libs.js")).pipe(gulp.dest(buildDest + '/app'));
   gulp.src(cssLibs).pipe(concat("vipers.libs.css")).pipe(gulp.dest(buildDest + '/css'));
   gulp.src(fonts).pipe(gulp.dest(buildDest + '/fonts'));
 
-  // Minify
   gulp.run('minify-app-js');
   gulp.run('minify-app-css');
 
-  // Copy source files to build
   gulp.src('./src/**/*.*', { base: './src' }).pipe(gulp.dest(buildDest));
 });
 
@@ -86,7 +83,6 @@ gulp.task('test', function() {
       action: 'run'
     }))
     .on('error', function(err) {
-      // Make sure failed tests cause gulp to exit non-zero
       throw err;
     });
 });

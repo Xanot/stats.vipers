@@ -90,19 +90,19 @@
           <span bo-text="stat._1.killCount"></span>
         </td>
         <td>
-          <span bo-text="(stat._1.killCount / stat._1.deathCount) | number:2"></span>
+          <span bo-text="stat._1 | statCalc:'kdr' | number:2"></span>
         </td>
         <td>
-          <span bo-text="((stat._1.hitCount / stat._1.fireCount) * 100) | number:2"></span> %
+          <span bo-text="stat._1 | statCalc:'acc' | number:2"></span> %
         </td>
         <td>
-          <span bo-text="((stat._1.headshotCount / stat._1.killCount) * 100) | number:2"></span> %
+          <span bo-text="stat._1 | statCalc:'hsr' | number:2"></span> %
         </td>
         <td>
-          <span bo-text="(stat._1.killCount / stat._1.secondsPlayed) * 3600 | number:2"></span>
+          <span bo-text="stat._1 | statCalc:'kpm' | number:2"></span>
         </td>
         <td>
-          <span bo-text="(stat._1.score / stat._1.secondsPlayed) * 60 | number:0"></span>
+          <span bo-text="stat._1 | statCalc:'spm' | number:0"></span>
         </td>
         <td>
           <span bo-text="stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]'"></span>
