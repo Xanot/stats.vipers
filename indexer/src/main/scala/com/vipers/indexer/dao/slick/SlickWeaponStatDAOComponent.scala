@@ -24,7 +24,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       try {
         weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*)
       } catch {
-        case _ : Exception =>
+        case _ : Exception => // Ignore primary key collisions
       }
     }
 
@@ -47,12 +47,12 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {
       def pk = primaryKey(s"pk_$tableName", (characterId, itemId))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed class WeaponStatsTimeSeries(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats_time_series") with WeaponStatColumns {
       def pk = primaryKey(s"pk_$tableName", (characterId, itemId, lastSaved))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed trait WeaponStatColumns { this: Table[WeaponStat] =>
@@ -63,6 +63,8 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       def headshotCount = column[Long]("headshot_count", O.NotNull)
       def killCount = column[Long]("kill_count", O.NotNull)
       def deathCount = column[Long]("death_count", O.NotNull)
+      def secondsPlayed = column[Long]("seconds_played", O.NotNull)
+      def score = column[Long]("score", O.NotNull)
       def lastSaved = column[Long]("last_saved", O.NotNull)
     }
   }

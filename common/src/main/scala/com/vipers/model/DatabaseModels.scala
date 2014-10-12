@@ -67,4 +67,6 @@ case class WeaponStat(characterId : String,
                       headshotCount : Long,
                       killCount : Long,
                       deathCount : Long,
+                      secondsPlayed : Long,
+                      score : Long,
                       lastSaveDate : Long)

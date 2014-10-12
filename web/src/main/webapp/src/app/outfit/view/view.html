@@ -96,7 +96,7 @@
           <span am-time-ago="member.lastLoginDate" bs-tooltip  data-type="info" data-title="{{ member.lastLoginDate | amCalendar }}" data-container="body"></span>
         </td>
         <td>
-          <span bo-text="member.minutesPlayed | minuteDuration"></span>
+          <span bo-text="member.minutesPlayed | duration:'minutes'"></span>
         </td>
         <td>
           <span am-time-ago="member.membership.outfitMemberSinceDate" bs-tooltip data-type="info" data-title="{{ member.membership.outfitMemberSinceDate | amCalendar }}" data-container="body"></span>

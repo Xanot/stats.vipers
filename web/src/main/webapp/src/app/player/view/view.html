@@ -53,6 +53,21 @@
           </a>
           <i class="fa fa-bullseye"></i>
         </th>
+        <th>
+          <a ng-click="predicate='_1.killCount / _1.secondsPlayed'; reverse=!reverse;">
+            KPM
+          </a>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.score / _1.secondsPlayed'; reverse=!reverse;">
+            SPM
+          </a>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.secondsPlayed'; reverse=!reverse;">
+            Time
+          </a>
+        </th>
       </tr>
       </thead>
       <tbody>
@@ -81,6 +96,15 @@
         </td>
         <td>
           <span bo-text="((stat._1.headshotCount / stat._1.killCount) * 100) | number:2"></span> %
+        </td>
+        <td>
+          <span bo-text="(stat._1.killCount / stat._1.secondsPlayed) * 3600 | number:2"></span>
+        </td>
+        <td>
+          <span bo-text="(stat._1.score / stat._1.secondsPlayed) * 60 | number:0"></span>
+        </td>
+        <td>
+          <span bo-text="stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]'"></span>
         </td>
       </tr>
       </tbody>

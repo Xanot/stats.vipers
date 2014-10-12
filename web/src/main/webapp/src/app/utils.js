@@ -31,9 +31,9 @@ angular.module('utils', ['constants'])
     };
   })
 
-  .filter('minuteDuration', function() {
-    return function(minutes) {
-      return moment.duration(minutes, "minutes").format("d[d] h[h]")
+  .filter('duration', function() {
+    return function(duration, type, format) {
+      return moment.duration(duration, type).format(format || "d[d] h[h]")
     };
   });
 

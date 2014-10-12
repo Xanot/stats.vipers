@@ -193,6 +193,8 @@ private[fetcher] object Wrapper {
           var hsCount = 0L
           var killCount = 0L
           var deathCount = 0L
+          var score = 0L
+          var secondsPlayed = 0L
 
           for((statName, value) <- stats) {
             if (statName == "weapon_hit_count") {
@@ -205,11 +207,15 @@ private[fetcher] object Wrapper {
               killCount = value
             } else if(statName == "weapon_deaths") {
               deathCount = value
+            } else if(statName == "weapon_score") {
+              score = value
+            } else if(statName == "weapon_play_time") {
+              secondsPlayed = value
             }
           }
 
           if(fireCount > 0 && killCount > 0) {
-            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, lastSave)
+            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, secondsPlayed, score, lastSave)
           }
         }
         list.toList
