@@ -21,13 +21,12 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
           try {
             withTransaction { implicit s =>
               characterDAO.createOrUpdate(character)
-              membership.map { m => outfitMembershipDAO.createOrUpdate(m) }
+              membership.map { m => outfitMembershipDAO.createOrUpdate(m) } // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
               weaponStats.map { ws =>
                 weaponStatDAO.deleteCharactersStats(character.id)
                 weaponStatDAO.createAll(ws:_*)
               }
 
-              // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
               log.debug(s"Character ${character.name} has been indexed")
               charactersBeingIndexed.remove(response.request)
               Some(character)
@@ -59,7 +58,14 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
           val needsIndexing = if(isStale(c.lastIndexedOn)) {
             indexChar(nameLower)
           } else {
-            false
+            val statsLastIndexedOn = weaponStatDAO.getCharactersWeaponStatsLastIndexedOn(c.id)
+            if(statsLastIndexedOn.isEmpty) { // e.g. Character previously indexed without stats
+              indexChar(nameLower)
+            } else if(statsLastIndexedOn.isDefined && isStale(statsLastIndexedOn.get)) { // e.g. Character previously indexed but has stale stats
+              indexChar(nameLower)
+            } else {
+              false
+            }
           }
 
           val membership = outfitMembershipDAO.find(c.id).flatMap { m =>

@@ -17,9 +17,10 @@ angular.module('player-view', ['utils', 'ui.router'])
             });
 
             PlayerService.getByName(nameLower).then(function(response) {
-              if(response.data.updateTime < new Date().getTime()) {
+              if((response.data.updateTime < new Date().getTime()) || response.data.weaponStats.length == 0) {
                 NotificationService.characterBeingIndexed(response.data.name)
               }
+
               deferred.resolve(response.data);
             }).catch(function(err) {
               deferred.reject();

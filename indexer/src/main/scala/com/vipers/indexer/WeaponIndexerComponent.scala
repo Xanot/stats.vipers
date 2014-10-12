@@ -1,7 +1,6 @@
 package com.vipers.indexer
 
 import java.util.concurrent.atomic.AtomicBoolean
-
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor.FetchAllWeaponsResponse
 import com.vipers.indexer.dao.DBComponent

@@ -58,6 +58,7 @@ private[indexer] object DAOs {
       def deleteCharactersStats(characterId : String)(implicit s : Session) : Boolean
       def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
       def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)]
+      def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long]
       def getCharactersWeaponStatHistory(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
     }
   }

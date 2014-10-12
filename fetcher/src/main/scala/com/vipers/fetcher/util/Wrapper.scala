@@ -215,7 +215,7 @@ private[fetcher] object Wrapper {
           }
 
           if(fireCount > 0 && killCount > 0) {
-            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, secondsPlayed, score, lastSave)
+            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, secondsPlayed, score, lastSave, Some(System.currentTimeMillis()))
           }
         }
         list.toList

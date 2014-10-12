@@ -69,4 +69,5 @@ case class WeaponStat(characterId : String,
                       deathCount : Long,
                       secondsPlayed : Long,
                       score : Long,
-                      lastSaveDate : Long)
+                      lastSaveDate : Long,
+                      lastIndexedOn : Option[Long])

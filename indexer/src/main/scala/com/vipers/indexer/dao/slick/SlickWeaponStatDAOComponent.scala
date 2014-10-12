@@ -38,6 +38,13 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       getCharactersMostRecentWeaponStatsCompiled(characterId).list
     }
 
+    private lazy val getCharactersWeaponStatsLastIndexedOnCompiled = Compiled((characterId : Column[String]) => {
+      weaponStatsTable.filter(r => r.characterId === characterId).map(_.lastIndexedOn)
+    })
+    override def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long] = {
+      getCharactersWeaponStatsLastIndexedOnCompiled(characterId).firstOption
+    }
+
     private lazy val getCharactersWeaponProgressCompiled = Compiled((characterId : Column[String], weaponId : Column[String]) => {
       weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId).sortBy(_.lastSaved.asc)
     })
@@ -47,12 +54,21 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {
       def pk = primaryKey(s"pk_$tableName", (characterId, itemId))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, lastIndexedOn.?) <> (WeaponStat.tupled, WeaponStat.unapply)
     }
 
     sealed class WeaponStatsTimeSeries(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats_time_series") with WeaponStatColumns {
       def pk = primaryKey(s"pk_$tableName", (characterId, itemId, lastSaved))
-      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved) <> (WeaponStat.tupled, WeaponStat.unapply)
+      // Time series do not need lastIndexedOn
+      def * = (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, lastIndexedOn.?).shaped <> (
+        {
+          case (characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, _) =>
+            WeaponStat(characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, None)
+        }, { s: WeaponStat => s match {
+          case WeaponStat(characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, _) =>
+            Some((characterId, itemId, fireCount, hitCount, headshotCount, killCount, deathCount, secondsPlayed, score, lastSaved, None))
+        }}
+      )
     }
 
     sealed trait WeaponStatColumns { this: Table[WeaponStat] =>
@@ -66,6 +82,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       def secondsPlayed = column[Long]("seconds_played", O.NotNull)
       def score = column[Long]("score", O.NotNull)
       def lastSaved = column[Long]("last_saved", O.NotNull)
+      def lastIndexedOn = column[Long]("last_indexed_on", O.Nullable)
     }
   }
 }
