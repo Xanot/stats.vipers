@@ -1,9 +1,9 @@
 package com.vipers.indexer.dao.slick
 
-import com.jolbox.bonecp.BoneCPDataSource
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.Configuration
 import com.vipers.indexer.dao.DBComponent
+import com.zaxxer.hikari.HikariDataSource
 import scala.slick.driver._
 import scala.slick.jdbc.JdbcBackend
 import scala.slick.jdbc.JdbcBackend.Database
@@ -13,23 +13,22 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
   with SlickCharacterDAOComponent
   with SlickOutfitMembershipDAOComponent
   with SlickWeaponDAOComponent
-  with SlickWeaponStatDAOComponent {
+  with SlickWeaponStatDAOComponent
+  with SlickCharacterStatDAOComponent {
 
   override protected val db: JdbcBackend.Database = {
     Database.forDataSource {
       val dbUrl : String = Configuration.Database.url
       val driver : String = Configuration.Database.driver
 
-      val ds : BoneCPDataSource = new BoneCPDataSource
-      ds.setDriverClass(driver)
+      val ds = new HikariDataSource
+      ds.setDriverClassName(driver)
 
-      Configuration.Database.user.map { u => ds.setUser(u) }
+      Configuration.Database.user.map { u => ds.setUsername(u) }
       Configuration.Database.password.map { p => ds.setPassword(p) }
 
       ds.setJdbcUrl(dbUrl)
-      ds.setPartitionCount(3)
-      ds.setMinConnectionsPerPartition(5)
-      ds.setMaxConnectionsPerPartition(20)
+      ds.setMaximumPoolSize(Configuration.Database.maxPoolSize)
       ds
     }
   }
@@ -53,7 +52,8 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
           outfitMembershipDAO.table.ddl ++
           weaponDAO.table.ddl ++
           weaponStatDAO.weaponStatsTable.ddl ++
-          weaponStatDAO.weaponStatsTimeSeriesTable.ddl).create
+          weaponStatDAO.weaponStatsTimeSeriesTable.ddl ++
+          characterStatDAO.table.ddl).create
       }
     } catch {
       case _ : Exception => // Tables already created

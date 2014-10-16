@@ -16,8 +16,8 @@ object Dependencies {
   val jbcrypt        = "org.mindrot"             %  "jbcrypt"                %  "[0.3m,)"
   val json4sNative   = "org.json4s"              %% "json4s-native"          %  "[3.2.10,)"
   val slick          = "com.typesafe.slick"      %% "slick"                  %  "2.1.0"
-  val bonecp         = "com.jolbox"              %   "bonecp"                %  "[0.8.0.RELEASE,)"
-  val h2             = "com.h2database"          %   "h2"                    %  "1.4.181"
+  val hikariCp       = "com.zaxxer"              %  "HikariCP-java6"         %  "[2.1.0,)"
+  val h2             = "com.h2database"          %  "h2"                     %  "1.4.181"
   val akkaActor      = "com.typesafe.akka"       %% "akka-actor"             %  akkaVersion
   val akkaSlf4j      = "com.typesafe.akka"       %% "akka-slf4j"             %  akkaVersion
   val scalaTest      = "org.scalatest"           %% "scalatest"              %  "[2.1.3,)"         % "test"
@@ -36,6 +36,6 @@ object Dependencies {
   val akkaDependencies = Seq(akkaActor, akkaSlf4j, akkaTest)
   val sprayDependencies = Seq(sprayCan, sprayRouting, sprayCaching, sprayHttp, sprayTestkit, json4sNative)
   val commonDependencies = Seq(_common, _commonTest, scalaTest, logback)
-  val databaseDependencies = Seq(slick, bonecp, h2)
+  val databaseDependencies = Seq(slick, hikariCp, h2)
   val websocketDependencies = Seq(jettyWebsocketApi, jettyWebsocketServer, websocketTest)
 }

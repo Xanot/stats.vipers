@@ -74,11 +74,6 @@ class SlickOutfitMembershipDAOTest extends WordSpecLike with DAOTest with SlickD
         outfitMembershipDAO.findAllCharactersByOutfitId("outfitId") match {
           case member :: Nil => member._1.name should be("Test")
         }
-
-        // invalid outfit
-        intercept[SQLException] {
-          outfitMembershipDAO.update(m.copy(outfitId = "newOutfit"))
-        }
       }
     }
 

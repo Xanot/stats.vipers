@@ -17,7 +17,7 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
     def index(response : FetchCharacterResponse) : Option[Character] = {
       response.contents match {
-        case Some((character, membership, weaponStats)) =>
+        case Some((character, membership, weaponStats, profileStats)) =>
           try {
             withTransaction { implicit s =>
               characterDAO.createOrUpdate(character)
@@ -25,6 +25,10 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
               weaponStats.map { ws =>
                 weaponStatDAO.deleteCharactersStats(character.id)
                 weaponStatDAO.createAll(ws:_*)
+              }
+              profileStats.map { ps =>
+                characterStatDAO.deleteCharactersStats(character.id)
+                characterStatDAO.createAll(ps:_*)
               }
 
               log.debug(s"Character ${character.name} has been indexed")

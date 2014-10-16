@@ -1,4 +1,4 @@
-<div bindonce="player">
+<div>
   <!-- Header -->
   <div class="row">
     <div class="col-xs-7">
@@ -72,7 +72,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr bindonce ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | orderBy:predicate:reverse">
+      <tr ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | orderBy:predicate:reverse">
         <td> {{ $index + 1 }} </td>
         <td>
           <a class="pull-right" ng-click="showHistory(stat)"><i class="fa fa-line-chart"></i></a>
@@ -80,35 +80,38 @@
             <highchart id="chart1" config="stat.history"></highchart>
           </div>
           <span ng-if="!stat.history">
-            <img class="item-img" bo-src="'http://census.soe.com/' + stat._2.imagePath" />
-            <a bo-href="'#/weapon/' + stat._2.id">
-              <span bo-text="stat._2.name"></span>
+            <img class="item-img" ng-src="http://census.soe.com/{{ ::stat._2.imagePath }}" />
+            <a href="#/weapon/{{ ::stat._2.id }}">
+              {{ ::stat._2.name }}
             </a>
           </span>
         </td>
         <td>
-          <span bo-text="stat._1.killCount"></span>
+          {{ ::stat._1.killCount }}
         </td>
         <td>
-          <span bo-text="stat._1 | statCalc:'kdr' | number:2"></span>
+          {{ ::(stat._1 | statCalc:'kdr' | number:2) }}
         </td>
         <td>
-          <span bo-text="stat._1 | statCalc:'acc' | number:2"></span> %
+          {{ ::(stat._1 | statCalc:'acc' | number:2) }} %
         </td>
         <td>
-          <span bo-text="stat._1 | statCalc:'hsr' | number:2"></span> %
+          {{ ::(stat._1 | statCalc:'hsr' | number:2) }} %
         </td>
         <td>
-          <span bo-text="stat._1 | statCalc:'kpm' | number:2"></span>
+          {{ ::(stat._1 | statCalc:'kpm' | number:2) }}
         </td>
         <td>
-          <span bo-text="stat._1 | statCalc:'spm' | number:0"></span>
+          {{ ::(stat._1 | statCalc:'spm' | number:0) }}
         </td>
         <td>
-          <span bo-text="stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]'"></span>
+          {{ ::(stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]') }}
         </td>
       </tr>
       </tbody>
     </table>
+  </div>
+  <div class="text-center" ng-if="player.weaponStats.length == 0" style="margin-top: 150px">
+    <i class="fa fa-spin fa-cog fa-5x"></i>
   </div>
 </div>

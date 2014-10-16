@@ -45,13 +45,13 @@ private[indexer] object DAOs {
     }
   }
 
-  trait WeaponDAOComponent extends DAOComponent { this : DB =>
+  trait WeaponDAOComponent extends DAOComponent { this: DB =>
     val weaponDAO : WeaponDAO
 
     trait WeaponDAO extends DAO[Weapon] {}
   }
 
-  trait WeaponStatDAOComponent extends DAOComponent { this : DB =>
+  trait WeaponStatDAOComponent extends DAOComponent { this: DB =>
     val weaponStatDAO : WeaponStatDAO
 
     trait WeaponStatDAO {
@@ -60,6 +60,16 @@ private[indexer] object DAOs {
       def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)]
       def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long]
       def getCharactersWeaponStatHistory(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
+    }
+  }
+
+  trait CharacterStatDAOComponent extends DAOComponent { this: DB =>
+    val characterStatDAO : CharacterStatDAO
+
+    trait CharacterStatDAO {
+      def deleteCharactersStats(characterId : String)(implicit s : Session)
+      def createAll(profileStats : ProfileStat*)(implicit s : Session)
+      def getCharactersOverallStats(characterId : String)(implicit s : Session) : List[ProfileStat]
     }
   }
 }

@@ -9,3 +9,4 @@ private[indexer] trait DBComponent extends DB
   with OutfitMembershipDAOComponent
   with WeaponDAOComponent
   with WeaponStatDAOComponent
+  with CharacterStatDAOComponent

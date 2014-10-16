@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('config.highcharts', [])
   .config(function() {
     Highcharts.theme = {

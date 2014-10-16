@@ -71,3 +71,11 @@ case class WeaponStat(characterId : String,
                       score : Long,
                       lastSaveDate : Long,
                       lastIndexedOn : Option[Long])
+
+case class ProfileStat(characterId : String,
+                       profileId : Short,
+                       kills : Long,
+                       deaths : Long,
+                       killedBy : Long,
+                       playTime : Long,
+                       score : Long)

@@ -28,7 +28,6 @@ var jsLibs = [
     "./bower_components/angular-moment/angular-moment.min.js",
     "./bower_components/angular-marked/angular-marked.min.js",
     "./bower_components/angular-loading-bar/build/loading-bar.min.js",
-    "./bower_components/angular-bindonce/bindonce.min.js",
     "./bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js",
     "./bower_components/angular-local-storage/angular-local-storage.min.js",
     "./bower_components/highcharts-ng/dist/highcharts-ng.min.js"

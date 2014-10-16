@@ -102,7 +102,7 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         characterIndexer.retrieve(nameLower) match {
           case (needsIndexing, retrievedInfo) =>
             if(needsIndexing) {
-              fetcherActor ! FetchCharacterRequest(Some(nameLower), None, withStats = true)
+              fetcherActor ! FetchCharacterRequest(Some(nameLower), None, withWeaponStats = true, withProfileStats = false)
             }
 
             retrievedInfo.map { case (c, membership, updateTime, mostRecentWeaponStats) =>
