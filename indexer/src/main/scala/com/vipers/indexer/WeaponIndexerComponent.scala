@@ -9,10 +9,8 @@ import com.vipers.model.Weapon
 private[indexer] trait WeaponIndexerComponent extends Logging { this: DBComponent =>
   val weaponIndexer = new WeaponIndexer
 
-  class WeaponIndexer {
+  class WeaponIndexer extends Indexer {
     private val weaponsBeingIndexed = new AtomicBoolean(false)
-
-    private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.weaponsStaleAfter
 
     def index(response : FetchAllWeaponsResponse) {
       try {
@@ -42,7 +40,7 @@ private[indexer] trait WeaponIndexerComponent extends Logging { this: DBComponen
       withSession { implicit s =>
         val weapons = weaponDAO.findAll
         if(weapons.nonEmpty) {
-          val needsIndexing = if(isStale(weapons(0).lastIndexedOn)) {
+          val needsIndexing = if(isStale(weapons(0).lastIndexedOn, Configuration.weaponsStaleAfter)) {
             isAlreadyBeingIndexed
           } else {
             false

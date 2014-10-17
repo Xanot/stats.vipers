@@ -9,15 +9,19 @@ import org.eclipse.jetty.util.ConcurrentHashSet
 import org.eclipse.jetty.websocket.servlet.{WebSocketServletFactory, WebSocketServlet}
 import akka.actor.Actor
 import org.eclipse.jetty.server.{ServerConnector, Server}
+import org.json4s.NoTypeHints
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.Future
 import akka.pattern.pipe
 import scala.concurrent.duration.FiniteDuration
 import org.json4s.native.JsonMethods._
 import org.json4s.JsonDSL._
+import org.json4s.native.Serialization
+import org.json4s.Extraction
 
 class NotifierActor extends Actor with Logging {
   import context.dispatcher
+  implicit val formats = Serialization.formats(NoTypeHints)
 
   override def preStart() : Unit = {
     // Periodically send a keep-alive ping
@@ -48,16 +52,16 @@ class NotifierActor extends Actor with Logging {
       Future {
         server.isRunning
       } pipeTo sender
-    case m : NotifierEvent =>
+    case Publish(event, data) =>
       Future {
-        log.debug("Notifying: " + m.event)
-        val iterator = listeners(m.event).iterator()
+        log.debug("Notifying: " + event)
+        val iterator = listeners(event).iterator()
         while(iterator.hasNext) {
           val socket = iterator.next()
           if(socket.isNotConnected) {
             iterator.remove()
           } else {
-            socket.getRemote.sendString(compact(render(("event" -> m.event) ~ ("data" -> m.data))))
+            socket.getRemote.sendString(compact(render(("event" -> event) ~ ("data" -> Extraction.decompose(data)))))
           }
         }
       }
@@ -98,8 +102,5 @@ object NotifierActor {
   case object IsRunning extends NotifierMessage
 
   // Event types
-  sealed abstract class NotifierEvent(val event : String, val data : String) extends NotifierMessage
-  case class Notify(override val event : String, override val data : String) extends NotifierEvent(event, data)
-  case class OutfitIndexed(outfitAliasLower : String) extends NotifierEvent(s"o:$outfitAliasLower", outfitAliasLower)
-  case class CharacterIndexed(nameLower : String) extends NotifierEvent(s"c:$nameLower", nameLower)
+  case class Publish(event : String, data : AnyRef) extends NotifierMessage
 }

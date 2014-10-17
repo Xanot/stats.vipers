@@ -6,16 +6,21 @@ import akka.util.Timeout
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor
 import com.vipers.fetcher.FetcherActor._
+import com.vipers.indexer.EventBusComponent._
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
 import com.vipers.model.{Weapon, WeaponStat, OutfitMembership, Character}
 import com.vipers.notifier.NotifierActor
-import com.vipers.notifier.NotifierActor.{OutfitIndexed, CharacterIndexed, Stop, Start}
+import com.vipers.notifier.NotifierActor._
 import scala.concurrent.Future
 import akka.pattern.pipe
 import scala.concurrent.duration.FiniteDuration
 
-class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitIndexerComponent with CharacterIndexerComponent with WeaponIndexerComponent {
+class IndexerActor extends Actor
+  with Logging with EventBusComponent with SlickDBComponent
+  with OutfitIndexerComponent with CharacterIndexerComponent
+  with WeaponIndexerComponent {
+
   import context.dispatcher
 
   protected var fetcherActor : ActorRef = _
@@ -32,6 +37,8 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
   }
 
   override def preStart() : Unit = {
+    eventBus.subscribe(self, classOf[NeedsIndexing])
+    eventBus.subscribe(self, classOf[Indexed])
     fetcherActor = context.actorOf(Props(classOf[FetcherActor]))
     notifierActor = context.actorOf(Props(classOf[NotifierActor]))
     notifierActor ! Start
@@ -50,16 +57,12 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
     //================================================================================
     case r : FetchOutfitResponse =>
       Future {
-        outfitIndexer.index(r).map { outfit =>
-          notifierActor ! OutfitIndexed(outfit.aliasLower) // Notify client
-        }
+        outfitIndexer.index(r)
       }
 
     case r : FetchCharacterResponse =>
       Future {
-        characterIndexer.index(r).map { character =>
-          notifierActor ! CharacterIndexed(character.nameLower) // Notify client
-        }
+        characterIndexer.index(r)
       }
 
     case r : FetchAllWeaponsResponse =>
@@ -70,24 +73,17 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
     //================================================================================
     // Requests
     //================================================================================
-    case GetOutfitRequest(alias, id) =>
+    case GetOutfitRequest(aliasLower) =>
       Future {
-        outfitIndexer.retrieve(alias, id) match {
-          case (needsIndexing, retrievedInfo) =>
-            if(needsIndexing) {
-              fetcherActor ! FetchOutfitRequest(alias, id)
+        outfitIndexer.retrieve(aliasLower).map { case (outfit, leader, members, updateTime) =>
+          GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
+            outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
+            members.map { c =>
+              GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
+                c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
             }
-
-            retrievedInfo.map { case (outfit, leader, members, updateTime) =>
-              GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
-                outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
-                members.map { c =>
-                  GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
-                    c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
-                }
-              )
-            }.getOrElse(BeingIndexed)
-        }
+          )
+        }.getOrElse(BeingIndexed)
       } pipeTo sender
 
     case GetAllIndexedOutfits =>
@@ -99,17 +95,10 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
 
     case GetCharacterRequest(nameLower) =>
       Future {
-        characterIndexer.retrieve(nameLower) match {
-          case (needsIndexing, retrievedInfo) =>
-            if(needsIndexing) {
-              fetcherActor ! FetchCharacterRequest(Some(nameLower), None, withWeaponStats = true, withProfileStats = false)
-            }
-
-            retrievedInfo.map { case (c, membership, updateTime, mostRecentWeaponStats) =>
-              GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-                c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
-            }.getOrElse(BeingIndexed)
-        }
+        characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime, mostRecentWeaponStats) =>
+          GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
+            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
+        }.getOrElse(BeingIndexed)
       } pipeTo sender
 
     case GetAllIndexedCharacters =>
@@ -126,6 +115,17 @@ class IndexerActor extends Actor with Logging with SlickDBComponent with OutfitI
         }
       } pipeTo sender
 
+    //================================================================================
+    // Events
+    //================================================================================
+    case CharacterIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
+    case CharacterWeaponStatsIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
+    case CharacterProfileStatsIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
+    case OutfitIndexed(outfitAliasLower) => notifierActor ! Publish(s"o:$outfitAliasLower", outfitAliasLower)
+
+    case CharacterNeedsIndexing(nameLower) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true)
+    case OutfitNeedsIndexing(aliasLower) => fetcherActor ! FetchOutfitRequest(aliasLower)
+
     case e : AnyRef => log.error(e.toString)
   }
 }
@@ -136,7 +136,7 @@ object IndexerActor {
   sealed trait IndexerMessage
 
   // Received
-  case class GetOutfitRequest(aliasLower : Option[String], id : Option[String]) extends IndexerMessage
+  case class GetOutfitRequest(aliasLower : String) extends IndexerMessage
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
   case object GetAllIndexedOutfits extends IndexerMessage
   case object GetAllIndexedCharacters extends IndexerMessage

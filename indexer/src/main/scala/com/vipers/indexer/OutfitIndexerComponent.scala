@@ -2,20 +2,19 @@ package com.vipers.indexer
 
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor.{OutfitMember, FetchOutfitResponse}
+import com.vipers.indexer.EventBusComponent.{OutfitNeedsIndexing, OutfitIndexed}
 import com.vipers.indexer.dao.DBComponent
 import com.vipers.model.Outfit
 import org.eclipse.jetty.util.ConcurrentHashSet
 import com.vipers.model.Character
 
-private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponent =>
+private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponent with EventBusComponent =>
   val outfitIndexer : OutfitIndexer = new OutfitIndexer
 
-  class OutfitIndexer {
+  class OutfitIndexer extends Indexer {
     private val outfitsBeingIndexed = new ConcurrentHashSet[String]
 
-    private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.outfitStaleAfter
-
-    def index(response : FetchOutfitResponse) : Option[Outfit] = {
+    def index(response : FetchOutfitResponse) : Unit = {
       response.contents match {
         case Some((outfit, members)) =>
           try {
@@ -31,60 +30,42 @@ private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponen
 
               log.debug(s"Outfit ${outfit.alias} has been indexed")
               outfitsBeingIndexed.remove(response.request)
-              Some(outfit)
+              eventBus.publish(OutfitIndexed(outfit.aliasLower))
             }
           } catch {
             case e : Exception =>
               e.printStackTrace()
               outfitsBeingIndexed.remove(response.request)
-              None
           }
         case None =>
           outfitsBeingIndexed.remove(response.request)
-          None
       }
     }
 
-    def retrieve(outfitAlias : Option[String], outfitId : Option[String]) : (Boolean, Option[(Outfit, Character, List[OutfitMember], Long)]) = {
+    def retrieve(outfitAliasLower : String) : Option[(Outfit, Character, List[OutfitMember], Long)] = {
       def outfitResponse(outfit : Outfit)(implicit s : Session) : (Outfit, Character, List[OutfitMember], Long) = {
         (outfit, characterDAO.find(outfit.leaderCharacterId).get, outfitMembershipDAO.findAllCharactersByOutfitId(outfit.id), outfit.lastIndexedOn + Configuration.outfitStaleAfter)
       }
 
-      def indexOutfit(aliasOrId : String) : Boolean = {
-        if(!outfitsBeingIndexed.contains(aliasOrId)) {
-          log.debug(s"Outfit $aliasOrId is being indexed")
-          outfitsBeingIndexed.add(aliasOrId)
-        } else {
-          false
+      def indexOutfit(aliasLower : String) : Unit = {
+        if(!outfitsBeingIndexed.contains(aliasLower)) {
+          log.debug(s"Outfit $aliasLower is being indexed")
+          eventBus.publish(OutfitNeedsIndexing(outfitAliasLower))
+          outfitsBeingIndexed.add(aliasLower)
         }
       }
 
       withSession { implicit s =>
-        if(outfitAlias.isDefined) {
-          outfitDAO.findByAliasLower(outfitAlias.get).map { outfit =>
-            val needsIndexing = if (isStale(outfit.lastIndexedOn)) {
-              indexOutfit(outfitAlias.get)
-            } else {
-              false
-            }
-
-            (needsIndexing, Some(outfitResponse(outfit)))
-          }.getOrElse {
-            (indexOutfit(outfitAlias.get), None)
+        outfitDAO.findByAliasLower(outfitAliasLower).map { outfit =>
+          if (isStale(outfit.lastIndexedOn, Configuration.outfitStaleAfter)) {
+            indexOutfit(outfitAliasLower)
           }
-        } else if(outfitId.isDefined) {
-          outfitDAO.find(outfitId.get).map { outfit =>
-            val needsIndexing = if (isStale(outfit.lastIndexedOn)) {
-              indexOutfit(outfitId.get)
-            } else {
-              false
-            }
 
-            (needsIndexing, Some(outfitResponse(outfit)))
-          }.getOrElse {
-            (indexOutfit(outfitId.get), None)
-          }
-        } else { (false, None) }
+          Some(outfitResponse(outfit))
+        }.getOrElse {
+          indexOutfit(outfitAliasLower)
+          None
+        }
       }
     }
   }

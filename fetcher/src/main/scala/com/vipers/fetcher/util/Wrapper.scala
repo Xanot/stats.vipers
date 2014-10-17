@@ -222,6 +222,10 @@ private[fetcher] object Wrapper {
       }
     }
 
+    def toProfileStats(characterId : String) : List[ProfileStat] = {
+      ???
+    }
+
     private def check[T](f : => T) : Option[T] = {
       if(json != JNothing) {
         Some(f)

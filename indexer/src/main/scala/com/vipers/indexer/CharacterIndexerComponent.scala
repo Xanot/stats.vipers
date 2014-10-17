@@ -2,20 +2,19 @@ package com.vipers.indexer
 
 import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor.FetchCharacterResponse
+import com.vipers.indexer.EventBusComponent.{CharacterIndexed, CharacterNeedsIndexing}
 import com.vipers.indexer.IndexerActor.GetCharacterResponseOutfitMembership
 import com.vipers.indexer.dao.DBComponent
 import com.vipers.model.{Weapon, WeaponStat, Character}
 import org.eclipse.jetty.util.ConcurrentHashSet
 
-private[indexer] trait CharacterIndexerComponent extends Logging { this: DBComponent =>
-  val characterIndexer : CharacterIndexer = new CharacterIndexer
+private[indexer] trait CharacterIndexerComponent extends Logging { this: DBComponent with EventBusComponent =>
+  val characterIndexer = new CharacterIndexer
 
-  class CharacterIndexer {
+  class CharacterIndexer extends Indexer {
     private val charactersBeingIndexed = new ConcurrentHashSet[String]
 
-    private def isStale(lastIndexedOn : Long) : Boolean = System.currentTimeMillis() - lastIndexedOn > Configuration.characterStaleAfter
-
-    def index(response : FetchCharacterResponse) : Option[Character] = {
+    def index(response : FetchCharacterResponse) : Unit = {
       response.contents match {
         case Some((character, membership, weaponStats, profileStats)) =>
           try {
@@ -33,42 +32,37 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
               log.debug(s"Character ${character.name} has been indexed")
               charactersBeingIndexed.remove(response.request)
-              Some(character)
+              eventBus.publish(CharacterIndexed(character.nameLower))
             }
           } catch {
             case e : Exception =>
               e.printStackTrace()
               charactersBeingIndexed.remove(response.request)
-              None
           }
         case None =>
           charactersBeingIndexed.remove(response.request)
-          None
       }
     }
 
-    def retrieve(nameLower : String) : (Boolean, Option[(Character, Option[GetCharacterResponseOutfitMembership], Long, List[(WeaponStat, Weapon)])]) = {
-      def indexChar(nameLower : String) : Boolean = {
+    def retrieve(nameLower : String) : Option[(Character, Option[GetCharacterResponseOutfitMembership], Long, List[(WeaponStat, Weapon)])] = {
+      def indexChar(nameLower : String) : Unit = {
         if(!charactersBeingIndexed.contains(nameLower)) {
           log.debug(s"Character $nameLower is being indexed")
+          eventBus.publish(CharacterNeedsIndexing(nameLower))
           charactersBeingIndexed.add(nameLower)
-        } else {
-          false
         }
       }
 
       withSession { implicit s =>
         characterDAO.findByNameLower(nameLower).map { c =>
-          val needsIndexing = if(isStale(c.lastIndexedOn)) {
+          if(isStale(c.lastIndexedOn, Configuration.characterStaleAfter)) {
             indexChar(nameLower)
           } else {
             val statsLastIndexedOn = weaponStatDAO.getCharactersWeaponStatsLastIndexedOn(c.id)
             if(statsLastIndexedOn.isEmpty) { // e.g. Character previously indexed without stats
               indexChar(nameLower)
-            } else if(statsLastIndexedOn.isDefined && isStale(statsLastIndexedOn.get)) { // e.g. Character previously indexed but has stale stats
+            } else if(statsLastIndexedOn.isDefined && isStale(statsLastIndexedOn.get, Configuration.characterStaleAfter)) { // e.g. Character previously indexed but has stale stats
               indexChar(nameLower)
-            } else {
-              false
             }
           }
 
@@ -80,9 +74,10 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
           val weaponStats = weaponStatDAO.getCharactersMostRecentWeaponStats(c.id)
 
-          (needsIndexing, Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter, weaponStats))
+          Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter, weaponStats)
         }.getOrElse {
-          (indexChar(nameLower), None)
+          indexChar(nameLower)
+          None
         }
       }
     }

@@ -4,7 +4,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
   .config(['$stateProvider', function($stateProvider) {
     $stateProvider
       .state('outfit-view', {
-        url: '/outfit/:aliasOrId',
+        url: '/outfit/:alias',
         controller: 'OutfitViewController',
         templateUrl: 'app/outfit/view/view.html',
         resolve: {
@@ -12,8 +12,8 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
             function($q, $stateParams, OutfitService, NotificationService, WebSocketService) {
             var deferred = $q.defer();
 
-            if($stateParams.aliasOrId.length <= 4) {
-              var aliasLower = $stateParams.aliasOrId.toLowerCase();
+            if($stateParams.alias.length >= 1 && $stateParams.alias.length <= 4) {
+              var aliasLower = $stateParams.alias.toLowerCase();
 
               WebSocketService.subscribe("o:" + aliasLower, function(data) {
                 NotificationService.outfitIndexed(data)
@@ -29,12 +29,7 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
                 NotificationService.outfitBeingIndexed(aliasLower);
               });
             } else {
-              OutfitService.get($stateParams.aliasOrId).then(function(response) {
-                deferred.resolve(response.data);
-              }).catch(function(err) {
-                deferred.reject();
-                NotificationService.outfitBeingIndexed($stateParams.aliasOrId);
-              });
+              deferred.reject();
             }
 
             return deferred.promise;

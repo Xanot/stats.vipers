@@ -23,65 +23,18 @@ class FetcherActor extends Actor {
   implicit val jsonFormats = org.json4s.DefaultFormats
 
   def receive = {
-    case FetchCharacterRequest(name, id, withStats) =>
+    case FetchCharacterRequest(name, withStats) =>
       Future {
-        val json = {
-          if(id.isDefined) {
-            sendRequest(ApiUrlBuilder.getCharactersById(id.get))
-          } else {
-            sendRequest(ApiUrlBuilder.getCharacterByName(name.get, withStats))
-          }
-        }
-        json \ "character_list" match {
+        sendRequest(ApiUrlBuilder.getCharacterByName(name, withStats)) \ "character_list" match {
           case JArray(parent) if parent.nonEmpty =>
             FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership,
-              (parent(0) \ "stats").toWeaponStats((parent(0) \ "character_id").extract[String]))), name.getOrElse(id.get))
-          case _ => FetchCharacterResponse(None, name.getOrElse(id.get))
+              (parent(0) \ "stats").toWeaponStats((parent(0) \ "character_id").extract[String]), None)), name)
+          case _ => FetchCharacterResponse(None, name)
         }
       } pipeTo sender
-    case FetchMultipleCharactersByIdRequest(ids @_*) =>
+    case m @ FetchOutfitRequest(alias) =>
       Future {
-        val json = sendRequest(ApiUrlBuilder.getCharactersById(ids:_*))
-        val JArray(parent) = json \ "character_list"
-        val list = mutable.ListBuffer.empty[Character]
-        parent.foreach { charJson =>
-          list += charJson.toCharacter.get
-        }
-        list
-      } pipeTo sender
-    case m @ FetchSimpleMultipleOutfitsRequest(sort, page) =>
-      Future {
-        val JArray(outfits) = sendRequest(ApiUrlBuilder.getSimpleOutfits(sort, page)) \ "outfit_list"
-        val list = mutable.ListBuffer.empty[Outfit]
-        outfits.foreach { outfitJson =>
-          list += outfitJson.toOutfit.get
-        }
-        list.toList
-      } pipeTo sender
-    case m @ FetchSimpleOutfitRequest(alias, id) =>
-      Future {
-        val json = {
-          if (alias.isDefined) {
-            sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = true))
-          } else {
-            sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = true))
-          }
-        }
-        json \ "outfit_list" match {
-          case JArray(parent) if parent.nonEmpty => Some(parent(0).toOutfit.get)
-          case _ => None
-        }
-      } pipeTo sender
-    case m @ FetchOutfitRequest(alias, id) =>
-      Future {
-        val json = {
-          if (alias.isDefined) {
-            sendRequest(ApiUrlBuilder.getOutfitByAlias(alias.get, isSimple = false))
-          } else {
-            sendRequest(ApiUrlBuilder.getOutfitById(id.get, isSimple = false))
-          }
-        }
-        json \ "outfit_list" match {
+        sendRequest(ApiUrlBuilder.getOutfitByAlias(alias, isSimple = false)) \ "outfit_list" match {
           case JArray(parent) if parent.nonEmpty =>
             FetchOutfitResponse(Some(parent(0).toOutfit.get, {
               val list = mutable.ListBuffer.empty[OutfitMember]
@@ -91,28 +44,8 @@ class FetcherActor extends Actor {
                 list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
               }
               list
-            }), alias.getOrElse(id.get))
-          case _ => FetchOutfitResponse(None, alias.getOrElse(id.get))
-        }
-      } pipeTo sender
-    case FetchOutfitCharactersRequest(alias, id, page) =>
-      Future {
-        val json = {
-          if(alias.isDefined) {
-            sendRequest(ApiUrlBuilder.getOutfitCharactersByAlias(alias.get, page))
-          } else {
-            sendRequest(ApiUrlBuilder.getOutfitCharactersById(id.get, page))
-          }
-        }
-        json \ "outfit_member_extended_list" match {
-          case JArray(parents) if parents.nonEmpty =>
-            val JString(total) = parents(0) \ "member_count"
-            val list = mutable.ListBuffer.empty[OutfitMember]
-            parents.foreach { parent =>
-              list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
-            }
-            Some(FetchOutfitCharactersResponse(total.toInt, list))
-          case _ => None
+            }), alias)
+          case _ => FetchOutfitResponse(None, alias)
         }
       } pipeTo sender
     case FetchAllWeaponsRequest =>
@@ -134,30 +67,20 @@ class FetcherActor extends Actor {
 
 object FetcherActor {
   val timeout = Timeout(30000, TimeUnit.MILLISECONDS)
-  import com.vipers.model.Sort.Sort
 
   type OutfitMember = (Character, OutfitMembership)
 
   //================================================================================
   // Character request/response
   //================================================================================
-  case class FetchCharacterRequest(characterName : Option[String], characterId : Option[String], withStats : Boolean)
-  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership], Option[List[WeaponStat]])], request : String)
-
-  case class FetchMultipleCharactersByIdRequest(characterIds : String*)
+  case class FetchCharacterRequest(characterName : String, withStats : Boolean)
+  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership], Option[List[WeaponStat]], Option[List[ProfileStat]])], request : String)
 
   //================================================================================
   // Outfit request/response
   //================================================================================
-  case class FetchSimpleOutfitRequest(alias : Option[String], id : Option[String])
-
-  case class FetchSimpleMultipleOutfitsRequest(sort : Sort, page : Page)
-
-  case class FetchOutfitRequest(alias : Option[String], id : Option[String])
+  case class FetchOutfitRequest(alias : String)
   case class FetchOutfitResponse(contents : Option[(Outfit, Seq[OutfitMember])], request : String)
-
-  case class FetchOutfitCharactersRequest(alias : Option[String], id : Option[String], page : Page)
-  case class FetchOutfitCharactersResponse(total : Int, characters : Seq[OutfitMember])
 
   //================================================================================
   // Weapon request/response

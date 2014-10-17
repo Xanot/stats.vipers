@@ -1,11 +1,5 @@
 <div class="row">
-  <div class="col-xs-4">
-    <!-- Outfit Search -->
-    <form ng-submit="outfitHrefSearch(selectedOutfit)">
-      <input ng-sum type="text" class="form-control" ng-model="selectedOutfit" ng-options="outfit as outfit.label for outfit in search($viewValue)" placeholder="Search" bs-typeahead>
-    </form>
-  </div>
-  <div class="col-xs-8">
+  <div>
     <!--Outfits-->
     <table class="table table-bordered table-responsive">
       <thead>
@@ -20,7 +14,7 @@
         <td> {{ $index + 1 }}</td>
         <td>
           <span ng-if="outfit.alias" class="faction-{{outfit.factionId}}">[{{ outfit.alias }}]</span>
-          <a href="{{ outfitHref(outfit) }}" class="faction-{{outfit.factionId}}">{{ outfit.name }}</a>
+          <a ui-sref="outfit-view({ alias : outfit.alias })" class="faction-{{outfit.factionId}}">{{ outfit.name }}</a>
         </td>
         <td>
           <span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span>

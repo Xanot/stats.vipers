@@ -61,7 +61,7 @@ class NotifierActorTest (_system : ActorSystem) extends TestKit(_system) with Wo
 
       test(listener) {
         Thread.sleep(500)
-        notifierActor ! Notify("c:12", "12")
+        notifierActor ! Publish("c:12", "12")
         latch.await()
         latch.getCount should be(0)
       }

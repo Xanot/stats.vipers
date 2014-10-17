@@ -23,23 +23,20 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
           }
         }
       } ~
-      path(Segment) { aliasOrId =>
+      path(Segment) { alias =>
         get {
           encodeResponse(Gzip) {
-            val request = if(aliasOrId.length <= 4) {
-              indexerActor ? GetOutfitRequest(Some(aliasOrId), None)
-            } else {
-              indexerActor ? GetOutfitRequest(None, Some(aliasOrId))
-            }
-            onComplete(request) {
-              case Success(response) =>
-                complete {
-                  response match {
-                    case m: GetOutfitResponse => m
-                    case BeingIndexed => NotFound
+            authorize(alias.length >= 1 && alias.length <= 4) {
+              onComplete(indexerActor ? GetOutfitRequest(alias)) {
+                case Success(response) =>
+                  complete {
+                    response match {
+                      case m: GetOutfitResponse => m
+                      case BeingIndexed => NotFound
+                    }
                   }
-                }
-              case Failure(m) => complete(InternalServerError, m.toString)
+                case Failure(m) => complete(InternalServerError, m.toString)
+              }
             }
           }
         }
