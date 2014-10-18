@@ -145,9 +145,13 @@ private[fetcher] object Wrapper {
 
     def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
       check {
+        if(json \ "characters_weapon_stat" == JNothing) {
+          return None
+        }
+
         val map = mutable.Map[String, (Long, mutable.ListBuffer[(String, Long)])]().empty
 
-        val JArray(weaponStat) = json \ "weapon_stat"
+        val JArray(weaponStat) = json \ "characters_weapon_stat"
         weaponStat.foreach { stat =>
           val JString(itemId) = stat \ "item_id"
           val JString(statName) = stat \ "stat_name"
@@ -164,7 +168,7 @@ private[fetcher] object Wrapper {
           }
         }
 
-        val JArray(weaponStatByFaction) = json \ "weapon_stat_by_faction"
+        val JArray(weaponStatByFaction) = json \ "characters_weapon_stat_by_faction"
         weaponStatByFaction.foreach { stat =>
           val JString(itemId) = stat \ "item_id"
           val JString(statName) = stat \ "stat_name"
@@ -215,7 +219,7 @@ private[fetcher] object Wrapper {
           }
 
           if(fireCount > 0 && killCount > 0) {
-            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, secondsPlayed, score, lastSave, Some(System.currentTimeMillis()))
+            list += WeaponStat(characterId, itemId, fireCount, hitCount, hsCount, killCount, deathCount, secondsPlayed, score, lastSave)
           }
         }
         list.toList

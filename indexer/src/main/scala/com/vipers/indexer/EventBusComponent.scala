@@ -29,11 +29,9 @@ private[indexer] object EventBusComponent {
 
   sealed trait Indexed extends IndexerEvent
   case class CharacterIndexed(nameLower : String) extends Indexed
-  case class CharacterWeaponStatsIndexed(nameLower : String) extends Indexed
-  case class CharacterProfileStatsIndexed(nameLower : String) extends Indexed
   case class OutfitIndexed(outfitAliasLower : String) extends Indexed
 
   sealed trait NeedsIndexing extends IndexerEvent
-  case class CharacterNeedsIndexing(nameLower : String) extends NeedsIndexing
+  case class CharacterNeedsIndexing(nameLower : String, statsLastIndexedOn : Option[Long]) extends NeedsIndexing
   case class OutfitNeedsIndexing(aliasLower : String) extends NeedsIndexing
 }

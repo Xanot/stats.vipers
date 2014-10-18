@@ -119,11 +119,9 @@ class IndexerActor extends Actor
     // Events
     //================================================================================
     case CharacterIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
-    case CharacterWeaponStatsIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
-    case CharacterProfileStatsIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
     case OutfitIndexed(outfitAliasLower) => notifierActor ! Publish(s"o:$outfitAliasLower", outfitAliasLower)
 
-    case CharacterNeedsIndexing(nameLower) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true)
+    case CharacterNeedsIndexing(nameLower, statsLastIndexedOn : Option[Long]) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true, statsLastIndexedOn)
     case OutfitNeedsIndexing(aliasLower) => fetcherActor ! FetchOutfitRequest(aliasLower)
 
     case e : AnyRef => log.error(e.toString)

@@ -20,7 +20,7 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
               case Success(characters) => complete {
                 characters
               }
-              case Failure(e) => complete(InternalServerError, e.toString)
+              case Failure(e) => complete(InternalServerError, e.getStackTrace.mkString("\n"))
             }
           }
         }
@@ -36,7 +36,7 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
                     case BeingIndexed => NotFound
                   }
                 }
-                case Failure(e) => complete(InternalServerError, e.toString)
+                case Failure(e) => complete(InternalServerError, e.getStackTrace.mkString("\n"))
               }
             }
           }
@@ -47,7 +47,7 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
               get {
                 onComplete((indexerActor ? GetCharactersWeaponStatHistory(characterName, itemId)).mapTo[List[WeaponStat]]) {
                   case Success(stats) => complete(stats)
-                  case Failure(e) => complete(InternalServerError, e.toString)
+                  case Failure(e) => complete(InternalServerError, e.getStackTrace.mkString("\n"))
                 }
               }
             }

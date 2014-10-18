@@ -3,7 +3,7 @@ package com.vipers.fetcher.util
 import com.vipers.fetcher.Configuration
 import com.vipers.model.Page
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
-import com.vipers.fetcher.util.CensusQuery.Search
+import com.vipers.fetcher.util.CensusQuery.{CensusQueryCommand, Search}
 import spray.http.Uri
 
 private[fetcher] object ApiUrlBuilder {
@@ -34,12 +34,17 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   // Character
   //================================================================================
-  def getCharacterByName(name : String, withStats : Boolean) : Uri = {
+  def getCharacterByName(name : String, withStats : Boolean, statsLastIndexedOn : Option[Long]) : Uri = {
     val s = Search("name.first_lower", name.toLowerCase)
     val params = {
-      Resolve("characters_weapon_stat", "characters_weapon_stat_by_faction", "characters_stat", "characters_stat_by_faction")
       if(withStats) {
-        CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false))), Resolve("weapon_stat", "weapon_stat_by_faction")).construct
+        CensusQuery(Some(s), Join(
+          OutfitMemberJoin(injectAt = "membership", isList = Some(false)),
+          CharacterWeaponStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
+          CharacterWeaponStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
+          CharacterProfileStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
+          CharacterProfileStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0)))))
+        )).construct
       } else {
         CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct
       }

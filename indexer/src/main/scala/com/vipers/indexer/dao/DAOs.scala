@@ -55,10 +55,12 @@ private[indexer] object DAOs {
     val weaponStatDAO : WeaponStatDAO
 
     trait WeaponStatDAO {
-      def deleteCharactersStats(characterId : String)(implicit s : Session) : Boolean
-      def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
-      def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)]
+      def insertTimeSeries(weaponStats : WeaponStat*)(implicit s : Session) : Unit
+      def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session)
+      def createOrUpdateLastIndexedOn(characterId : String, stamp : Long)(implicit s : Session)
       def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long]
+      def getCharactersWeaponStatsLastSavedOn(CharacterId : String)(implicit s : Session) : Option[Long]
+      def getCharactersMostRecentWeaponStats(characterId : String)(implicit s : Session) : List[(WeaponStat, Weapon)]
       def getCharactersWeaponStatHistory(characterId : String, weaponId : String)(implicit s : Session) : List[WeaponStat]
     }
   }
@@ -67,8 +69,7 @@ private[indexer] object DAOs {
     val characterStatDAO : CharacterStatDAO
 
     trait CharacterStatDAO {
-      def deleteCharactersStats(characterId : String)(implicit s : Session)
-      def createAll(profileStats : ProfileStat*)(implicit s : Session)
+      def createOrUpdate(profileStat : ProfileStat)(implicit s : Session)
       def getCharactersOverallStats(characterId : String)(implicit s : Session) : List[ProfileStat]
     }
   }

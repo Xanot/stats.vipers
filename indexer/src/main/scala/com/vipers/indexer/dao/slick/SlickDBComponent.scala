@@ -53,7 +53,8 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
           weaponDAO.table.ddl ++
           weaponStatDAO.weaponStatsTable.ddl ++
           weaponStatDAO.weaponStatsTimeSeriesTable.ddl ++
-          characterStatDAO.table.ddl).create
+          characterStatDAO.table.ddl ++
+          weaponStatDAO.weaponStatsIndexed.ddl).create
       }
     } catch {
       case _ : Exception => // Tables already created

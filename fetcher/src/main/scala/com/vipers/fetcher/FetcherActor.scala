@@ -23,13 +23,13 @@ class FetcherActor extends Actor {
   implicit val jsonFormats = org.json4s.DefaultFormats
 
   def receive = {
-    case FetchCharacterRequest(name, withStats) =>
+    case FetchCharacterRequest(name, withStats, statsLastIndexedOn) =>
       Future {
-        sendRequest(ApiUrlBuilder.getCharacterByName(name, withStats)) \ "character_list" match {
+        sendRequest(ApiUrlBuilder.getCharacterByName(name, withStats, statsLastIndexedOn)) \ "character_list" match {
           case JArray(parent) if parent.nonEmpty =>
             FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership,
-              (parent(0) \ "stats").toWeaponStats((parent(0) \ "character_id").extract[String]), None)), name)
-          case _ => FetchCharacterResponse(None, name)
+              parent(0).toWeaponStats((parent(0) \ "character_id").extract[String]), None)), (name, withStats))
+          case _ => FetchCharacterResponse(None, (name, withStats))
         }
       } pipeTo sender
     case m @ FetchOutfitRequest(alias) =>
@@ -73,8 +73,8 @@ object FetcherActor {
   //================================================================================
   // Character request/response
   //================================================================================
-  case class FetchCharacterRequest(characterName : String, withStats : Boolean)
-  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership], Option[List[WeaponStat]], Option[List[ProfileStat]])], request : String)
+  case class FetchCharacterRequest(characterName : String, withStats : Boolean, statsLastIndexedOn : Option[Long])
+  case class FetchCharacterResponse(contents : Option[(Character, Option[OutfitMembership], Option[List[WeaponStat]], Option[List[ProfileStat]])], request : (String, Boolean))
 
   //================================================================================
   // Outfit request/response

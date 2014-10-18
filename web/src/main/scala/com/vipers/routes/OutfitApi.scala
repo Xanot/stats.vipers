@@ -18,7 +18,7 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
           encodeResponse(Gzip) {
             onComplete((indexerActor ? GetAllIndexedOutfits).mapTo[List[Outfit]]) {
               case Success(outfits) => complete(outfits)
-              case Failure(m) => complete(InternalServerError, m.toString)
+              case Failure(m) => complete(InternalServerError, m.getStackTrace.mkString("\n"))
             }
           }
         }
@@ -35,7 +35,7 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
                       case BeingIndexed => NotFound
                     }
                   }
-                case Failure(m) => complete(InternalServerError, m.toString)
+                case Failure(m) => complete(InternalServerError, m.getStackTrace.mkString("\n"))
               }
             }
           }
