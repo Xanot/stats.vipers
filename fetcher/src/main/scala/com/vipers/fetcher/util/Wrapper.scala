@@ -145,7 +145,7 @@ private[fetcher] object Wrapper {
 
     def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
       check {
-        if(json \ "characters_weapon_stat" == JNothing) {
+        if(json \ "characters_weapon_stat" == JNothing || json \ "characters_weapon_stat_by_faction" == JNothing) {
           return None
         }
 
@@ -175,8 +175,6 @@ private[fetcher] object Wrapper {
           val JString(valueNc) = stat \ "value_nc"
           val JString(valueTr) = stat \ "value_tr"
           val JString(valueVs) = stat \ "value_vs"
-
-          // TODO: Don't count teamkills (or count as different column)
 
           if(map.contains(itemId)) {
             map(itemId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
@@ -226,8 +224,67 @@ private[fetcher] object Wrapper {
       }
     }
 
-    def toProfileStats(characterId : String) : List[ProfileStat] = {
-      ???
+    def toProfileStats(characterId : String) : Option[List[ProfileStat]] = {
+      check {
+        if(json \ "characters_stat" == JNothing || json \ "characters_stat_by_faction" == JNothing) {
+          return None
+        }
+
+        val map = mutable.Map[Short, (Long, mutable.ListBuffer[(String, Long)])]().empty
+
+        val JArray(weaponStat) = json \ "characters_stat"
+        weaponStat.foreach { stat =>
+          val JString(pid) = stat \ "profile_id"
+          val profileId = pid.toShort
+          val JString(statName) = stat \ "stat_name"
+          val JString(value) = stat \ "value_forever"
+
+          if(map.contains(profileId)) {
+            map(profileId)._2 += ((statName, value.toLong))
+          } else {
+            val JString(lastSave) = stat \ "last_save"
+            map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
+          }
+        }
+
+        val JArray(weaponStatByFaction) = json \ "characters_stat_by_faction"
+        weaponStatByFaction.foreach { stat =>
+          val JString(pid) = stat \ "profile_id"
+          val profileId = pid.toShort
+          val JString(statName) = stat \ "stat_name"
+          val JString(valueNc) = stat \ "value_forever_nc"
+          val JString(valueTr) = stat \ "value_forever_tr"
+          val JString(valueVs) = stat \ "value_forever_vs"
+
+          if(map.contains(profileId)) {
+            map(profileId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
+          } else {
+            val JString(lastSave) = stat \ "last_save"
+            map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
+          }
+        }
+
+        val list = new mutable.ListBuffer[ProfileStat]
+
+        for((profileId, (lastSave, stats)) <- map) {
+          var killedByCount = 0L
+          var score = 0L
+          var secondsPlayed = 0L
+
+          for((statName, value) <- stats) {
+            if(statName == "score") {
+              score = value
+            } else if(statName == "play_time") {
+              secondsPlayed = value
+            } else if(statName == "killed_by") {
+              killedByCount = value
+            }
+          }
+
+          list += ProfileStat(characterId, profileId, killedByCount, secondsPlayed, score)
+        }
+        list.toList
+      }
     }
 
     private def check[T](f : => T) : Option[T] = {

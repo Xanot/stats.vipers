@@ -73,8 +73,6 @@ case class WeaponStat(characterId : String,
 
 case class ProfileStat(characterId : String,
                        profileId : Short,
-                       kills : Long,
-                       deaths : Long,
                        killedBy : Long,
                        playTime : Long,
                        score : Long)

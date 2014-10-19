@@ -187,7 +187,8 @@ dt, dd {
 
 /* Character page */
 .item-img {
-    height: 25%;
+    width: 64px;
+    height: 32px;
 }
 .highcharts-container{
     min-width: 400px;

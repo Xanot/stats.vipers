@@ -49,10 +49,10 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
     }
 
     def retrieve(nameLower : String) : Option[(Character, Option[GetCharacterResponseOutfitMembership], Long, List[(WeaponStat, Weapon)])] = {
-      def indexChar(nameLower : String, statsLastIndexedOn : Option[Long]) : Unit = {
+      def indexChar(nameLower : String, statsLastSavedOn : Option[Long]) : Unit = {
         if(!charactersBeingIndexed.contains(nameLower)) {
           log.debug(s"Character $nameLower is being indexed")
-          eventBus.publish(CharacterNeedsIndexing(nameLower, statsLastIndexedOn))
+          eventBus.publish(CharacterNeedsIndexing(nameLower, statsLastSavedOn))
           charactersBeingIndexed.add(nameLower)
         }
       }
@@ -60,13 +60,11 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
       withSession { implicit s =>
         characterDAO.findByNameLower(nameLower).map { c =>
           val weaponStatsLastSavedOn = weaponStatDAO.getCharactersWeaponStatsLastSavedOn(c.id)
-          weaponStatsLastSavedOn.map(r => println("Weapon stats last saved on: " + r))
 
           if(isStale(c.lastIndexedOn, Configuration.characterStaleAfter)) {
             indexChar(nameLower, weaponStatsLastSavedOn)
           } else {
             val statsLastIndexedOn = weaponStatDAO.getCharactersWeaponStatsLastIndexedOn(c.id)
-            statsLastIndexedOn.map(r => println("Stats last indexed on: " + r))
             if(statsLastIndexedOn.isEmpty) { // e.g. Character previously indexed without stats
               indexChar(nameLower, None)
             } else if(statsLastIndexedOn.isDefined && isStale(statsLastIndexedOn.get, Configuration.characterStaleAfter)) { // e.g. Character previously indexed but has stale stats

@@ -34,16 +34,16 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   // Character
   //================================================================================
-  def getCharacterByName(name : String, withStats : Boolean, statsLastIndexedOn : Option[Long]) : Uri = {
+  def getCharacterByName(name : String, withStats : Boolean, statsLastSavedOn : Option[Long]) : Uri = {
     val s = Search("name.first_lower", name.toLowerCase)
     val params = {
       if(withStats) {
         CensusQuery(Some(s), Join(
           OutfitMemberJoin(injectAt = "membership", isList = Some(false)),
-          CharacterWeaponStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
-          CharacterWeaponStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
-          CharacterProfileStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0))))),
-          CharacterProfileStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastIndexedOn.getOrElse(0)))))
+          CharacterWeaponStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
+          CharacterWeaponStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
+          CharacterProfileStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
+          CharacterProfileStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0)))))
         )).construct
       } else {
         CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct

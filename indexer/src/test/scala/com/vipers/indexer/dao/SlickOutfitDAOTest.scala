@@ -1,73 +1,39 @@
 package com.vipers.indexer.dao
 
 import java.sql.SQLException
-
 import com.vipers.dao.DAOTest
-import com.vipers.model.{Character, Outfit}
-import com.vipers.indexer.dao.slick.{SlickOutfitMembershipDAOComponent, SlickCharacterDAOComponent, SlickOutfitDAOComponent}
+import com.vipers.indexer.dao.slick.SlickOutfitDAOComponent
 import org.scalatest.WordSpecLike
 
-class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
-  with SlickOutfitDAOComponent with SlickCharacterDAOComponent with SlickOutfitMembershipDAOComponent {
-
+class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest with SlickOutfitDAOComponent with Sample {
   import driver.simple._
 
-  override def beforeAll(): Unit = {
-    withTransaction { implicit s =>
-      (outfitDAO.table.ddl ++ characterDAO.table.ddl).create
-    }
-  }
-
-  override def afterAll(): Unit = {
-    withTransaction { implicit s =>
-      (outfitDAO.table.ddl ++ characterDAO.table.ddl).drop
-    }
-  }
+  override protected val ddl = outfitDAO.table.ddl
 
   "Outfit" should {
     "be created" in {
-      val char = Character(
-        "TestLeader",
-        "test",
-        "5428013610391601489",
-        90,
-        20,
-        900,
-        800,
-        80,
-        9000,
-        1,
-        System.currentTimeMillis(),
-        System.currentTimeMillis(),
-        System.currentTimeMillis(),
-        100,
-        15000,
-        System.currentTimeMillis()
-      )
-
       withTransaction { implicit s =>
-        characterDAO.create(char)
-        outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892, System.currentTimeMillis())) should be(true)
+        outfitDAO.create(SampleOutfits.VIPR) should be(true)
       }
 
       // duplicate id
       intercept[SQLException] {
         withTransaction { implicit s =>
-          outfitDAO.create(Outfit("TheVipers", "thevipers", "VIPR", "vipr", "5428013610391601489", 126, 1, "37523756405021402", 1408310892, System.currentTimeMillis()))
+          outfitDAO.create(SampleOutfits.VIPR)
         }
       }
     }
 
     "s be retrieved" in {
       withTransaction { implicit s =>
-        outfitDAO.create(Outfit("test", "test", "test", "test", "5428013610391601489", 126, 1, "test", 1408310892, System.currentTimeMillis())) should be(true)
+        outfitDAO.create(SampleOutfits.CHI) should be(true)
         outfitDAO.findAll.length should be(2)
       }
     }
 
     "be retrieved by id" in {
       withSession { implicit s =>
-        outfitDAO.find("37523756405021402").get.name should be("TheVipers")
+        outfitDAO.find(SampleOutfits.VIPR.id).get.name should be("TheVipers")
       }
     }
 
@@ -93,7 +59,7 @@ class SlickOutfitDAOTest extends WordSpecLike with DAOTest with SlickDBTest
 
     "be deleted" in {
       withTransaction { implicit s =>
-        outfitDAO.deleteById(outfitDAO.findByAliasLower("vipr").get.id) should be(true)
+        outfitDAO.deleteById(SampleOutfits.VIPR.id) should be(true)
         outfitDAO.findByAliasLower("vipr") should be(None)
       }
     }

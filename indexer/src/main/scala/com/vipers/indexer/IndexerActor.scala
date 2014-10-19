@@ -121,7 +121,7 @@ class IndexerActor extends Actor
     case CharacterIndexed(nameLower) => notifierActor ! Publish(s"c:$nameLower", nameLower)
     case OutfitIndexed(outfitAliasLower) => notifierActor ! Publish(s"o:$outfitAliasLower", outfitAliasLower)
 
-    case CharacterNeedsIndexing(nameLower, statsLastIndexedOn : Option[Long]) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true, statsLastIndexedOn)
+    case CharacterNeedsIndexing(nameLower, statsLastSavedOn) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true, statsLastSavedOn)
     case OutfitNeedsIndexing(aliasLower) => fetcherActor ! FetchOutfitRequest(aliasLower)
 
     case e : AnyRef => log.error(e.toString)

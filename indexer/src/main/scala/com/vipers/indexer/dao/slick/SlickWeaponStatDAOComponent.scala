@@ -27,19 +27,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       }
     }
 
-    private lazy val existsCompiled = Compiled((characterId : Column[String], itemId : Column[String]) => {
-      weaponStatsTable.filter(r => r.characterId === characterId && r.itemId === itemId).exists
-    })
-    private lazy val updateCompiled = Compiled((characterId : Column[String], itemId : Column[String]) => {
-      weaponStatsTable.filter(r => r.characterId === characterId && r.itemId === itemId)
-    })
-    override def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session) = {
-      if(existsCompiled(weaponStat.characterId, weaponStat.itemId).run) {
-        updateCompiled(weaponStat.characterId, weaponStat.itemId).update(weaponStat)
-      } else {
-        weaponStatsTableCompiled.insert(weaponStat)
-      }
-    }
+    override def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session) = weaponStatsTableCompiled.insertOrUpdate(weaponStat)
 
     private lazy val getCharactersMostRecentWeaponStatsCompiled = Compiled((characterId : Column[String]) => {
       for {

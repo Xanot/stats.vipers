@@ -70,7 +70,7 @@ private[indexer] object DAOs {
 
     trait CharacterStatDAO {
       def createOrUpdate(profileStat : ProfileStat)(implicit s : Session)
-      def getCharactersOverallStats(characterId : String)(implicit s : Session) : List[ProfileStat]
+      def getCharactersProfileStats(characterId : String)(implicit s : Session) : List[ProfileStat]
     }
   }
 }

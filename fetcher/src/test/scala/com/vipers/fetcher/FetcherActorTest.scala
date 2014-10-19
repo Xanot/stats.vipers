@@ -24,46 +24,62 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
     TestKit.shutdownActorSystem(system)
   }
 
-  //================================================================================
-  // Character
-  //================================================================================
   "Fetcher actor" should {
+    //================================================================================
+    // Character
+    //================================================================================
     "return character given character name" in {
       // Valid name without stats
-      var request = FetchCharacterRequest("Xanot", false)
+      var request = FetchCharacterRequest("Xanot", false, None)
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
         response.contents.get._1.id should be("5428035526967126513")
         response.contents.get._1.name should be("Xanot")
         response.contents.get._1.factionId should be(1)
         response.contents.get._2 should not be(None)
         response.contents.get._3 should be(None)
-        response.request should be("Xanot")
+        response.contents.get._4 should be(None)
+        response.request._1 should be("Xanot")
+        response.request._2 should be(false)
       }
 
       // Valid name with stats
-      request = FetchCharacterRequest("Xanot", true)
+      request = FetchCharacterRequest("Xanot", true, None)
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
         response.contents.get._1.id should be("5428035526967126513")
         response.contents.get._1.name should be("Xanot")
         response.contents.get._1.factionId should be(1)
         response.contents.get._2 should not be(None)
         response.contents.get._3 should not be(None)
-        response.request should be("Xanot")
+        response.contents.get._4 should not be(None)
+        response.request._1 should be("Xanot")
+        response.request._2 should be(true)
+      }
+
+      // With stats (with stats last saved date)
+      request = FetchCharacterRequest("Xanot", true, Some(1411669674L))
+      whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
+        response.contents.get._1.id should be("5428035526967126513")
+        response.contents.get._1.name should be("Xanot")
+        response.contents.get._1.factionId should be(1)
+        response.contents.get._2 should not be(None)
+        response.contents.get._3 should not be(None)
+        response.contents.get._4 should not be(None)
+        response.request._1 should be("Xanot")
+        response.request._2 should be(true)
       }
 
       // non-existing name
-      request = FetchCharacterRequest("Xanotetqteqgq", false)
+      request = FetchCharacterRequest("Xanotetqteqgq", false, None)
       whenReady((fetcherActor ? request).mapTo[FetchCharacterResponse]) { response =>
         response.contents should be(None)
-        response.request should be("Xanotetqteqgq")
+        response.request._1 should be("Xanotetqteqgq")
+        response.request._2 should be(false)
       }
     }
-  }
 
-  //================================================================================
-  // Outfit
-  //================================================================================
-  "Fetcher actor" should {
+    //================================================================================
+    // Outfit
+    //================================================================================
     "return outfit info with leader(with faction) and member characters given alias" in {
       var request = FetchOutfitRequest("VIPR")
       whenReady((fetcherActor ? request).mapTo[FetchOutfitResponse]) { response =>
@@ -85,12 +101,10 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.request should be("VIPRR")
       }
     }
-  }
 
-  //================================================================================
-  // Weapon
-  //================================================================================
-  "Fetcher actor" should {
+    //================================================================================
+    // Weapon
+    //================================================================================
     "return all weapons" in {
       whenReady((fetcherActor ? FetchAllWeaponsRequest).mapTo[FetchAllWeaponsResponse]) { response =>
         response.weapons.length should be > 100
