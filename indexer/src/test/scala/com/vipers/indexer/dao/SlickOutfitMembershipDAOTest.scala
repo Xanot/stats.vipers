@@ -28,6 +28,7 @@ class SlickOutfitMembershipDAOTest extends WordSpecLike with DAOTest with SlickD
       withSession { implicit s =>
         outfitMembershipDAO.findAllCharactersByOutfitId(SampleOutfits.VIPR.id) match {
           case member :: Nil => member._1.name should be("Xanot")
+          case _ => throw new Error
         }
       }
     }
@@ -39,6 +40,7 @@ class SlickOutfitMembershipDAOTest extends WordSpecLike with DAOTest with SlickD
 
         outfitMembershipDAO.findAllCharactersByOutfitId("outfitId") match {
           case member :: Nil => member._1.name should be("Xanot")
+          case _ => throw new Error
         }
       }
     }

@@ -33,13 +33,29 @@ angular.module('player-view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerViewController', ['$scope', '$filter', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService',
-    function($scope, $filter, PlayerService, resolvePlayer, WebSocketService, NotificationService) {
+  .controller('PlayerViewController', ['$scope', '$filter', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService', 'localStorageService',
+    function($scope, $filter, PlayerService, resolvePlayer, WebSocketService, NotificationService, localStorageService) {
       $scope.player = resolvePlayer;
 
-      // Default stat order
-      $scope.predicate = '_1.killCount';
-      $scope.reverse = !$scope.reverse;
+      var defaultSort = function() {
+        switch(localStorageService.get("character").sort) {
+          case "Used On":
+            $scope.predicate = '_1.lastSaveDate';
+            break;
+          case "Kills":
+            $scope.predicate = '_1.killCount';
+            break;
+        }
+      };
+
+      var defaultOrder = function() {
+        if(localStorageService.get("character").order == "desc") {
+          $scope.reverse = !$scope.reverse
+        }
+      };
+
+      defaultSort();
+      defaultOrder();
 
       $scope.showHistory = function(stat) {
         if(stat.history) {
@@ -109,10 +125,10 @@ angular.module('player-view', ['utils', 'ui.router'])
                   return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kdr')]];
                 })
               }, {
-                name: 'KPM',
+                name: 'KPH',
                 visible: false,
                 data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kpm')]];
+                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kph')]];
                 })
               }, {
                 name: 'SPM',

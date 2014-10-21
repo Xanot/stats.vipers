@@ -17,13 +17,27 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     ];
     $scope.notificationTabs.activeTab = 0;
 
+    $scope.orderOptions = [
+      "desc",
+      "asc"
+    ];
+
+    $scope.sortOptions = [
+      "Used On",
+      "Kills"
+    ];
+
     $scope.setRealTimeDefaults = function() {
       SettingsService.setRealTimeDefaults();
     };
 
     $scope.setNotificationDefaults = function() {
       SettingsService.setNotificationDefaults();
-    }
+    };
+
+    $scope.setCharacterDefaults = function() {
+      SettingsService.setCharacterDefaults();
+    };
   }])
 
   .factory('SettingsService', ['$rootScope', 'localStorageService', function($rootScope, localStorageService) {
@@ -45,17 +59,22 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
       {"beingIndexedEnabled":true, "beingIndexedExpireAfter": 5,
         "indexedEnabled": true, "indexedExpireAfter": 60}
     );
+    var characterSettings = category("character", {"sort": "Used On", "order": "desc"});
 
     return {
       init: function() {
         realTimeSettings.init();
         notificationSettings.init();
+        characterSettings.init();
       },
       setRealTimeDefaults: function() {
         realTimeSettings.setDefaults();
       },
       setNotificationDefaults: function() {
         notificationSettings.setDefaults();
+      },
+      setCharacterDefaults: function() {
+        characterSettings.setDefaults();
       }
     }
   }]);

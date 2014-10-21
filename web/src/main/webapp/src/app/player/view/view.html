@@ -55,12 +55,17 @@
         </th>
         <th>
           <a ng-click="predicate='_1.killCount / _1.secondsPlayed'; reverse=!reverse;">
-            KPM
+            KPH
           </a>
         </th>
         <th>
           <a ng-click="predicate='_1.score / _1.secondsPlayed'; reverse=!reverse;">
             SPM
+          </a>
+        </th>
+        <th>
+          <a ng-click="predicate='_1.lastSaveDate'; reverse=!reverse;">
+            Used
           </a>
         </th>
         <th>
@@ -99,10 +104,13 @@
           {{ ::(stat._1 | statCalc:'hsr' | number:2) }} %
         </td>
         <td>
-          {{ ::(stat._1 | statCalc:'kpm' | number:2) }}
+          {{ ::(stat._1 | statCalc:'kph' | number:2) }}
         </td>
         <td>
           {{ ::(stat._1 | statCalc:'spm' | number:0) }}
+        </td>
+        <td>
+          <span am-time-ago="::stat._1.lastSaveDate"></span>
         </td>
         <td>
           {{ ::(stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]') }}

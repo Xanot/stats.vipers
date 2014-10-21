@@ -1,6 +1,6 @@
 <div class="settings">
   <div class="row">
-    <!-- Automatic update -->
+    <!-- Real-time updates -->
     <div class="col-md-4">
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -32,6 +32,32 @@
             <div ng-repeat="tab in notificationTabs" title="{{ tab.title }}" bs-pane></div>
             <div ng-include src="notificationTabs[notificationTabs.activeTab].page"></div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- Character -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Character <small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setCharacterDefaults()"></i></small></h3>
+        </div>
+        <div class="panel-body">
+          <table class="table">
+            <tbody>
+            <tr>
+              <td>Default Sort</td>
+              <td>
+                <select class="form-control input-sm" ng-options="option.toString() for option in sortOptions" ng-model="character.sort"></select>
+              </td>
+            </tr>
+            <tr>
+              <td>Order</td>
+              <td>
+                <select class="form-control input-sm" ng-options="option.toString() for option in orderOptions" ng-model="character.order"></select>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

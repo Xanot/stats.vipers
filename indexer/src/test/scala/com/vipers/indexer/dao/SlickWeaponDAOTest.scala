@@ -29,6 +29,7 @@ class SlickWeaponDAOTest extends WordSpecLike with DAOTest with SlickDBTest with
           case b :: c :: Nil =>
             b.name should be("Corvus VA55")
             c.name should be("NS-15M")
+          case _ => throw new Error
         }
       }
     }

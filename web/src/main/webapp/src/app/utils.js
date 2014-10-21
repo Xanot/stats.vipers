@@ -45,7 +45,7 @@ angular.module('utils', ['constants'])
         case 'kdr':
           value = s.killCount / s.deathCount;
           break;
-        case 'kpm':
+        case 'kph':
           value = (s.killCount / s.secondsPlayed) * 3600;
           break;
         case 'spm':

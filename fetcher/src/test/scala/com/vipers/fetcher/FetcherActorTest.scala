@@ -38,6 +38,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.contents.get._2 should not be(None)
         response.contents.get._3 should be(None)
         response.contents.get._4 should be(None)
+        response.contents.get._5 should be(true)
         response.request._1 should be("Xanot")
         response.request._2 should be(false)
       }
@@ -51,6 +52,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.contents.get._2 should not be(None)
         response.contents.get._3 should not be(None)
         response.contents.get._4 should not be(None)
+        response.contents.get._5 should be(true)
         response.request._1 should be("Xanot")
         response.request._2 should be(true)
       }
@@ -64,6 +66,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.contents.get._2 should not be(None)
         response.contents.get._3 should not be(None)
         response.contents.get._4 should not be(None)
+        response.contents.get._5 should be(false)
         response.request._1 should be("Xanot")
         response.request._2 should be(true)
       }

@@ -2,6 +2,7 @@ package com.vipers.indexer.dao
 
 import com.vipers.dao.DAOTest
 import com.vipers.indexer.dao.slick.{SlickWeaponDAOComponent, SlickWeaponStatDAOComponent}
+import com.vipers.model.WeaponStat
 import org.scalatest.WordSpecLike
 
 class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest with Sample
@@ -16,9 +17,7 @@ class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest 
   "Weapon stats" should {
     "be created or updated" in {
       withTransaction { implicit s =>
-        weaponStatDAO.createOrUpdate(SampleCharacterWeaponStat.Corvus)
-        weaponStatDAO.createOrUpdate(SampleCharacterWeaponStat.NS15)
-
+        weaponStatDAO.createAll(SampleCharacterWeaponStat.Corvus, SampleCharacterWeaponStat.NS15)
         weaponStatDAO.createOrUpdate(SampleCharacterWeaponStat.Corvus.copy(headshotCount = 9000))
       }
     }
@@ -32,6 +31,7 @@ class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest 
           case corvus :: ns :: Nil =>
             ns._2.name should be("NS-15M")
             corvus._1.headshotCount should be(9000)
+          case _ => throw new Error
         }
       }
     }
@@ -41,6 +41,14 @@ class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest 
         weaponStatDAO.getCharactersWeaponStatsLastSavedOn(SampleCharacters.Xanot.id).get should be(1409415911L)
         weaponStatDAO.createOrUpdate(SampleCharacterWeaponStat.Corvus.copy(lastSaveDate = 1409415912L))
         weaponStatDAO.getCharactersWeaponStatsLastSavedOn(SampleCharacters.Xanot.id).get should be(1409415912L)
+      }
+    }
+  }
+
+  "Most recent weapon stat" should {
+    "be retrieved" in {
+      withSession { implicit s =>
+        weaponStatDAO.getCharactersMostRecentWeaponStat(SampleCharacters.Xanot.id, SampleWeapons.Corvus.id).get.lastSaveDate should be(1409415912L)
       }
     }
   }
@@ -58,12 +66,14 @@ class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest 
         weaponStatDAO.getCharactersWeaponStatHistory(SampleCharacters.Xanot.id, SampleWeapons.Corvus.id) match {
           case t1 :: Nil =>
             t1 should be(SampleCharacterWeaponStat.Corvus)
+          case _ => throw new Error
         }
 
         weaponStatDAO.getCharactersWeaponStatHistory(SampleCharacters.Xanot.id, SampleWeapons.NS15.id) match {
           case t1 :: t2 :: Nil =>
             t1 should be(SampleCharacterWeaponStat.NS15)
             t2 should be(SampleCharacterWeaponStat.NS15.copy(lastSaveDate = 1409415912L))
+          case _ => throw new Error
         }
       }
     }

@@ -12,9 +12,7 @@ class SlickCharacterStatDAOTest extends WordSpecLike with DAOTest with SlickDBTe
   "Character's profile stats" should {
     "be created or updated" in {
       withTransaction { implicit s =>
-        characterStatDAO.createOrUpdate(SampleCharacterProfileStat.HeavyAssault)
-        characterStatDAO.createOrUpdate(SampleCharacterProfileStat.CombatMedic)
-
+        characterStatDAO.createAll(SampleCharacterProfileStat.HeavyAssault, SampleCharacterProfileStat.CombatMedic)
         characterStatDAO.createOrUpdate(SampleCharacterProfileStat.HeavyAssault.copy(score = 9000))
       }
     }
@@ -25,6 +23,7 @@ class SlickCharacterStatDAOTest extends WordSpecLike with DAOTest with SlickDBTe
           case m :: ha :: Nil =>
             ha.score should be(9000)
             m.playTime should be(1243963)
+          case _ => throw new Error
         }
       }
     }

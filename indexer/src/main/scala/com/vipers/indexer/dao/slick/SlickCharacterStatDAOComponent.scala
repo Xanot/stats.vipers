@@ -13,6 +13,10 @@ private[indexer] trait SlickCharacterStatDAOComponent extends CharacterStatDAOCo
     val table = TableQuery[CharacterStats]
     private lazy val tableCompiled = Compiled(table)
 
+    override def createAll(profileStats : ProfileStat*)(implicit s : Session) = {
+      tableCompiled.insertAll(profileStats:_*)
+    }
+
     override def createOrUpdate(profileStat : ProfileStat)(implicit s : Session) = tableCompiled.insertOrUpdate(profileStat)
 
     private lazy val filterCharacterCompiled = Compiled((characterId : Column[String]) => table.filter(_.characterId === characterId))

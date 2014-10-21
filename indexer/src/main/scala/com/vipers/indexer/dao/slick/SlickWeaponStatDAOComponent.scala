@@ -20,11 +20,12 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
     private lazy val weaponStatsIndexedCompiled = Compiled(weaponStatsIndexed)
 
     override def insertTimeSeries(weaponStats : WeaponStat*)(implicit s : Session) = {
-      try {
-        weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*)
-      } catch {
-        case _ : Exception => // Ignore primary key collisions
-      }
+      try { weaponStatsTimeSeriesTableCompiled.insertAll(weaponStats:_*) }
+      catch { case _ : Exception => } // Ignore primary key collisions
+    }
+
+    override def createAll(weaponStats : WeaponStat*)(implicit s : Session) = {
+      weaponStatsTableCompiled.insertAll(weaponStats:_*)
     }
 
     override def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session) = weaponStatsTableCompiled.insertOrUpdate(weaponStat)
@@ -40,28 +41,35 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
     }
 
     private lazy val getCharactersWeaponStatsLastIndexedOnCompiled = Compiled((characterId : Column[String]) => {
-      weaponStatsIndexed.filter(r => r.characterId === characterId).map(_.lastIndexedOn)
+      weaponStatsIndexed.filter(_.characterId === characterId).map(_.lastIndexedOn)
     })
     override def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long] = {
       getCharactersWeaponStatsLastIndexedOnCompiled(characterId).firstOption
     }
 
     private lazy val getCharactersWeaponStatsLastSavedOnCompiled = Compiled((characterId : Column[String]) => {
-      weaponStatsTable.filter(r => r.characterId === characterId).map(_.lastSaved).max
+      weaponStatsTable.filter(_.characterId === characterId).map(_.lastSaved).max
     })
     override def getCharactersWeaponStatsLastSavedOn(characterId : String)(implicit s : Session) : Option[Long] = {
       getCharactersWeaponStatsLastSavedOnCompiled(characterId).run
+    }
+
+    private lazy val getCharactersMostRecentWeaponStatCompiled = Compiled((characterId : Column[String], itemId : Column[String]) => {
+      weaponStatsTable.filter(r => r.characterId === characterId && r.itemId === itemId)
+    })
+    def getCharactersMostRecentWeaponStat(characterId : String, itemId : String)(implicit s : Session) : Option[WeaponStat] = {
+      getCharactersMostRecentWeaponStatCompiled(characterId, itemId).firstOption
     }
 
     override def createOrUpdateLastIndexedOn(characterId : String, stamp : Long)(implicit s : Session) = {
       weaponStatsIndexedCompiled.insertOrUpdate((characterId, stamp))
     }
 
-    private lazy val getCharactersWeaponProgressCompiled = Compiled((characterId : Column[String], weaponId : Column[String]) => {
+    private lazy val getCharactersWeaponStatHistoryCompiled = Compiled((characterId : Column[String], weaponId : Column[String]) => {
       weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId).sortBy(_.lastSaved.asc)
     })
     override def getCharactersWeaponStatHistory(characterId : String, itemId : String)(implicit s : Session) : List[WeaponStat] = {
-      getCharactersWeaponProgressCompiled(characterId, itemId).list
+      getCharactersWeaponStatHistoryCompiled(characterId, itemId).list
     }
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {

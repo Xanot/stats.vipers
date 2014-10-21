@@ -16,23 +16,35 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
     def index(response : FetchCharacterResponse) : Unit = {
       response.contents match {
-        case Some((character, membership, weaponStats, profileStats)) =>
+        case Some((character, membership, weaponStats, profileStats, firstStatIndex)) =>
           try {
+            val b = System.currentTimeMillis()
             withTransaction { implicit s =>
               characterDAO.createOrUpdate(character)
-              membership.map { m => outfitMembershipDAO.createOrUpdate(m) } // TODO: Handle outfit membership? leave it blank until the outfit is indexed?
+              membership.map { m => outfitMembershipDAO.createOrUpdate(m) } // TODO: Process outfit? leave it blank until the outfit is indexed?
 
               if(response.request._2) { // If stats were requested
                 weaponStatDAO.createOrUpdateLastIndexedOn(character.id, System.currentTimeMillis())
-              }
 
-              weaponStats.map { ws =>
-                ws.foreach { stat => weaponStatDAO.createOrUpdate(stat) }
-                weaponStatDAO.insertTimeSeries(ws:_*)
+                weaponStats.map { ws =>
+                  if(firstStatIndex) {
+                    weaponStatDAO.createAll(ws:_*)
+                    weaponStatDAO.insertTimeSeries(ws:_*)
+                  } else {
+                    weaponStatDAO.insertTimeSeries(correctStats(ws):_*)
+                  }
+                }
+                profileStats.map { ps =>
+                  if(firstStatIndex) {
+                    characterStatDAO.createAll(ps:_*)
+                  } else {
+                    ps.foreach { stat =>
+                      characterStatDAO.createOrUpdate(stat)
+                    }
+                  }
+                }
               }
-              profileStats.map { ps =>
-                ps.foreach { stat => characterStatDAO.createOrUpdate(stat) }
-              }
+              println(System.currentTimeMillis() - b)
 
               log.debug(s"Character ${character.name} has been indexed")
               charactersBeingIndexed.remove(response.request._1)
@@ -85,6 +97,50 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
           indexChar(nameLower, None)
           None
         }
+      }
+    }
+
+    private def correctStats(stats : Seq[WeaponStat])(implicit s : Session) : Seq[WeaponStat] = {
+      stats.map { stat =>
+        val corrected : WeaponStat = if(stat.deathCount == 0 || stat.fireCount == 0 || stat.headshotCount == 0 || stat.hitCount == 0 || stat.killCount == 0 || stat.score == 0) {
+          weaponStatDAO.getCharactersMostRecentWeaponStat(stat.characterId, stat.itemId).map { p =>
+            var deathCount = stat.deathCount
+            if(deathCount == 0) {
+              deathCount = p.deathCount
+            }
+
+            var fireCount = stat.fireCount
+            if(fireCount == 0) {
+              fireCount = p.fireCount
+            }
+
+            var headshotCount = stat.headshotCount
+            if(headshotCount == 0) {
+              headshotCount = p.headshotCount
+            }
+
+            var hitCount = stat.hitCount
+            if(hitCount == 0) {
+              hitCount = p.hitCount
+            }
+
+            var killCount = stat.killCount
+            if(killCount == 0) {
+              killCount = p.killCount
+            }
+
+            var score = stat.score
+            if(score == 0) {
+              score = p.score
+            }
+            stat.copy(deathCount = deathCount, fireCount = fireCount, headshotCount = headshotCount, hitCount = hitCount, killCount = killCount, score = score)
+          }.getOrElse(stat)
+        } else {
+          stat
+        }
+
+        weaponStatDAO.createOrUpdate(corrected)
+        corrected
       }
     }
   }
