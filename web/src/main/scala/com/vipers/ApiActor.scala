@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 import akka.actor.{Props, Actor}
 import akka.util.Timeout
 import com.vipers.indexer.IndexerActor
-import com.vipers.routes.{WeaponApi, UI, OutfitApi, CharacterApi}
+import com.vipers.routes.{WeaponApi, OutfitApi, CharacterApi}
 import org.json4s.DefaultFormats
 import spray.http.HttpHeaders.RawHeader
 import spray.httpx.Json4sSupport
@@ -12,11 +12,11 @@ import spray.routing.HttpService
 
 sealed class ApiActor extends Actor with Api {
   override val actorRefFactory = context
-
   protected val indexerActor = context.actorOf(Props(classOf[IndexerActor]))
+  private val cors = RawHeader("Access-Control-Allow-Origin", Configuration.Web.allowOrigin)
 
   def receive = runRoute {
-    respondWithHeaders(RawHeader("Access-Control-Allow-Origin", "*")) { ctx => route(ctx) } // Enable CORS
+    respondWithHeaders(cors) { ctx => route(ctx) } // Enable CORS
   }
 }
 
@@ -26,9 +26,8 @@ trait JsonRoute extends Route with Json4sSupport {
   implicit val json4sFormats = DefaultFormats
 }
 
-trait Api extends CharacterApi with OutfitApi with WeaponApi with UI { this: ApiActor =>
+trait Api extends CharacterApi with OutfitApi with WeaponApi { this: ApiActor =>
   protected lazy val route = {
-    uiRoute ~
     outfitRoute ~
     characterRoute ~
     weaponRoute

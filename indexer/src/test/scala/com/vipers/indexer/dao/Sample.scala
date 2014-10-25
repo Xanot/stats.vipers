@@ -2,7 +2,7 @@ package com.vipers.indexer.dao
 
 import com.vipers.model._
 
-private[dao] trait Sample {
+trait Sample {
   object SampleCharacters {
     lazy val Xanot = Character("Xanot","xanot","5428035526967126513",100,0,1411,113707,0,114976,1,1359718034L,1412367959L,1412369810L,606,42025,1413670967359L)
     lazy val ThatTinkSound = Character("ThatTinkSound","thattinksound","5428232026854955473",20,63,632,1266,0,670,1,1407074228,1407880533,1407881191,14,380,1413671172456L)

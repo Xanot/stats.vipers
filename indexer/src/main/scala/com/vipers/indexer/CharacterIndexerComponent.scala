@@ -18,7 +18,6 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
       response.contents match {
         case Some((character, membership, weaponStats, profileStats, firstStatIndex)) =>
           try {
-            val b = System.currentTimeMillis()
             withTransaction { implicit s =>
               characterDAO.createOrUpdate(character)
               membership.map { m => outfitMembershipDAO.createOrUpdate(m) } // TODO: Process outfit? leave it blank until the outfit is indexed?
@@ -44,7 +43,6 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
                   }
                 }
               }
-              println(System.currentTimeMillis() - b)
 
               log.debug(s"Character ${character.name} has been indexed")
               charactersBeingIndexed.remove(response.request._1)

@@ -59,7 +59,7 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
       {"beingIndexedEnabled":true, "beingIndexedExpireAfter": 5,
         "indexedEnabled": true, "indexedExpireAfter": 60}
     );
-    var characterSettings = category("character", {"sort": "Used On", "order": "desc"});
+    var characterSettings = category("character", {"sort": "Kills", "order": "desc"});
 
     return {
       init: function() {

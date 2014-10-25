@@ -2,15 +2,16 @@ package com.vipers.indexer
 
 import java.util.concurrent.atomic.AtomicBoolean
 import com.vipers.Logging
+import com.vipers.dbms.DB
 import com.vipers.fetcher.FetcherActor.FetchAllWeaponsResponse
-import com.vipers.indexer.dao.DBComponent
+import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
 import com.vipers.model.Weapon
 
-private[indexer] trait WeaponIndexerComponent extends Logging { this: DBComponent =>
+private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with WeaponDAOComponent =>
   val weaponIndexer = new WeaponIndexer
 
   class WeaponIndexer extends Indexer {
-    private val weaponsBeingIndexed = new AtomicBoolean(false)
+    val weaponsBeingIndexed = new AtomicBoolean(false)
 
     def index(response : FetchAllWeaponsResponse) {
       try {

@@ -1,9 +1,10 @@
 import sbt._
 
 object Dependencies {
-  private val akkaVersion  = "2.3.5"
-  private val sprayVersion = "1.3.1"
-  private val jettyVersion = "9.2.2.v20140723"
+  private val akkaVersion      = "2.3.5"
+  private val sprayVersion     = "1.3.1"
+  private val jettyVersion     = "9.2.2.v20140723"
+  private val scalaMockVersion = "3.2-RC1"
 
   val _common         = "com.vipers"             %% "common"                 %  "[0.1-SNAPSHOT,)"
   val _commonTest     = "com.vipers"             %% "common"                 %  "[0.1-SNAPSHOT,)"   % "test" classifier "tests"
@@ -20,7 +21,7 @@ object Dependencies {
   val h2             = "com.h2database"          %  "h2"                     %  "1.4.181"
   val akkaActor      = "com.typesafe.akka"       %% "akka-actor"             %  akkaVersion
   val akkaSlf4j      = "com.typesafe.akka"       %% "akka-slf4j"             %  akkaVersion
-  val scalaTest      = "org.scalatest"           %% "scalatest"              %  "[2.1.3,)"         % "test"
+  val scalaTest      = "org.scalatest"           %% "scalatest"              %  "2.2.1"            % "test"
   val akkaTest       = "com.typesafe.akka"       %% "akka-testkit"           %  akkaVersion        % "test"
 
   val sprayCan       = "io.spray"                %% "spray-can"              %  sprayVersion
@@ -33,9 +34,12 @@ object Dependencies {
   val jettyWebsocketApi    = "org.eclipse.jetty.websocket" % "websocket-api"     % jettyVersion
   val websocketTest        = "com.ning"                    % "async-http-client" % "1.8.13"        % "test"
 
+  val scalaMock            = "org.scalamock" %% "scalamock-core"              % scalaMockVersion % "test"
+  val scalaMockSupport     = "org.scalamock" %% "scalamock-scalatest-support" % scalaMockVersion % "test"
+
   val akkaDependencies = Seq(akkaActor, akkaSlf4j, akkaTest)
   val sprayDependencies = Seq(sprayCan, sprayRouting, sprayCaching, sprayHttp, sprayTestkit, json4sNative)
-  val commonDependencies = Seq(_common, _commonTest, scalaTest, logback)
+  val commonDependencies = Seq(_common, _commonTest, scalaTest, scalaMock, scalaMockSupport, logback)
   val databaseDependencies = Seq(slick, hikariCp, h2)
   val websocketDependencies = Seq(jettyWebsocketApi, jettyWebsocketServer, websocketTest)
 }
