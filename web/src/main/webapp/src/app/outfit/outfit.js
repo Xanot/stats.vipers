@@ -10,23 +10,16 @@ angular.module('outfit', ['outfit-view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('OutfitController', ['$scope', '$state', 'OutfitService', function($scope, $state, OutfitService) {
-    function getOutfits(page) {
-      OutfitService.getAll().then(function(response) {
-        $scope.outfits = response.data
-      });
-    }
-
-    getOutfits(1)
+  .controller('OutfitController', ['$scope', '$state', function($scope, $state) {
+    $scope.go = function(alias) {
+      $state.transitionTo('outfit-view', {alias: alias})
+    };
   }])
 
   .factory('OutfitService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       get: function(alias) {
         return $http.get(UrlService.url("/outfit/" + alias))
-      },
-      getAll: function() {
-        return $http.get(UrlService.url("/outfit"))
       }
     }
   }]);

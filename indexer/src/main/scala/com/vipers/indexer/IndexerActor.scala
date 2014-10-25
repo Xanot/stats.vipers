@@ -86,26 +86,12 @@ class IndexerActor extends Actor
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
-    case GetAllIndexedOutfits =>
-      Future {
-        withSession { implicit s =>
-          outfitDAO.findAll
-        }
-      } pipeTo sender
-
     case GetCharacterRequest(nameLower) =>
       Future {
         characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime, mostRecentWeaponStats) =>
           GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
             c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
         }.getOrElse(BeingIndexed)
-      } pipeTo sender
-
-    case GetAllIndexedCharacters =>
-      Future {
-        withSession { implicit s =>
-          characterDAO.findAll
-        }
       } pipeTo sender
 
     case GetCharactersWeaponStatHistory(characterId, itemId) =>
@@ -136,8 +122,6 @@ object IndexerActor {
   // Received
   case class GetOutfitRequest(aliasLower : String) extends IndexerMessage
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
-  case object GetAllIndexedOutfits extends IndexerMessage
-  case object GetAllIndexedCharacters extends IndexerMessage
   case class GetCharactersWeaponStatHistory(characterId : String, itemId : String) extends IndexerMessage
 
   // Sent

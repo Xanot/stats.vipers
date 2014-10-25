@@ -1,27 +1,13 @@
 <div class="row">
-  <div>
-    <!--Outfits-->
-    <table class="table table-bordered table-responsive">
-      <thead>
-      <tr>
-        <th>#</th>
-        <th>Name</th>
-        <th>Creation Date</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr ng-repeat="outfit in outfits">
-        <td> {{ $index + 1 }}</td>
-        <td>
-          <span ng-if="outfit.alias" class="faction-{{outfit.factionId}}">[{{ outfit.alias }}]</span>
-          <a ui-sref="outfit-view({ alias : outfit.alias })" class="faction-{{outfit.factionId}}">{{ outfit.name }}</a>
-        </td>
-        <td>
-          <span am-time-ago="outfit.creationDate" data-type="info" data-title="{{ outfit.creationDate | amCalendar }}" bs-tooltip></span>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="col-xs-4">
+    <form>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Outfit Alias" ng-model="outfitAlias">
+        <span class="input-group-btn">
+          <input class="btn btn-default" type="submit" ng-click="go(outfitAlias)" value="Go!"/>
+        </span>
+      </div>
+    </form>
   </div>
 </div>
 

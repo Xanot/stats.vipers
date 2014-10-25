@@ -10,19 +10,16 @@ angular.module('player', ['player-view', 'utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerController', ['$scope', 'PlayerService', function($scope, PlayerService) {
-    PlayerService.getAllCharacters().then(function(response) {
-      $scope.players = response.data
-    });
+  .controller('PlayerController', ['$scope', '$state', function($scope, $state) {
+    $scope.go = function(name) {
+      $state.transitionTo('player-view', {name: name})
+    };
   }])
 
   .factory('PlayerService', ['$http', 'UrlService', function($http, UrlService) {
     return {
       getByName: function(name) {
         return $http.get(UrlService.url("/player/" + name))
-      },
-      getAllCharacters: function() {
-        return $http.get(UrlService.url("/player"))
       },
       getCharactersWeaponStatHistory: function(charId, itemId) {
         return $http.get(UrlService.url("/player/" + charId + "/stats/" + itemId))

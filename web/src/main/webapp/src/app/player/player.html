@@ -1,22 +1,13 @@
 <div class="row">
-  <!--Players -->
-  <table class="table table-bordered table-responsive">
-    <thead>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr ng-repeat="player in ::players | limitTo:10">
-      <td> {{ $index + 1 }}</td>
-      <td>
-        <a href="#/player/{{ ::player.name }}" ng-class="::{'faction-1' : player.factionId === 1, 'faction-2' : player.factionId === 2, 'faction-3' : player.factionId === 3}">
-          {{ ::player.name }}
-        </a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="col-xs-4">
+    <form>
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Character Name" ng-model="characterName">
+        <span class="input-group-btn">
+          <input class="btn btn-default" type="submit" ng-click="go(characterName)" value="Go!"/>
+        </span>
+      </div>
+    </form>
+  </div>
 </div>
 

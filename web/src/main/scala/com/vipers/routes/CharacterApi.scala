@@ -2,7 +2,7 @@ package com.vipers.routes
 
 import akka.pattern.ask
 import com.vipers.indexer.IndexerActor._
-import com.vipers.model.{WeaponStat, Character}
+import com.vipers.model.WeaponStat
 import com.vipers.{ApiActor, JsonRoute}
 import spray.httpx.encoding.Gzip
 import scala.util.{Success, Failure}
@@ -13,18 +13,6 @@ trait CharacterApi extends JsonRoute { this: ApiActor =>
 
   protected lazy val characterRoute = {
     pathPrefix("player") {
-      pathEnd {
-        encodeResponse(Gzip) {
-          get {
-            onComplete((indexerActor ? GetAllIndexedCharacters).mapTo[List[Character]]) {
-              case Success(characters) => complete {
-                characters
-              }
-              case Failure(e) => complete(InternalServerError, e.getStackTrace.mkString("\n"))
-            }
-          }
-        }
-      } ~
       pathPrefix(Segment) { characterName =>
         pathEnd {
           get {

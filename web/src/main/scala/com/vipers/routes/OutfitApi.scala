@@ -2,7 +2,6 @@ package com.vipers.routes
 
 import akka.pattern.ask
 import com.vipers.indexer.IndexerActor._
-import com.vipers.model.Outfit
 import com.vipers.{ApiActor, JsonRoute}
 import spray.httpx.encoding.Gzip
 import scala.util.{Failure, Success}
@@ -13,16 +12,6 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
 
   protected lazy val outfitRoute = {
     pathPrefix("outfit") {
-      pathEnd {
-        get {
-          encodeResponse(Gzip) {
-            onComplete((indexerActor ? GetAllIndexedOutfits).mapTo[List[Outfit]]) {
-              case Success(outfits) => complete(outfits)
-              case Failure(m) => complete(InternalServerError, m.getStackTrace.mkString("\n"))
-            }
-          }
-        }
-      } ~
       path(Segment) { alias =>
         get {
           encodeResponse(Gzip) {
