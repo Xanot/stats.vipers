@@ -8,25 +8,13 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   // Outfit
   //================================================================================
   "getOutfitByAlias uri" should "be constructed" in {
-    // Simple (with leader and faction)
-    {
-      val uri = ApiUrlBuilder.getOutfitByAlias("vipr", isSimple = true)
-      uri.path.tail.toString().endsWith("outfit") should be(right = true)
-      uri.query.length should be(3)
-      uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id")
-      uri.query.get("alias_lower").get should be("vipr")
-    }
-
     // With leader (with faction) and member characters
-    {
-      val uri = ApiUrlBuilder.getOutfitByAlias("vipr", isSimple = false)
-      uri.path.tail.toString().endsWith("outfit") should be(right = true)
-      uri.query.length should be(3)
-      uri.query.get("c:lang").get should be("en")
-      uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id,outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0)")
-      uri.query.get("alias_lower").get should be("vipr")
-    }
+    val uri = ApiUrlBuilder.getOutfitByAlias("vipr")
+    uri.path.tail.toString().endsWith("outfit") should be(right = true)
+    uri.query.length should be(3)
+    uri.query.get("c:lang").get should be("en")
+    uri.query.get("c:join").get should be("character^inject_at:leader^on:leader_character_id^to:character_id,outfit_member^inject_at:members^list:1(character^inject_at:character^outer:0(characters_stat_history^inject_at:characters_stat_history^list:1^terms:stat_name=kills'stat_name=deaths'stat_name=score^show:stat_name'all_time))")
+    uri.query.get("alias_lower").get should be("vipr")
   }
 
   //================================================================================
@@ -38,7 +26,8 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.path.tail.toString().endsWith("character") should be(right = true)
     uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
-    uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0")
+    uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0," +
+      "characters_stat_history^inject_at:characters_stat_history^list:1^terms:stat_name=kills'stat_name=deaths'stat_name=score^show:stat_name'all_time")
     uri.query.get("name.first_lower").get should be("xanot")
 
     // With stats
@@ -47,6 +36,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0," +
+      "characters_stat_history^inject_at:characters_stat_history^list:1^terms:stat_name=kills'stat_name=deaths'stat_name=score^show:stat_name'all_time," +
       "characters_weapon_stat^inject_at:characters_weapon_stat^list:1^terms:last_save=>0," +
       "characters_weapon_stat_by_faction^inject_at:characters_weapon_stat_by_faction^list:1^terms:last_save=>0," +
       "characters_stat^inject_at:characters_stat^list:1^terms:last_save=>0," +
@@ -59,6 +49,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.query.length should be(3)
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:join").get should be("outfit_member^inject_at:membership^list:0," +
+      "characters_stat_history^inject_at:characters_stat_history^list:1^terms:stat_name=kills'stat_name=deaths'stat_name=score^show:stat_name'all_time," +
       "characters_weapon_stat^inject_at:characters_weapon_stat^list:1^terms:last_save=>1413669674," +
       "characters_weapon_stat_by_faction^inject_at:characters_weapon_stat_by_faction^list:1^terms:last_save=>1413669674," +
       "characters_stat^inject_at:characters_stat^list:1^terms:last_save=>1413669674," +

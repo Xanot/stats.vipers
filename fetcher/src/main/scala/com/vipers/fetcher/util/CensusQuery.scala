@@ -220,5 +220,15 @@ private[fetcher] object CensusQuery {
                                                   show : Option[Seq[String]] = None,
                                                   nested : Option[JoinQuery] = None,
                                                   isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat_by_faction", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
+
+    case class CharacterStatHistoryJoin(injectAt : String = "characters_stat_history",
+                                        on : Option[String] = None,
+                                        to : Option[String] = None,
+                                        terms : Option[Seq[(String, String)]] = None,
+                                        hide : Option[Seq[String]] = None,
+                                        show : Option[Seq[String]] = None,
+                                        nested : Option[JoinQuery] = None,
+                                        isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat_history", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
+
   }
 }

@@ -3,7 +3,7 @@ package com.vipers.fetcher.util
 import com.vipers.fetcher.Configuration
 import com.vipers.model.Page
 import com.vipers.fetcher.util.CensusQuery.CensusQueryCommand._
-import com.vipers.fetcher.util.CensusQuery.{CensusQueryCommand, Search}
+import com.vipers.fetcher.util.CensusQuery.Search
 import spray.http.Uri
 
 private[fetcher] object ApiUrlBuilder {
@@ -11,23 +11,23 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   // Outfit
   //================================================================================
-  def getOutfitByAlias(outfitAlias : String, isSimple : Boolean) : Uri = {
+  def getOutfitByAlias(outfitAlias : String) : Uri = {
     val s = Search("alias_lower", outfitAlias.toLowerCase)
-    val params = isSimple match {
-      case true =>
-        CensusQuery(Some(s),
-          Join(
-            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id"))
-          )
-        ).construct
-      case false =>
-        CensusQuery(Some(s),
-          Join(
-            CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id")),
-            OutfitMemberJoin(nested = Some(CharacterJoin(isOuter = Some(false))))
-          )
-        ).construct
-    }
+    val params =
+      CensusQuery(Some(s),
+        Join(
+          CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id")),
+          OutfitMemberJoin(nested = Some(
+            CharacterJoin(isOuter = Some(false), nested = Some(
+              CharacterStatHistoryJoin(
+                terms = Some(Seq(("stat_name", "kills"), ("stat_name", "deaths"), ("stat_name", "score"))),
+                show = Some(Seq("stat_name", "all_time"))
+              )
+            ))
+          ))
+        )
+      ).construct
+
     construct(Uri.Path("outfit"), params.toMap)
   }
 
@@ -40,13 +40,23 @@ private[fetcher] object ApiUrlBuilder {
       if(withStats) {
         CensusQuery(Some(s), Join(
           OutfitMemberJoin(injectAt = "membership", isList = Some(false)),
+          CharacterStatHistoryJoin(
+            terms = Some(Seq(("stat_name", "kills"), ("stat_name", "deaths"), ("stat_name", "score"))),
+            show = Some(Seq("stat_name", "all_time"))
+          ),
           CharacterWeaponStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
           CharacterWeaponStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
           CharacterProfileStatsJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0))))),
           CharacterProfileStatsByFactionJoin(terms = Some(Seq(("last_save", ">" + statsLastSavedOn.getOrElse(0)))))
         )).construct
       } else {
-        CensusQuery(Some(s), Join(OutfitMemberJoin(injectAt = "membership", isList = Some(false)))).construct
+        CensusQuery(Some(s), Join(
+          OutfitMemberJoin(injectAt = "membership", isList = Some(false)),
+          CharacterStatHistoryJoin(
+            terms = Some(Seq(("stat_name", "kills"), ("stat_name", "deaths"), ("stat_name", "score"))),
+            show = Some(Seq("stat_name", "all_time"))
+          )
+        )).construct
       }
     }
     construct(Uri.Path("character"), params.toMap)

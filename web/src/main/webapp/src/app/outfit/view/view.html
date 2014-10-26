@@ -48,6 +48,16 @@
             BR
           </a>
         </th>
+        <th class="text-center">
+          <a ng-click="limitRows = 50; predicate='kills / deaths'; reverse=!reverse;">
+            KDR
+          </a>
+        </th>
+        <th class="text-center">
+          <a ng-click="limitRows = 50; predicate='score / minutesPlayed'; reverse=!reverse;">
+            SPM
+          </a>
+        </th>
         <th>
           <a ng-click="limitRows = 50; predicate='lastLoginDate'; reverse=!reverse;">
             Last login
@@ -94,6 +104,12 @@
           <span ng-if="::(member.battleRank == 100)" class="br100">
             <span>{{ ::member.battleRank }}</span>
           </span>
+        </td>
+        <td class="text-center">
+          {{ ::(member.kills / member.deaths | number:2 ) }}
+        </td>
+        <td class="text-center">
+          {{ ::(member.score / member.minutesPlayed | number:2) }}
         </td>
         <td>
           <span am-time-ago="::member.lastLoginDate" bs-tooltip  data-type="info" data-title="{{ ::(member.lastLoginDate | amCalendar) }}" data-container="body"></span>

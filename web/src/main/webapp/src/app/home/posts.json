@@ -1,14 +1,8 @@
 [
   {
-    "title": "Hello World 2",
-    "slug": "hello-world-2",
-    "file": "app/home/posts/Test2.md",
-    "creationDate": "1410320916"
-  },
-  {
-    "title": "Hello World",
+    "title": "v0.0.1 superluminal-farmer",
     "slug": "hello-world",
-    "file": "app/home/posts/Test.md",
-    "creationDate": "1410319561"
+    "file": "app/home/posts/hello-world.md",
+    "creationDate": "1414253004"
   }
 ]

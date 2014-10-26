@@ -33,7 +33,7 @@ class FetcherActor extends Actor {
       } pipeTo sender
     case m @ FetchOutfitRequest(alias) =>
       Future {
-        sendRequest(ApiUrlBuilder.getOutfitByAlias(alias, isSimple = false)) \ "outfit_list" match {
+        sendRequest(ApiUrlBuilder.getOutfitByAlias(alias)) \ "outfit_list" match {
           case JArray(parent) if parent.nonEmpty =>
             FetchOutfitResponse(Some(parent(0).toOutfit.get, {
               val list = mutable.ListBuffer.empty[OutfitMember]

@@ -45,19 +45,31 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
 
   { // Create tables
     import driver.simple._
-    try {
-      withTransaction { implicit s =>
-        (characterDAO.table.ddl ++
-          outfitDAO.table.ddl ++
-          outfitMembershipDAO.table.ddl ++
-          weaponDAO.table.ddl ++
-          weaponStatDAO.weaponStatsTable.ddl ++
-          weaponStatDAO.weaponStatsTimeSeriesTable.ddl ++
-          characterStatDAO.table.ddl ++
-          weaponStatDAO.weaponStatsIndexed.ddl).create
-      }
-    } catch {
-      case _ : Exception => // Tables already created
+
+    withTransaction { implicit  s =>
+      try { characterDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { characterStatDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { outfitDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { outfitMembershipDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponStatDAO.weaponStatsTable.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponStatDAO.weaponStatsIndexed.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponStatDAO.weaponStatsTimeSeriesTable.ddl.create }
+      catch { case _ : Exception => }
     }
   }
 }

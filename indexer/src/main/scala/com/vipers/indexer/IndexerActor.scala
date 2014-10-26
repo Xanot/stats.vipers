@@ -79,8 +79,9 @@ class IndexerActor extends Actor
           GetOutfitResponse(outfit.name, outfit.alias, outfit.aliasLower,
             outfit.memberCount, outfit.factionId, outfit.id, outfit.creationDate, leader, outfit.lastIndexedOn, updateTime,
             members.map { c =>
-              GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts,
-                c._1.creationDate, c._1.lastLoginDate, c._1.minutesPlayed, c._2)
+              GetOutfitResponseCharacter(c._1.name, c._1.nameLower, c._1.id, c._1.kills, c._1.deaths, c._1. score,
+                c._1.battleRank, c._1.battleRankPercent, c._1.earnedCerts, c._1.creationDate, c._1.lastLoginDate,
+                c._1.minutesPlayed, c._2)
             }
           )
         }.getOrElse(BeingIndexed)
@@ -89,8 +90,9 @@ class IndexerActor extends Actor
     case GetCharacterRequest(nameLower) =>
       Future {
         characterIndexer.retrieve(nameLower).map { case (c, membership, updateTime, mostRecentWeaponStats) =>
-          GetCharacterResponse(c.name, c.nameLower, c.id, c.battleRank, c.battleRankPercent, c.availableCerts, c.earnedCerts, c.certPercent,
-            c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate, c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
+          GetCharacterResponse(c.name, c.nameLower, c.id, c.kills, c.deaths, c.score, c.battleRank, c.battleRankPercent,
+            c.availableCerts, c.earnedCerts, c.certPercent, c.spentCerts, c.factionId, c.creationDate, c.lastLoginDate,
+            c.minutesPlayed, c.lastIndexedOn, updateTime, membership, mostRecentWeaponStats)
         }.getOrElse(BeingIndexed)
       } pipeTo sender
 
@@ -142,6 +144,9 @@ object IndexerActor {
   case class GetOutfitResponseCharacter(name : String,
                                         nameLower : String,
                                         id : String,
+                                        kills : Long,
+                                        deaths: Long,
+                                        score : Long,
                                         battleRank : Short,
                                         battleRankPercent : Short,
                                         earnedCerts : Int,
@@ -153,6 +158,9 @@ object IndexerActor {
   case class GetCharacterResponse(name : String,
                                   nameLower : String,
                                   id : String,
+                                  kills : Long,
+                                  deaths: Long,
+                                  score : Long,
                                   battleRank : Short,
                                   battleRankPercent : Short,
                                   availableCerts : Int,

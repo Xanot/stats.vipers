@@ -32,8 +32,6 @@ private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershi
       def rankOrdinal = column[Byte]("rank_ordinal", O.NotNull)
       def memberSinceDate = column[Long]("member_since_date", O.NotNull)
 
-      def character = foreignKey(s"fk_${tableName}_id}", id, characterDAO.table)(_.id)
-
       def * = (outfitId, id, rank, rankOrdinal, memberSinceDate) <> (OutfitMembership.tupled, OutfitMembership.unapply)
     }
   }

@@ -19,6 +19,10 @@ case class Character(name : String,
                      nameLower : String,
                      override val id : String,
 
+                     kills : Long,
+                     deaths : Long,
+                     score : Long,
+
                      battleRank : Short,
                      battleRankPercent : Short,
 

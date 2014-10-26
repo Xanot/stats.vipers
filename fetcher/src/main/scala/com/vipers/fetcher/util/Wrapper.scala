@@ -59,10 +59,32 @@ private[fetcher] object Wrapper {
           )
         }
 
+        val JArray(stats) = json \ "characters_stat_history"
+        val (kills, deaths, score) = {
+          var kills = 0L
+          var deaths = 0L
+          var score = 0L
+
+          stats.foreach { stat =>
+            val JString(statName) = stat \ "stat_name"
+            val JString(value) = stat \ "all_time"
+
+            statName match {
+              case "kills" => kills = value.toLong
+              case "deaths" => deaths = value.toLong
+              case "score" => score = value.toLong
+            }
+          }
+          (kills, deaths, score)
+        }
+
         Character(
           name,
           nameLower,
           id,
+          kills,
+          deaths,
+          score,
           battleRank.toShort,
           battleRankPercentToNext.toShort,
           availablePoints.toInt,
@@ -236,14 +258,17 @@ private[fetcher] object Wrapper {
         weaponStat.foreach { stat =>
           val JString(pid) = stat \ "profile_id"
           val profileId = pid.toShort
-          val JString(statName) = stat \ "stat_name"
-          val JString(value) = stat \ "value_forever"
 
-          if(map.contains(profileId)) {
-            map(profileId)._2 += ((statName, value.toLong))
-          } else {
-            val JString(lastSave) = stat \ "last_save"
-            map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
+          if(profileId != 0) {
+            val JString(statName) = stat \ "stat_name"
+            val JString(value) = stat \ "value_forever"
+
+            if(map.contains(profileId)) {
+              map(profileId)._2 += ((statName, value.toLong))
+            } else {
+              val JString(lastSave) = stat \ "last_save"
+              map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
+            }
           }
         }
 
@@ -251,16 +276,19 @@ private[fetcher] object Wrapper {
         weaponStatByFaction.foreach { stat =>
           val JString(pid) = stat \ "profile_id"
           val profileId = pid.toShort
-          val JString(statName) = stat \ "stat_name"
-          val JString(valueNc) = stat \ "value_forever_nc"
-          val JString(valueTr) = stat \ "value_forever_tr"
-          val JString(valueVs) = stat \ "value_forever_vs"
 
-          if(map.contains(profileId)) {
-            map(profileId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
-          } else {
-            val JString(lastSave) = stat \ "last_save"
-            map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
+          if(profileId != 0) {
+            val JString(statName) = stat \ "stat_name"
+            val JString(valueNc) = stat \ "value_forever_nc"
+            val JString(valueTr) = stat \ "value_forever_tr"
+            val JString(valueVs) = stat \ "value_forever_vs"
+
+            if(map.contains(profileId)) {
+              map(profileId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
+            } else {
+              val JString(lastSave) = stat \ "last_save"
+              map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
+            }
           }
         }
 

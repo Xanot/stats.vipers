@@ -19,6 +19,10 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))
       def nameLower = column[String]("name_lower", O.NotNull, O.DBType("VARCHAR(100)"))
 
+      def kills = column[Long]("kills", O.NotNull)
+      def deaths = column[Long]("deaths", O.NotNull)
+      def score = column[Long]("score", O.NotNull)
+
       def battleRank = column[Short]("battle_rank", O.NotNull)
       def battleRankPercent = column[Short]("battle_rank_percent", O.NotNull)
 
@@ -37,7 +41,7 @@ private[indexer] trait SlickCharacterDAOComponent extends CharacterDAOComponent 
 
       def lastIndexedOn = column[Long]("last_indexed_on", O.NotNull)
 
-      def * = (name, nameLower, id, battleRank, battleRankPercent, certsAvailable, certsEarned, certPercent,
+      def * = (name, nameLower, id, kills, deaths, score, battleRank, battleRankPercent, certsAvailable, certsEarned, certPercent,
         certsSpent, factionId, creationDate, lastLoginDate, lastSaveDate, loginCount, minutesPlayed, lastIndexedOn) <> (Character.tupled, Character.unapply)
     }
   }
