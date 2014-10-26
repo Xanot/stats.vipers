@@ -45,17 +45,17 @@
         </th>
         <th class="text-center">
           <a ng-click="limitRows = 50; predicate='battleRank == 100 ? earnedCerts : battleRank + (battleRankPercent * 0.01)'; reverse=!reverse;">
-            BR
+            <abr abbr="br"></abr>
           </a>
         </th>
         <th class="text-center">
           <a ng-click="limitRows = 50; predicate='kills / deaths'; reverse=!reverse;">
-            KDR
+            <abr abbr="kdr"></abr>
           </a>
         </th>
         <th class="text-center">
           <a ng-click="limitRows = 50; predicate='score / minutesPlayed'; reverse=!reverse;">
-            SPM
+            <abr abbr="spm"></abr>
           </a>
         </th>
         <th>

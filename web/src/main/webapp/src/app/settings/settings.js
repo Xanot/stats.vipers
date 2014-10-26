@@ -38,6 +38,10 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     $scope.setCharacterDefaults = function() {
       SettingsService.setCharacterDefaults();
     };
+
+    $scope.setAbbrDefaults = function() {
+      SettingsService.setAbbrDefaults();
+    };
   }])
 
   .factory('SettingsService', ['$rootScope', 'localStorageService', function($rootScope, localStorageService) {
@@ -60,12 +64,14 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
         "indexedEnabled": true, "indexedExpireAfter": 60}
     );
     var characterSettings = category("character", {"sort": "Kills", "order": "desc"});
+    var abbreviationSettings = category("abbr", {enabled: false});
 
     return {
       init: function() {
         realTimeSettings.init();
         notificationSettings.init();
         characterSettings.init();
+        abbreviationSettings.init();
       },
       setRealTimeDefaults: function() {
         realTimeSettings.setDefaults();
@@ -75,6 +81,9 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
       },
       setCharacterDefaults: function() {
         characterSettings.setDefaults();
+      },
+      setAbbrDefaults: function() {
+        abbreviationSettings.setDefaults();
       }
     }
   }]);

@@ -57,6 +57,42 @@ angular.module('utils', ['constants'])
     }
   }])
 
+  .directive('abr', ['localStorageService', function(localStorageService) {
+    return {
+      restrict: 'E',
+      replace: true,
+      scope: {
+        abbr: "@"
+      },
+      template: '<span ng-switch="abbrEnabled"><span ng-switch-when="true"><abbr title="{{ title }}">{{ abbr.toUpperCase() }}</abbr></span><span ng-switch-when="false">{{ abbr.toUpperCase() }}</span></span>',
+      link: function(scope, elem, attrs) {
+        scope.abbrEnabled = localStorageService.get("abbr").enabled;
+        if(scope.abbrEnabled) {
+          switch(scope.abbr) {
+            case "kdr":
+              scope.title = "Kills/Deaths";
+              break;
+            case "spm":
+              scope.title = "Score per minute";
+              break;
+            case "kph":
+              scope.title = "Kills per hour";
+              break;
+            case "acc":
+              scope.title = "Accuracy";
+              break;
+            case "hsr":
+              scope.title = "Headshot ratio";
+              break;
+            case "br":
+              scope.title = "Battle rank";
+              break;
+          }
+        }
+      }
+    }
+  }])
+
   .filter('duration', function() {
     return function(duration, type, format) {
       return moment.duration(duration, type).format(format || "d[d] h[h]")

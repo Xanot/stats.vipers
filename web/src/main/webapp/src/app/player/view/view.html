@@ -13,9 +13,9 @@
     </div>
     <div class="col-xs-2">
       <dl class="dl-horizontal">
-        <dt>KDR</dt>
+        <dt><abr abbr="kdr"></abr></dt>
         <dd>{{ (player.kills / player.deaths | number:2) }}</dd>
-        <dt>SPM</dt>
+        <dt><abr abbr="spm"></abr></dt>
         <dd>{{ (player.score / player.minutesPlayed | number:2) }}</dd>
       </dl>
     </div>
@@ -46,35 +46,36 @@
         </th>
         <th>
           <a ng-click="predicate='_1.killCount / _1.deathCount'; reverse=!reverse;">
-            K/D
+            <abr abbr="kdr"></abr>
           </a>
         </th>
         <th>
           <a ng-click="predicate='_1.hitCount / _1.fireCount'; reverse=!reverse;">
-            ACC
+            <abr abbr="acc"></abr>
           </a>
           <i class="fa fa-bullseye"></i>
         </th>
         <th>
           <a ng-click="predicate='_1.headshotCount / _1.killCount'; reverse=!reverse;">
-            HSR
+            <abr abbr="hsr"></abr>
           </a>
           <i class="fa fa-bullseye"></i>
         </th>
         <th>
           <a ng-click="predicate='_1.killCount / _1.secondsPlayed'; reverse=!reverse;">
-            KPH
+            <abr abbr="kph"></abr>
           </a>
         </th>
         <th>
           <a ng-click="predicate='_1.score / _1.secondsPlayed'; reverse=!reverse;">
-            SPM
+            <abr abbr="spm"></abr>
           </a>
         </th>
         <th>
           <a ng-click="predicate='_1.lastSaveDate'; reverse=!reverse;">
             Used
           </a>
+          <i class="fa fa-clock-o"></i>
         </th>
         <th>
           <a ng-click="predicate='_1.secondsPlayed'; reverse=!reverse;">
