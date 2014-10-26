@@ -1,4 +1,3 @@
-
 This is the first public release. The project is open-sourced @ [GitHub](https://github.com/Xanot/stats.vipers):
 
 * This is a hobby project. Expect updates on weekends.

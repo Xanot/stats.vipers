@@ -1,5 +1,11 @@
 [
   {
+    "title": "v0.0.2 immaculate-viper",
+    "slug": "immaculate-viper",
+    "file": "app/home/posts/v0.0.2.md",
+    "creationDate": "1414331369"
+  },
+  {
     "title": "v0.0.1 superluminal-farmer",
     "slug": "hello-world",
     "file": "app/home/posts/hello-world.md",
