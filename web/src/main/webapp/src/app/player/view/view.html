@@ -90,15 +90,17 @@
         <td> {{ $index + 1 }} </td>
         <td>
           <a class="pull-right" ng-click="showHistory(stat)"><i class="fa fa-line-chart"></i></a>
-          <div ng-if="stat.history">
-            <highchart id="chart1" config="stat.history"></highchart>
+          <div ng-switch="!!stat.history">
+            <div ng-switch-when="true">
+              <highchart id="chart1" config="stat.history"></highchart>
+            </div>
+            <span ng-switch-when="false">
+              <img class="item-img" ng-src="http://census.soe.com/{{ ::stat._2.imagePath }}" />
+              <a href="#/weapon/{{ ::stat._2.id }}">
+                {{ ::stat._2.name }}
+              </a>
+            </span>
           </div>
-          <span ng-if="!stat.history">
-            <img class="item-img" ng-src="http://census.soe.com/{{ ::stat._2.imagePath }}" />
-            <a href="#/weapon/{{ ::stat._2.id }}">
-              {{ ::stat._2.name }}
-            </a>
-          </span>
         </td>
         <td>
           {{ ::stat._1.killCount }}

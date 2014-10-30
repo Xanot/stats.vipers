@@ -182,11 +182,8 @@ private[fetcher] object Wrapper {
           if(map.contains(itemId)) {
             map(itemId)._2 += ((statName, value.toLong))
           } else {
-            val JString(vehicleId) = stat \ "vehicle_id"
-            if(vehicleId == "0") {
-              val JString(lastSave) = stat \ "last_save"
-              map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
-            }
+            val JString(lastSave) = stat \ "last_save"
+            map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
           }
         }
 

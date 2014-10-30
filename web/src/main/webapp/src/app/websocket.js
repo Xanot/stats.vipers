@@ -66,7 +66,7 @@
 
       bind("onOpen", function() {
         $rootScope.isConnected = true;
-        $rootScope.$apply();
+        $rootScope.$digest();
         for(var i = 0; i < pending.length; i++) {
           send("subscribe", pending[i])
         }
@@ -74,7 +74,7 @@
 
       bind("onClose", function() {
         $rootScope.isConnected = false;
-        $rootScope.$apply();
+        $rootScope.$digest();
       });
 
       return {

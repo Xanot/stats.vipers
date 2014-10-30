@@ -112,6 +112,7 @@ angular.module('player-view', ['utils', 'ui.router'])
                 }
               }, {
                 name: 'HSR',
+                visible: false,
                 data: $.map(response.data, function(s) {
                   return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'hsr')]];
                 }),
