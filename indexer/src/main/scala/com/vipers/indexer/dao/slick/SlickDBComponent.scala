@@ -62,9 +62,6 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
       try { weaponDAO.table.ddl.create }
       catch { case _ : Exception => }
 
-      try { weaponDAO.itemProfileTable.ddl.create }
-      catch { case _ : Exception => }
-
       try { weaponStatDAO.weaponStatsTable.ddl.create }
       catch { case _ : Exception => }
 

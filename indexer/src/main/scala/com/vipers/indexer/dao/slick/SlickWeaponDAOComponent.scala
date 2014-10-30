@@ -2,7 +2,7 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
-import com.vipers.model.DatabaseModels.{Weapon, ItemProfile}
+import com.vipers.model.DatabaseModels.Weapon
 
 private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with WeaponDAOComponent { this: SlickDB =>
   import driver.simple._
@@ -11,17 +11,6 @@ private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with We
 
   sealed class SlickWeaponDAO extends SlickDAO[Weapon] with WeaponDAO {
     override val table = TableQuery[Weapons]
-
-    val itemProfileTable = TableQuery[ItemProfileTable]
-    private lazy val itemProfileTableCompiled = Compiled(itemProfileTable)
-
-    override def createItemProfiles(itemProfiles : ItemProfile*)(implicit s : Session) : Unit = {
-      itemProfileTableCompiled.insertAll(itemProfiles:_*)
-    }
-
-    override def deleteItemProfiles(implicit s : Session) : Unit = {
-      itemProfileTableCompiled.delete
-    }
 
     sealed class Weapons(tag : Tag) extends TableWithID(tag, "weapon") {
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))
@@ -40,6 +29,7 @@ private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with We
       def heatCapacity = column[Option[Int]]("heat_capacity")
       def heatOverheatPenaltyMs = column[Option[Int]]("heat_overheat_penalty_ms")
       def lastIndexedOn = column[Long]("last_indexed_on", O.NotNull)
+      def profiles = column[Option[String]]("profiles")
 
       def * = (id,
         name,
@@ -57,15 +47,8 @@ private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with We
         heatBleedOffRate,
         heatCapacity,
         heatOverheatPenaltyMs,
-        lastIndexedOn) <> (Weapon.tupled, Weapon.unapply)
-    }
-
-    sealed class ItemProfileTable(tag : Tag) extends Table[ItemProfile](tag, "item_profile") {
-      def itemId = column[String]("item_id", O.NotNull, O.DBType("VARCHAR(20)"))
-      def profileId = column[Short]("profile_id", O.NotNull)
-      def * = (itemId, profileId)
-
-      def pk = primaryKey(s"pk_$tableName", (itemId, profileId))
+        lastIndexedOn,
+        profiles) <> (Weapon.tupled, Weapon.unapply)
     }
   }
 }

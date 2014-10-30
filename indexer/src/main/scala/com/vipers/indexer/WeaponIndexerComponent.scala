@@ -17,10 +17,7 @@ private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with We
       try {
         withTransaction { implicit s =>
           weaponDAO.deleteAll
-          weaponDAO.deleteItemProfiles
-
-          weaponDAO.createAll(response.weapons.map(_._1):_*)
-          weaponDAO.createItemProfiles(response.weapons.flatMap(_._2):_*)
+          weaponDAO.createAll(response.weapons:_*)
 
           log.debug("Weapons have been indexed")
           weaponsBeingIndexed.compareAndSet(true, false)

@@ -71,14 +71,6 @@ private[fetcher] object ApiUrlBuilder {
   }
 
   //================================================================================
-  // Profile
-  //================================================================================
-  def getAllProfiles : Uri = {
-    val params = CensusQuery(None, Limit(10000)).construct
-    construct(Uri.Path("profile"), params.toMap)
-  }
-
-  //================================================================================
   // Utility
   //================================================================================
   private def construct(path : Uri.Path, params : Map[String, String]) : Uri = {

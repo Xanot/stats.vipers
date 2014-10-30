@@ -116,7 +116,13 @@ private[fetcher] object Wrapper {
       }
     }
 
-    def toWeapon : Option[(Weapon, Option[ItemProfile])] = {
+    def toWeapon : Option[Weapon] = {
+      def toItemProfile(itemProfile : JValue) : Short = {
+        val (JString(itemId), JString(profileId)) = (itemProfile \ "item_id", itemProfile \ "profile_id")
+
+        profileId.toShort
+      }
+
       implicit val jsonFormats = org.json4s.DefaultFormats
       check {
         val itemToWeapon = json \ "item_to_weapon"
@@ -151,7 +157,7 @@ private[fetcher] object Wrapper {
           json \ "heat_overheat_penalty_ms"
         )}
 
-        (Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
+        Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
           equipMs.toOption.map(_.extract[String].toInt),
           fromIronSightsMs.toOption.map(_.extract[String].toInt),
           toIronSightsMs.toOption.map(_.extract[String].toInt),
@@ -162,18 +168,15 @@ private[fetcher] object Wrapper {
           heatBleedOffRate.toOption.map(_.extract[String].toFloat),
           heatCapacity.toOption.map(_.extract[String].toInt),
           heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt),
-          System.currentTimeMillis()), toItemProfile(itemToWeapon \ "item_profile"))
+          System.currentTimeMillis(), {
+            if(itemToWeapon \ "item_profile" != JNothing) {
+              val JArray(profiles) = itemToWeapon \ "item_profile"
+              Some(profiles.map( s => toItemProfile(s)).mkString(","))
+            } else {
+              None
+            }
+          })
       }
-    }
-
-    private def toItemProfile(itemProfile : JValue) : Option[ItemProfile] = {
-      if(itemProfile == JNothing) {
-        return None
-      }
-
-      val (JString(itemId), JString(profileId)) = (itemProfile \ "item_id", itemProfile \ "profile_id")
-
-      Some(itemId, profileId.toShort)
     }
 
     def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
@@ -320,37 +323,6 @@ private[fetcher] object Wrapper {
           list += ProfileStat(characterId, profileId, killedByCount, secondsPlayed, score)
         }
         list.toList
-      }
-    }
-
-    def toProfile : Option[Profile] = {
-      check {
-        val (JString(id),
-        JString(name),
-        JString(factionId),
-        JString(imagePath),
-        JString(movementSpeed),
-        JString(backpedalSpeedModifier),
-        JString(sprintSpeedModifier),
-        JString(strafeSpeedModifier)) = {
-          (json \ "profile_id",
-            json \ "name" \ "en",
-            json \ "faction_id",
-            json \ "image_path",
-            json \ "movement_speed",
-            json \ "backpedal_speed_modifier",
-            json \ "sprint_speed_modifier",
-            json \ "strafe_speed_modifier")
-        }
-
-        Profile(id,
-          name,
-          factionId.toByte,
-          imagePath ,
-          movementSpeed.toInt,
-          backpedalSpeedModifier.toFloat,
-          sprintSpeedModifier.toFloat,
-          strafeSpeedModifier.toFloat)
       }
     }
 

@@ -2,7 +2,7 @@ package com.vipers.routes
 
 import akka.pattern.ask
 import com.vipers.indexer.IndexerActor._
-import com.vipers.model.WeaponStat
+import com.vipers.model.DatabaseModels.WeaponStat
 import com.vipers.{ApiActor, JsonRoute}
 import spray.httpx.encoding.Gzip
 import scala.util.{Success, Failure}

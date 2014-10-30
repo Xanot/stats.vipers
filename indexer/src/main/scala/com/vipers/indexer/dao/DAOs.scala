@@ -48,10 +48,7 @@ private[indexer] object DAOs {
   trait WeaponDAOComponent extends DAOComponent { this: DB =>
     val weaponDAO : WeaponDAO
 
-    trait WeaponDAO extends DAO[Weapon] {
-      def createItemProfiles(itemProfiles : ItemProfile*)(implicit s : Session) : Unit
-      def deleteItemProfiles(implicit s : Session) : Unit
-    }
+    trait WeaponDAO extends DAO[Weapon] {}
   }
 
   trait WeaponStatDAOComponent extends DAOComponent { this: DB =>
@@ -78,17 +75,5 @@ private[indexer] object DAOs {
       def createOrUpdate(profileStat : ProfileStat)(implicit s : Session)
       def getCharactersProfileStats(characterId : String)(implicit s : Session) : List[ProfileStat]
     }
-  }
-
-  trait ProfileDAOComponent extends DAOComponent { this: DB =>
-    val profileDAO : ProfileDAO
-
-    trait ProfileDAO extends DAO[Profile] {}
-  }
-
-  trait VehicleDAOComponent extends DAOComponent { this: DB =>
-    val vehicleDAO : VehicleDAO
-
-    trait VehicleDAO extends DAO[Vehicle] {}
   }
 }

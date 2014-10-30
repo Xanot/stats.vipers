@@ -196,7 +196,7 @@ private[fetcher] object CensusQuery {
                                hide: Option[Seq[String]] = None,
                                show: Option[Seq[String]] = None,
                                nested: Option[Seq[JoinQuery]] = None,
-                               isOuter: Option[Boolean] = None) extends JoinQuery("item_profile", injectAt, None, on, to, terms, hide, show, nested, isOuter)
+                               isOuter: Option[Boolean] = None) extends JoinQuery("item_profile", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterWeaponStatsJoin(injectAt: String = "characters_weapon_stat",
                                         on: Option[String] = None,

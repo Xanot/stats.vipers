@@ -1,8 +1,6 @@
 package com.vipers.model
 
 object DatabaseModels {
-  type ItemProfile = (String, Short)
-
   trait WithID {
     val id : String
   }
@@ -65,7 +63,8 @@ object DatabaseModels {
                     heatBleedOffRate : Option[Float],
                     heatCapacity : Option[Int],
                     heatOverheatPenaltyMs : Option[Int],
-                    lastIndexedOn : Long) extends WithID
+                    lastIndexedOn : Long,
+                    profiles : Option[String]) extends WithID
 
   case class WeaponStat(characterId : String,
                         itemId : String,
@@ -92,6 +91,4 @@ object DatabaseModels {
                      backpedalSpeedModifier: Float,
                      sprintSpeedModifier: Float,
                      strafeSpeedModifier: Float) extends WithID
-
-  case class Vehicle(override val id : String) extends WithID
 }
