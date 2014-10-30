@@ -5,7 +5,7 @@ import com.vipers.fetcher.FetcherActor.FetchCharacterResponse
 import com.vipers.indexer.EventBusComponent.{CharacterIndexed, CharacterNeedsIndexing}
 import com.vipers.indexer.IndexerActor.GetCharacterResponseOutfitMembership
 import com.vipers.indexer.dao.DBComponent
-import com.vipers.model.{Weapon, WeaponStat, Character}
+import com.vipers.model.DatabaseModels.{Weapon, WeaponStat, Character}
 import org.eclipse.jetty.util.ConcurrentHashSet
 
 private[indexer] trait CharacterIndexerComponent extends Logging { this: DBComponent with EventBusComponent =>

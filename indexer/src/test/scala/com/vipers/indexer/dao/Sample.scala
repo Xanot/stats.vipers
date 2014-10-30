@@ -1,6 +1,6 @@
 package com.vipers.indexer.dao
 
-import com.vipers.model._
+import com.vipers.model.DatabaseModels._
 
 trait Sample {
   object SampleCharacters {
@@ -22,6 +22,11 @@ trait Sample {
     lazy val Corvus = Weapon("7152","Corvus VA55",Some("The Corvus VA55 features low recoil and high accuracy over sustained fire, making it a popular choice for long range engagements. VS use only."),Some(1),"/files/ps2/images/static/9470.png",false,Some(650),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None,1413671383823L)
   }
 
+  object SampleItemProfiles {
+    lazy val NS15 : ItemProfile = ("75034", 22)
+    lazy val Corvus : ItemProfile = ("7512", 16)
+  }
+
   object SampleCharacterProfileStat {
     lazy val HeavyAssault = ProfileStat("5428035526967126513",6,2755,1087435,15285405)
     lazy val CombatMedic = ProfileStat("5428035526967126513",4,1237,1243963,8672186)
@@ -32,7 +37,3 @@ trait Sample {
     lazy val Corvus = WeaponStat("5428035526967126513","7152",246806,86063,3344,10000,2420,646800,2158969,1391790581L)
   }
 }
-
-
-
-

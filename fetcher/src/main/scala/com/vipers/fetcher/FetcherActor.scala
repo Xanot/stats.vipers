@@ -7,7 +7,7 @@ import akka.pattern.{ask, pipe}
 import akka.util.Timeout
 import com.vipers.fetcher.util.ApiUrlBuilder
 import com.vipers.fetcher.util.Wrapper.ApiDeserializer
-import com.vipers.model._
+import com.vipers.model.DatabaseModels._
 import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import spray.can.Http
@@ -50,11 +50,20 @@ class FetcherActor extends Actor {
     case FetchAllWeaponsRequest =>
       Future {
         val JArray(weaponList) = sendRequest(ApiUrlBuilder.getAllWeapons) \ "weapon_list"
-        val list = mutable.ListBuffer.empty[Weapon]
+        val list = mutable.ListBuffer.empty[(Weapon, Option[ItemProfile])]
         weaponList.foreach { json =>
           list += json.toWeapon.get
         }
         FetchAllWeaponsResponse(list)
+      } pipeTo sender
+    case FetchAllProfilesRequest =>
+      Future {
+        val JArray(profileList) = sendRequest(ApiUrlBuilder.getAllProfiles) \ "profile_list"
+        val list = mutable.ListBuffer.empty[Profile]
+        profileList.foreach { json =>
+          list += json.toProfile.get
+        }
+        FetchAllProfilesResponse(list)
       } pipeTo sender
   }
 
@@ -86,5 +95,11 @@ object FetcherActor {
   // Weapon request/response
   //================================================================================
   case object FetchAllWeaponsRequest
-  case class FetchAllWeaponsResponse(weapons : Seq[Weapon])
+  case class FetchAllWeaponsResponse(weapons : Seq[(Weapon, Option[ItemProfile])])
+
+  //================================================================================
+  // Profile request/response
+  //================================================================================
+  case object FetchAllProfilesRequest
+  case class FetchAllProfilesResponse(profiles : Seq[Profile])
 }

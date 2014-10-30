@@ -4,9 +4,8 @@ import com.vipers.Logging
 import com.vipers.fetcher.FetcherActor.{OutfitMember, FetchOutfitResponse}
 import com.vipers.indexer.EventBusComponent.{OutfitNeedsIndexing, OutfitIndexed}
 import com.vipers.indexer.dao.DBComponent
-import com.vipers.model.Outfit
+import com.vipers.model.DatabaseModels.{Outfit, Character}
 import org.eclipse.jetty.util.ConcurrentHashSet
-import com.vipers.model.Character
 
 private[indexer] trait OutfitIndexerComponent extends Logging { this: DBComponent with EventBusComponent =>
   val outfitIndexer : OutfitIndexer = new OutfitIndexer

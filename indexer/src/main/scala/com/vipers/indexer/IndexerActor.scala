@@ -9,7 +9,7 @@ import com.vipers.fetcher.FetcherActor._
 import com.vipers.indexer.EventBusComponent._
 import com.vipers.indexer.IndexerActor._
 import com.vipers.indexer.dao.slick.SlickDBComponent
-import com.vipers.model.{Weapon, WeaponStat, OutfitMembership, Character}
+import com.vipers.model.DatabaseModels._
 import com.vipers.notifier.NotifierActor
 import com.vipers.notifier.NotifierActor._
 import scala.concurrent.Future

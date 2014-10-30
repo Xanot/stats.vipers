@@ -103,7 +103,7 @@ private[fetcher] object CensusQuery {
                              terms: Option[Seq[(String, String)]] = None,
                              hide: Option[Seq[String]] = None,
                              show: Option[Seq[String]] = None,
-                             nested: Option[JoinQuery] = None,
+                             nested: Option[Seq[JoinQuery]] = None,
                              isOuter: Option[Boolean] = None) {
 
       override def toString: String = {
@@ -136,7 +136,11 @@ private[fetcher] object CensusQuery {
           }
         }
         isOuter.map { isOuter => if (isOuter) builder ++= "^outer:1" else builder ++= "^outer:0"}
-        nested.map { nested => builder ++= s"(${nested.toString})"}
+        nested.map { joins =>
+          if(joins.nonEmpty) {
+            builder ++= joins.mkString("(", ",", ")")
+          }
+        }
         builder.toString()
       }
     }
@@ -147,7 +151,7 @@ private[fetcher] object CensusQuery {
                                 terms: Option[Seq[(String, String)]] = None,
                                 hide: Option[Seq[String]] = None,
                                 show: Option[Seq[String]] = None,
-                                nested: Option[JoinQuery] = None,
+                                nested: Option[Seq[JoinQuery]] = None,
                                 isList: Option[Boolean] = Some(true),
                                 isOuter: Option[Boolean] = None) extends JoinQuery("outfit_member", injectAt, isList, on, to, terms, hide, show, nested, isOuter)
 
@@ -157,14 +161,14 @@ private[fetcher] object CensusQuery {
                              terms: Option[Seq[(String, String)]] = None,
                              hide: Option[Seq[String]] = None,
                              show: Option[Seq[String]] = None,
-                             nested: Option[JoinQuery] = None,
+                             nested: Option[Seq[JoinQuery]] = None,
                              isOuter: Option[Boolean] = None) extends JoinQuery("character", injectAt, None, on, to, terms, hide, show, nested, isOuter)
 
     case class FactionJoin(injectAt: String = "faction",
                            terms: Option[Seq[(String, String)]] = None,
                            hide: Option[Seq[String]] = None,
                            show: Option[Seq[String]] = None,
-                           nested: Option[JoinQuery] = None,
+                           nested: Option[Seq[JoinQuery]] = None,
                            isOuter: Option[Boolean] = None) extends JoinQuery("faction", injectAt, None, None, None, terms, hide, show, nested, isOuter)
 
     case class ItemToWeaponJoin(injectAt: String = "item_to_weapon",
@@ -173,7 +177,7 @@ private[fetcher] object CensusQuery {
                                 terms: Option[Seq[(String, String)]] = None,
                                 hide: Option[Seq[String]] = None,
                                 show: Option[Seq[String]] = None,
-                                nested: Option[JoinQuery] = None,
+                                nested: Option[Seq[JoinQuery]] = None,
                                 isOuter: Option[Boolean] = None) extends JoinQuery("item_to_weapon", injectAt, None, on, to, terms, hide, show, nested, isOuter)
 
     case class ItemJoin(injectAt: String = "item",
@@ -182,8 +186,17 @@ private[fetcher] object CensusQuery {
                         terms: Option[Seq[(String, String)]] = None,
                         hide: Option[Seq[String]] = None,
                         show: Option[Seq[String]] = None,
-                        nested: Option[JoinQuery] = None,
+                        nested: Option[Seq[JoinQuery]] = None,
                         isOuter: Option[Boolean] = None) extends JoinQuery("item", injectAt, None, on, to, terms, hide, show, nested, isOuter)
+
+    case class ItemProfileJoin(injectAt: String = "item_profile",
+                               on: Option[String] = Some("item_id"),
+                               to: Option[String] = Some("item_id"),
+                               terms: Option[Seq[(String, String)]] = None,
+                               hide: Option[Seq[String]] = None,
+                               show: Option[Seq[String]] = None,
+                               nested: Option[Seq[JoinQuery]] = None,
+                               isOuter: Option[Boolean] = None) extends JoinQuery("item_profile", injectAt, None, on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterWeaponStatsJoin(injectAt: String = "characters_weapon_stat",
                                         on: Option[String] = None,
@@ -191,7 +204,7 @@ private[fetcher] object CensusQuery {
                                         terms: Option[Seq[(String, String)]] = None,
                                         hide: Option[Seq[String]] = None,
                                         show: Option[Seq[String]] = None,
-                                        nested: Option[JoinQuery] = None,
+                                        nested: Option[Seq[JoinQuery]] = None,
                                         isOuter: Option[Boolean] = None) extends JoinQuery("characters_weapon_stat", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterWeaponStatsByFactionJoin(injectAt: String = "characters_weapon_stat_by_faction",
@@ -200,7 +213,7 @@ private[fetcher] object CensusQuery {
                                                  terms: Option[Seq[(String, String)]] = None,
                                                  hide: Option[Seq[String]] = None,
                                                  show: Option[Seq[String]] = None,
-                                                 nested: Option[JoinQuery] = None,
+                                                 nested: Option[Seq[JoinQuery]] = None,
                                                  isOuter: Option[Boolean] = None) extends JoinQuery("characters_weapon_stat_by_faction", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterProfileStatsJoin(injectAt : String = "characters_stat",
@@ -209,7 +222,7 @@ private[fetcher] object CensusQuery {
                                          terms : Option[Seq[(String, String)]] = None,
                                          hide : Option[Seq[String]] = None,
                                          show : Option[Seq[String]] = None,
-                                         nested : Option[JoinQuery] = None,
+                                         nested : Option[Seq[JoinQuery]] = None,
                                          isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterProfileStatsByFactionJoin(injectAt : String = "characters_stat_by_faction",
@@ -218,7 +231,7 @@ private[fetcher] object CensusQuery {
                                                   terms : Option[Seq[(String, String)]] = None,
                                                   hide : Option[Seq[String]] = None,
                                                   show : Option[Seq[String]] = None,
-                                                  nested : Option[JoinQuery] = None,
+                                                  nested : Option[Seq[JoinQuery]] = None,
                                                   isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat_by_faction", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
     case class CharacterStatHistoryJoin(injectAt : String = "characters_stat_history",
@@ -227,7 +240,7 @@ private[fetcher] object CensusQuery {
                                         terms : Option[Seq[(String, String)]] = None,
                                         hide : Option[Seq[String]] = None,
                                         show : Option[Seq[String]] = None,
-                                        nested : Option[JoinQuery] = None,
+                                        nested : Option[Seq[JoinQuery]] = None,
                                         isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat_history", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
   }

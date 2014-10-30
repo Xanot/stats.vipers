@@ -1,6 +1,6 @@
 package com.vipers.fetcher.util
 
-import com.vipers.model._
+import com.vipers.model.DatabaseModels._
 import org.json4s.JsonAST._
 import scala.collection.mutable
 
@@ -116,13 +116,14 @@ private[fetcher] object Wrapper {
       }
     }
 
-    def toWeapon : Option[Weapon] = {
+    def toWeapon : Option[(Weapon, Option[ItemProfile])] = {
       implicit val jsonFormats = org.json4s.DefaultFormats
       check {
-        val item = json \ "item_to_weapon" \ "item"
+        val itemToWeapon = json \ "item_to_weapon"
+        val item = itemToWeapon \ "item"
         val itemName = item \ "name" \ "en"
         val itemDescription = item \ "description" \ "en"
-        val (JString(weaponId), JString(name), description, factionId, JString(imagePath), JString(isVehicleWeapon),
+        val (JString(itemId), JString(name), description, factionId, JString(imagePath), JString(isVehicleWeapon),
           JString(moveModifier), JString(turnModifier)) = {
           (
             item \ "item_id",
@@ -150,7 +151,7 @@ private[fetcher] object Wrapper {
           json \ "heat_overheat_penalty_ms"
         )}
 
-        Weapon(weaponId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
+        (Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
           equipMs.toOption.map(_.extract[String].toInt),
           fromIronSightsMs.toOption.map(_.extract[String].toInt),
           toIronSightsMs.toOption.map(_.extract[String].toInt),
@@ -161,8 +162,18 @@ private[fetcher] object Wrapper {
           heatBleedOffRate.toOption.map(_.extract[String].toFloat),
           heatCapacity.toOption.map(_.extract[String].toInt),
           heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt),
-          System.currentTimeMillis())
+          System.currentTimeMillis()), toItemProfile(itemToWeapon \ "item_profile"))
       }
+    }
+
+    private def toItemProfile(itemProfile : JValue) : Option[ItemProfile] = {
+      if(itemProfile == JNothing) {
+        return None
+      }
+
+      val (JString(itemId), JString(profileId)) = (itemProfile \ "item_id", itemProfile \ "profile_id")
+
+      Some(itemId, profileId.toShort)
     }
 
     def toWeaponStats(characterId : String) : Option[List[WeaponStat]] = {
@@ -309,6 +320,37 @@ private[fetcher] object Wrapper {
           list += ProfileStat(characterId, profileId, killedByCount, secondsPlayed, score)
         }
         list.toList
+      }
+    }
+
+    def toProfile : Option[Profile] = {
+      check {
+        val (JString(id),
+        JString(name),
+        JString(factionId),
+        JString(imagePath),
+        JString(movementSpeed),
+        JString(backpedalSpeedModifier),
+        JString(sprintSpeedModifier),
+        JString(strafeSpeedModifier)) = {
+          (json \ "profile_id",
+            json \ "name" \ "en",
+            json \ "faction_id",
+            json \ "image_path",
+            json \ "movement_speed",
+            json \ "backpedal_speed_modifier",
+            json \ "sprint_speed_modifier",
+            json \ "strafe_speed_modifier")
+        }
+
+        Profile(id,
+          name,
+          factionId.toByte,
+          imagePath ,
+          movementSpeed.toInt,
+          backpedalSpeedModifier.toFloat,
+          sprintSpeedModifier.toFloat,
+          strafeSpeedModifier.toFloat)
       }
     }
 

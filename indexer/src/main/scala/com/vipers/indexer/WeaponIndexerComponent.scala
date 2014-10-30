@@ -5,7 +5,7 @@ import com.vipers.Logging
 import com.vipers.dbms.DB
 import com.vipers.fetcher.FetcherActor.FetchAllWeaponsResponse
 import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
-import com.vipers.model.Weapon
+import com.vipers.model.DatabaseModels.Weapon
 
 private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with WeaponDAOComponent =>
   val weaponIndexer = new WeaponIndexer
@@ -17,7 +17,11 @@ private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with We
       try {
         withTransaction { implicit s =>
           weaponDAO.deleteAll
-          weaponDAO.createAll(response.weapons: _*)
+          weaponDAO.deleteItemProfiles
+
+          weaponDAO.createAll(response.weapons.map(_._1):_*)
+          weaponDAO.createItemProfiles(response.weapons.flatMap(_._2):_*)
+
           log.debug("Weapons have been indexed")
           weaponsBeingIndexed.compareAndSet(true, false)
         }

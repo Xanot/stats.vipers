@@ -68,7 +68,7 @@ class CensusQueryTest extends WordSpecLike with Test {
           terms = Some(Seq(("termKey", "termValue"), ("termKey2", "termValue2"))),
           hide = Some(Seq("hideField", "hideField2")),
           show = Some(Seq("showField", "showField2")),
-          nested = Some(CharacterJoin(isOuter = Some(true))),
+          nested = Some(Seq(CharacterJoin(isOuter = Some(true)))),
           isOuter = Some(false)
       ) {}, FactionJoin()).construct match {
         case (command, v) =>
@@ -101,7 +101,7 @@ class CensusQueryTest extends WordSpecLike with Test {
       CensusQuery(None, commands =
         Show("field1", "field2"),
         Timing(true),
-        Join(CharacterJoin(nested = Some(FactionJoin())), FactionJoin())
+        Join(CharacterJoin(nested = Some(Seq(FactionJoin()))), FactionJoin())
       ).construct match {
         case show :: timing :: join :: Nil =>
           show should be("c:show", "field1,field2")
@@ -115,7 +115,7 @@ class CensusQueryTest extends WordSpecLike with Test {
       val p = CensusQuery(Some(Search("alias_lower", "vipr")), commands =
         Show("field1", "field2"),
         Timing(true),
-        Join(CharacterJoin(nested = Some(FactionJoin())), FactionJoin())
+        Join(CharacterJoin(nested = Some(Seq(FactionJoin()))), FactionJoin())
       ) ++ CensusQuery(None, commands = Case(true), Limit(10))
 
       p.construct match {

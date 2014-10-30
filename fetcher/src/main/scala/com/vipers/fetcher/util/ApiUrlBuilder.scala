@@ -17,14 +17,14 @@ private[fetcher] object ApiUrlBuilder {
       CensusQuery(Some(s),
         Join(
           CharacterJoin(injectAt = "leader", on = Some("leader_character_id"), to = Some("character_id")),
-          OutfitMemberJoin(nested = Some(
-            CharacterJoin(isOuter = Some(false), nested = Some(
+          OutfitMemberJoin(nested = Some(Seq(
+            CharacterJoin(isOuter = Some(false), nested = Some(Seq(
               CharacterStatHistoryJoin(
                 terms = Some(Seq(("stat_name", "kills"), ("stat_name", "deaths"), ("stat_name", "score"))),
                 show = Some(Seq("stat_name", "all_time"))
               )
-            ))
-          ))
+            )))
+          )))
         )
       ).construct
 
@@ -66,8 +66,16 @@ private[fetcher] object ApiUrlBuilder {
   // Weapon
   //================================================================================
   def getAllWeapons : Uri = {
-    val params = CensusQuery(None, Limit(10000), Join(ItemToWeaponJoin(nested = Some(ItemJoin())))).construct
+    val params = CensusQuery(None, Limit(10000), Join(ItemToWeaponJoin(nested = Some(Seq(ItemJoin(), ItemProfileJoin()))))).construct
     construct(Uri.Path("weapon"), params.toMap)
+  }
+
+  //================================================================================
+  // Profile
+  //================================================================================
+  def getAllProfiles : Uri = {
+    val params = CensusQuery(None, Limit(10000)).construct
+    construct(Uri.Path("profile"), params.toMap)
   }
 
   //================================================================================

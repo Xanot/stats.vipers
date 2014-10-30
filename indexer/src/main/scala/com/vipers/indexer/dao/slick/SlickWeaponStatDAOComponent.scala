@@ -2,7 +2,7 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.WeaponStatDAOComponent
-import com.vipers.model.{Weapon, WeaponStat}
+import com.vipers.model.DatabaseModels.{Weapon, WeaponStat}
 
 private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponent { this: SlickDB with SlickWeaponDAOComponent =>
   import driver.simple._

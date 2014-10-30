@@ -2,7 +2,7 @@ package com.vipers.indexer.dao
 
 import com.vipers.dao.DAOTest
 import com.vipers.indexer.dao.slick.{SlickWeaponDAOComponent, SlickWeaponStatDAOComponent}
-import com.vipers.model.WeaponStat
+import com.vipers.model.DatabaseModels.WeaponStat
 import org.scalatest.WordSpecLike
 
 class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest with Sample

@@ -111,6 +111,17 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
     "return all weapons" in {
       whenReady((fetcherActor ? FetchAllWeaponsRequest).mapTo[FetchAllWeaponsResponse]) { response =>
         response.weapons.length should be > 100
+        response.weapons(0)._1.id should be(response.weapons(0)._2.get._1)
+        response.weapons.filter(_._1.name == "Supernova FPC")(0)._2 should be(None) // No item profile for vehicle weapons
+      }
+    }
+
+    //================================================================================
+    // Profile
+    //================================================================================
+    "return all profiles" in {
+      whenReady((fetcherActor ? FetchAllProfilesRequest).mapTo[FetchAllProfilesResponse]) { response =>
+        response.profiles.length should be >= 18
       }
     }
   }

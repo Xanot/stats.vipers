@@ -13,15 +13,17 @@ class WeaponIndexerComponentTest extends WordSpecLike with Test
   with WeaponIndexerComponent with MockWeaponDAO with Sample {
 
   private val weps = List(
-    SampleWeapons.Corvus.copy(lastIndexedOn = System.currentTimeMillis()),
-    SampleWeapons.NS15.copy(lastIndexedOn = System.currentTimeMillis())
+    (SampleWeapons.Corvus.copy(lastIndexedOn = System.currentTimeMillis()), Some(SampleItemProfiles.Corvus)),
+    (SampleWeapons.NS15.copy(lastIndexedOn = System.currentTimeMillis()), Some(SampleItemProfiles.NS15))
   )
 
   "Weapon indexer" should {
     "index weapons" in {
       inSequence {
         weaponDAO.expects('deleteAll)(None).returning(true)
-        weaponDAO.expects('createAll)(weps, None).returning(true)
+        weaponDAO.expects('deleteItemProfiles)(None).returning(true)
+        weaponDAO.expects('createAll)(weps.map(_._1), None).returning(true)
+        weaponDAO.expects('createItemProfiles)(weps.flatMap(_._2), None).returning(true)
       }
 
       weaponIndexer.index(FetchAllWeaponsResponse(weps))
@@ -32,7 +34,9 @@ class WeaponIndexerComponentTest extends WordSpecLike with Test
       inSequence {
         weaponDAO.expects('findAll)(None).returning(List.empty)
         weaponDAO.expects('deleteAll)(None).returning(true)
-        weaponDAO.expects('createAll)(weps, None).returning(true)
+        weaponDAO.expects('deleteItemProfiles)(None).returning(true)
+        weaponDAO.expects('createAll)(weps.map(_._1), None).returning(true)
+        weaponDAO.expects('createItemProfiles)(weps.flatMap(_._2), None).returning(true)
       }
 
       weaponIndexer.retrieve match {
@@ -48,13 +52,13 @@ class WeaponIndexerComponentTest extends WordSpecLike with Test
 
     "return weapons if weapons are indexed and are not stale" in {
       inSequence {
-        weaponDAO.expects('findAll)(None).returning(weps)
+        weaponDAO.expects('findAll)(None).returning(weps.map(_._1))
       }
 
       weaponIndexer.retrieve match {
         case (needsIndexing, weapons) =>
           needsIndexing should be(false)
-          weapons should be(Some(weps))
+          weapons should be(Some(weps.map(_._1)))
       }
 
       weaponIndexer.weaponsBeingIndexed.get() should be(false)

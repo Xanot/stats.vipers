@@ -3,7 +3,7 @@ package com.vipers.indexer.dao.slick
 import com.vipers.dbms.SlickDB
 import com.vipers.fetcher.FetcherActor.OutfitMember
 import com.vipers.indexer.dao.DAOs.OutfitMembershipDAOComponent
-import com.vipers.model.OutfitMembership
+import com.vipers.model.DatabaseModels.OutfitMembership
 
 private[indexer] trait SlickOutfitMembershipDAOComponent extends OutfitMembershipDAOComponent  with SlickDAOComponent {
   this: SlickDB with SlickCharacterDAOComponent =>

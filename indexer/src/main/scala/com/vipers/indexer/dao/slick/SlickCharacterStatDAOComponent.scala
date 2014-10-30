@@ -2,7 +2,7 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.CharacterStatDAOComponent
-import com.vipers.model.ProfileStat
+import com.vipers.model.DatabaseModels.ProfileStat
 
 private[indexer] trait SlickCharacterStatDAOComponent extends CharacterStatDAOComponent { this: SlickDB =>
   import driver.simple._
