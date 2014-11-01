@@ -35,9 +35,18 @@ angular.module('player-view', ['utils', 'ui.router'])
 
   .controller('PlayerViewController', ['$scope', '$filter', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService', 'localStorageService',
     function($scope, $filter, PlayerService, resolvePlayer, WebSocketService, NotificationService, localStorageService) {
-      $scope.player = resolvePlayer;
+      function processProfiles(player) {
+        _.forEach(player.weaponStats, function(stat) { // Process profiles
+          if(stat._2.profiles) {
+            stat._2.profiles = $filter('profile')(stat._2.profiles)
+          } else {
+            stat._2.profiles = [{name: 'Vehicle', imagePath: 'files/ps2/images/static/11875.png'}]
+          }
+        });
+        $scope.player = resolvePlayer;
+      }
 
-      var defaultSort = function() {
+      function defaultSort() {
         switch(localStorageService.get("character").sort) {
           case "Used On":
             $scope.predicate = '_1.lastSaveDate';
@@ -46,16 +55,37 @@ angular.module('player-view', ['utils', 'ui.router'])
             $scope.predicate = '_1.killCount';
             break;
         }
-      };
+      }
 
-      var defaultOrder = function() {
+      function defaultOrder() {
         if(localStorageService.get("character").order == "desc") {
           $scope.reverse = !$scope.reverse
         }
-      };
+      }
 
       defaultSort();
       defaultOrder();
+      processProfiles(resolvePlayer);
+
+      $scope.filterClass = 'All';
+      $scope.classes = [
+        {"value":"All", "label": "<i class=\"fa fa-asterisk fa-fw class-img\"></i>"},
+        {"value":"Heavy Assault","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/59.png'/>"},
+        {"value":"Light Assault","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/62.png'/>"},
+        {"value":"Combat Medic","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/65.png'/>"},
+        {"value":"Infiltrator","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/204.png'/>"},
+        {"value":"Engineer","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/201.png'/>"},
+        {"value":"MAX","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/207.png'/>"},
+        {"value":"Vehicle","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/11875.png'/>"}
+      ];
+
+      $scope.classMatcher = function(stat) {
+        if($scope.filterClass && $scope.filterClass != 'All') {
+          return _.any(stat._2.profiles, {name: $scope.filterClass});
+        } else {
+          return true
+        }
+      };
 
       $scope.showHistory = function(stat) {
         if(stat.history) {
@@ -146,7 +176,7 @@ angular.module('player-view', ['utils', 'ui.router'])
       // Retrieve the character if it is updated
       WebSocketService.subscribe("c:" + resolvePlayer.nameLower, function(data) {
         PlayerService.getByName(data).then(function(response) {
-          $scope.player = response.data;
+          processProfiles(response.data);
         });
         NotificationService.characterIndexed(data)
       });

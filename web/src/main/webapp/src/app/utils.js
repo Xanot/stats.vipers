@@ -31,6 +31,36 @@ angular.module('utils', ['constants'])
     };
   })
 
+  .filter('profile', [function() {
+    return function(str) {
+      if(str != undefined) {
+        var profiles = str.split(",");
+        var p = [];
+
+        if(_.contains(profiles, "2") || _.contains(profiles, "17") || _.contains(profiles, "10")) {
+          p.push({name : "Infiltrator", imagePath: "files/ps2/images/static/204.png"})
+        }
+        if(_.contains(profiles, "4") || _.contains(profiles, "19") || _.contains(profiles, "12")) {
+          p.push({name : "Light Assault", imagePath: "files/ps2/images/static/62.png"})
+        }
+        if(_.contains(profiles, "5") || _.contains(profiles, "20") || _.contains(profiles, "13")) {
+          p.push({name : "Combat Medic", imagePath: "files/ps2/images/static/65.png"})
+        }
+        if(_.contains(profiles, "6") || _.contains(profiles, "21") || _.contains(profiles, "14")) {
+          p.push({name : "Engineer", imagePath: "files/ps2/images/static/201.png"})
+        }
+        if(_.contains(profiles, "7") || _.contains(profiles, "22") || _.contains(profiles, "15")) {
+          p.push({name : "Heavy Assault", imagePath: "files/ps2/images/static/59.png"})
+        }
+        if(_.contains(profiles, "8") || _.contains(profiles, "23") || _.contains(profiles, "16")) {
+          p.push({name : "MAX", imagePath: "files/ps2/images/static/207.png"})
+        }
+
+        return p;
+      }
+    }
+  }])
+
   .filter('statCalc', [function() {
     return function(s, item) {
       var value;

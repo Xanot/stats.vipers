@@ -186,9 +186,38 @@ dt, dd {
 }
 
 /* Character page */
+.dropdown-menu {
+    background-color: #242422;
+}
+.table-button {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    font-size: 15px;
+    font-weight: bold;
+    outline: none;
+}
+.table-button:active:focus {
+    outline: none;
+}
+.table-button:hover {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+.table-button:focus {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
 .item-img {
     width: 64px;
     height: 32px;
+}
+.class-img {
+    width: 32px;
+    height: 32px;
+    font-size: 32px;
 }
 .highcharts-container{
     min-width: 400px;

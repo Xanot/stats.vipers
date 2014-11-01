@@ -31,13 +31,19 @@
     </div>
   </div>
   <!-- Content -->
-  <div class="row" ng-if="player.weaponStats.length > 0">
+  <div class="row" ng-show="player.weaponStats.length > 0">
     <table class="table table-bordered table-responsive">
       <thead>
       <tr>
         <th>#</th>
         <th class="table-input">
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
+        </th>
+        <th>
+          <button type="button" class="btn btn-default btn-sm table-button" ng-model="filterClass"
+                  data-html="1" ng-options="class.value as class.label for class in classes" bs-select>
+            <span class="caret"></span>
+          </button>
         </th>
         <th>
           <a ng-click="predicate='_1.killCount'; reverse=!reverse;">
@@ -86,7 +92,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | orderBy:predicate:reverse">
+      <tr ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | filter: classMatcher | orderBy:predicate:reverse">
         <td> {{ $index + 1 }} </td>
         <td>
           <a class="pull-right" ng-click="showHistory(stat)"><i class="fa fa-line-chart"></i></a>
@@ -103,16 +109,19 @@
           </div>
         </td>
         <td>
+          <img class="class-img" ng-repeat="class in ::stat._2.profiles" ng-src="http://census.soe.com/{{ ::class.imagePath }}" />
+        </td>
+        <td>
           {{ ::stat._1.killCount }}
         </td>
         <td>
           {{ ::(stat._1 | statCalc:'kdr' | number:2) }}
         </td>
         <td>
-          {{ ::(stat._1 | statCalc:'acc' | number:2) }} %
+          {{ ::(stat._1 | statCalc:'acc' | number:2) }}%
         </td>
         <td>
-          {{ ::(stat._1 | statCalc:'hsr' | number:2) }} %
+          {{ ::(stat._1 | statCalc:'hsr' | number:2) }}%
         </td>
         <td>
           {{ ::(stat._1 | statCalc:'kph' | number:2) }}
