@@ -104,8 +104,8 @@ angular.module('player-view', ['utils', 'ui.router'])
 
               series: [{
                 name: 'ACC',
-                data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'acc')]]
+                data: _.map(response.data, function(s) {
+                  return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'acc')]
                 }),
                 tooltip: {
                   valueSuffix: '%'
@@ -113,8 +113,8 @@ angular.module('player-view', ['utils', 'ui.router'])
               }, {
                 name: 'HSR',
                 visible: false,
-                data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'hsr')]];
+                data: _.map(response.data, function(s) {
+                  return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'hsr')];
                 }),
                 tooltip: {
                   valueSuffix: '%'
@@ -122,20 +122,20 @@ angular.module('player-view', ['utils', 'ui.router'])
               }, {
                 name: 'KDR',
                 visible: false,
-                data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kdr')]];
+                data: _.map(response.data, function(s) {
+                  return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'kdr')];
                 })
               }, {
                 name: 'KPH',
                 visible: false,
-                data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'kph')]];
+                data: _.map(response.data, function(s) {
+                  return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'kph')];
                 })
               }, {
                 name: 'SPM',
                 visible: false,
-                data: $.map(response.data, function(s) {
-                  return [[s.lastSaveDate * 1000, $filter('statCalc')(s, 'spm')]];
+                data: _.map(response.data, function(s) {
+                  return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'spm')];
                 })
               }]
             };

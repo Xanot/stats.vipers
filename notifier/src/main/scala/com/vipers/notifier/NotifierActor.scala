@@ -48,10 +48,7 @@ class NotifierActor extends Actor with Logging {
       server.stop()
       listeners = null
       connections = null
-    case IsRunning =>
-      Future {
-        server.isRunning
-      } pipeTo sender
+    case IsRunning => sender ! server.isRunning
     case Publish(event, data) =>
       Future {
         log.debug("Notifying: " + event)

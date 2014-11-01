@@ -14,9 +14,10 @@ var buildDest = "../resources/client";
 var jsLibs = [
     "./bower_components/moment/min/moment.min.js",
     "./bower_components/moment-duration-format/lib/moment-duration-format.js",
-    "./bower_components/argjs/min/arg-min.js",
-    "./bower_components/marked/lib/marked.js",
-    "./bower_components/jquery/dist/jquery.min.js",
+    "./lib/arg.js/arg-1.2.min.js",
+    "./lib/marked/marked-0.3.2.min.js",
+    "./bower_components/lodash/dist/lodash.min.js",
+    "./bower_components/highcharts/adapters/standalone-framework.js",
     "./bower_components/highcharts/highcharts.js",
 
     "./bower_components/angular/angular.min.js",
@@ -28,8 +29,8 @@ var jsLibs = [
     "./bower_components/angular-moment/angular-moment.min.js",
     "./bower_components/angular-marked/angular-marked.min.js",
     "./bower_components/angular-loading-bar/build/loading-bar.min.js",
-    "./bower_components/ngInfiniteScroll/build/ng-infinite-scroll.min.js",
-    "./bower_components/angular-local-storage/angular-local-storage.min.js",
+    "./lib/ngInfiniteScroll/infinite-scroll-1.1.2master.js",
+    "./bower_components/angular-local-storage/dist/angular-local-storage.min.js",
     "./bower_components/highcharts-ng/dist/highcharts-ng.min.js"
 ];
 
