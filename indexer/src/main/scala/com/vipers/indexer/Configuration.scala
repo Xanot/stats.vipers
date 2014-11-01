@@ -25,4 +25,5 @@ private[indexer] object Configuration {
   val characterStaleAfter = config.getDuration("character-stale-after", TimeUnit.MILLISECONDS)
   val outfitStaleAfter = config.getDuration("outfit-stale-after", TimeUnit.MILLISECONDS)
   val weaponsStaleAfter = config.getDuration("weapons-stale-after", TimeUnit.MILLISECONDS)
+  val weaponStatKillThreshold = config.getLong("weapon-stat-kill-threshold")
 }

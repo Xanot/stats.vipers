@@ -1,6 +1,7 @@
 package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
+import com.vipers.indexer.Configuration
 import com.vipers.indexer.dao.DAOs.WeaponStatDAOComponent
 import com.vipers.model.DatabaseModels.{Weapon, WeaponStat}
 
@@ -32,7 +33,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
 
     private lazy val getCharactersMostRecentWeaponStatsCompiled = Compiled((characterId : Column[String]) => {
       for {
-        weaponStat <- weaponStatsTable if weaponStat.characterId === characterId
+        weaponStat <- weaponStatsTable if weaponStat.characterId === characterId && weaponStat.killCount >= Configuration.weaponStatKillThreshold
         weapon <- weaponDAO.table if weapon.id === weaponStat.itemId
       } yield (weaponStat, weapon)
     })
