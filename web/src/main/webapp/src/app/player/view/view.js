@@ -43,7 +43,7 @@ angular.module('player-view', ['utils', 'ui.router'])
             stat._2.profiles = [{name: 'Vehicle', imagePath: 'files/ps2/images/static/11875.png'}]
           }
         });
-        $scope.player = resolvePlayer;
+        $scope.player = player;
       }
 
       function defaultSort() {
@@ -61,6 +61,59 @@ angular.module('player-view', ['utils', 'ui.router'])
         if(localStorageService.get("character").order == "desc") {
           $scope.reverse = !$scope.reverse
         }
+      }
+
+      function doSumKills(stats) {
+        return _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.killCount;
+        }, 0);
+      }
+
+      function doAvgKDR(stats) {
+        var deaths = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.deathCount;
+        }, 0);
+        return $scope.sumKills / deaths
+      }
+
+      function doAvgAcc(stats) {
+        var fireCount = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.fireCount;
+        }, 0);
+
+        var hitCount = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.hitCount;
+        }, 0);
+
+        return (hitCount / fireCount) * 100;
+      }
+
+      function doAvgHsr(stats) {
+        var hsCount = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.headshotCount;
+        }, 0);
+
+        return (hsCount / $scope.sumKills) * 100;
+      }
+
+      function doAvgKph(stats) {
+        var secondsPlayed = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.secondsPlayed;
+        }, 0);
+
+        return ($scope.sumKills / secondsPlayed) * 3600;
+      }
+
+      function doAvgSpm(stats) {
+        var secondsPlayed = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.secondsPlayed;
+        }, 0);
+
+        var score = _.reduce(stats, function(sum, stat) {
+          return sum + stat._1.score;
+        }, 0);
+
+        return (score / secondsPlayed) * 60;
       }
 
       defaultSort();
@@ -81,11 +134,28 @@ angular.module('player-view', ['utils', 'ui.router'])
 
       $scope.classMatcher = function(stat) {
         if($scope.filterClass && $scope.filterClass != 'All') {
-          return _.any(stat._2.profiles, {name: $scope.filterClass});
+          if($scope.filterClass === "Light Assault" || $scope.filterClass === "Engineer" || $scope.filterClass === "Infiltrator") {
+            return stat._2.profiles.length < 3 && _.any(stat._2.profiles, {name: $scope.filterClass});
+          } else {
+            return stat._2.profiles.length == 1 && _.any(stat._2.profiles, {name: $scope.filterClass});
+          }
         } else {
           return true
         }
       };
+
+      $scope.$watch('filteredWeaponStats', function() {
+        if($scope.filteredWeaponStats) {
+          $scope.sumKills = doSumKills($scope.filteredWeaponStats);
+          if($scope.filterClass != 'All' || $scope.filterName) {
+            $scope.avgKdr = doAvgKDR($scope.filteredWeaponStats);
+            $scope.avgAcc = doAvgAcc($scope.filteredWeaponStats);
+            $scope.avgHsr = doAvgHsr($scope.filteredWeaponStats);
+            $scope.avgKph = doAvgKph($scope.filteredWeaponStats);
+            $scope.avgSpm = doAvgSpm($scope.filteredWeaponStats);
+          }
+        }
+      }, true);
 
       $scope.showHistory = function(stat) {
         if(stat.history) {

@@ -189,6 +189,16 @@ dt, dd {
 .dropdown-menu {
     background-color: #242422;
 }
+.table-avg td.invisible {
+    border-left: hidden !important;
+    border-top: hidden !important;
+}
+.table-avg td:nth-child(10), .table-avg td.invisible:nth-child(5) {
+    border-left: inherit !important;
+}
+.table-avg td.invisible:nth-child(4), .table-avg td.invisible:nth-child(9), .table-avg td.invisible:last-child {
+    border-right: hidden!important
+}
 .table-button {
     background-color: transparent;
     padding: 0;

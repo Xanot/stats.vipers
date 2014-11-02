@@ -34,6 +34,19 @@
   <div class="row" ng-show="player.weaponStats.length > 0">
     <table class="table table-bordered table-responsive">
       <thead>
+      <tr class="table-avg">
+        <td class="invisible"></td>
+        <td class="invisible"></td>
+        <td class="invisible"></td>
+        <td ng-class="{'invisible': sumKills == 0}"> {{ sumKills }} </td>
+        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgKdr | number: 2 }} </td>
+        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgAcc | number: 2 }}% </td>
+        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgHsr | number: 2 }}% </td>
+        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgKph | number: 2 }} </td>
+        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgSpm | number: 0 }} </td>
+        <td class="invisible"></td>
+        <td class="invisible"></td>
+      </tr>
       <tr>
         <th>#</th>
         <th class="table-input">
@@ -92,7 +105,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr ng-repeat="stat in player.weaponStats | filter: {_2 : {name : filterName || ''}} | filter: classMatcher | orderBy:predicate:reverse">
+      <tr ng-repeat="stat in (filteredWeaponStats = (player.weaponStats | filter: {_2 : {name : filterName || ''}} | filter: classMatcher | orderBy:predicate:reverse))">
         <td> {{ $index + 1 }} </td>
         <td>
           <a class="pull-right" ng-click="showHistory(stat)"><i class="fa fa-line-chart"></i></a>
