@@ -31,11 +31,14 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
   }])
 
   .factory('SettingsService', ['$rootScope', 'localStorageService', function($rootScope, localStorageService) {
-    function category(name, defaults) {
+    function category(name, defaults, migration) {
       return {
-        defaults: JSON.parse(JSON.stringify(defaults)),
         init: function() {
-          localStorageService.bind($rootScope, name, JSON.parse(JSON.stringify(this.defaults)))
+          if(migration && migration(_.cloneDeep(defaults))) {
+            this.setDefaults();
+          } else {
+            localStorageService.bind($rootScope, name, _.cloneDeep(defaults));
+          }
         },
         setDefaults: function() {
           localStorageService.remove(name);
@@ -56,12 +59,25 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     });
     var characterSettings = category("character", {
       "showWeaponImages": true,
-      "columnOptions": ["Kills", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
-      "columns": ["Kills", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
+      "columnOptions": ["Kills", "KDR", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
+      "columns": ["Kills", "KDR", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
       "sortOptions" : ["Used On", "Kills"],
       "sort": "Kills",
       "orderOptions": ["desc", "asc"],
-      "order": "desc"
+      "order": "desc",
+      "weaponHistoryStatsOptions": ["KDR", "ACC", "HSR", "KPH", "SPM"],
+      "weaponHistoryStats": ["ACC"]
+    }, function(defaults) {
+      var character = localStorageService.get("character");
+      if(character) {
+        if(!_.isEqual(character.columnOptions, defaults.columnOptions) ||
+          !_.isEqual(character.sortOptions, defaults.sortOptions) ||
+          !_.isEqual(character.orderOptions, defaults.orderOptions) ||
+          !_.isEqual(character.weaponHistoryStatsOptions, defaults.weaponHistoryStatsOptions)) {
+          return true
+        }
+      }
+      return false;
     });
 
     return {

@@ -204,6 +204,7 @@ angular.module('player-view', ['utils', 'ui.router'])
 
               series: [{
                 name: 'ACC',
+                visible: _.contains($scope.settings.weaponHistoryStats, 'ACC'),
                 data: _.map(response.data, function(s) {
                   return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'acc')]
                 }),
@@ -212,7 +213,7 @@ angular.module('player-view', ['utils', 'ui.router'])
                 }
               }, {
                 name: 'HSR',
-                visible: false,
+                visible: _.contains($scope.settings.weaponHistoryStats, 'HSR'),
                 data: _.map(response.data, function(s) {
                   return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'hsr')];
                 }),
@@ -221,19 +222,19 @@ angular.module('player-view', ['utils', 'ui.router'])
                 }
               }, {
                 name: 'KDR',
-                visible: false,
+                visible: _.contains($scope.settings.weaponHistoryStats, 'KDR'),
                 data: _.map(response.data, function(s) {
                   return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'kdr')];
                 })
               }, {
                 name: 'KPH',
-                visible: false,
+                visible: _.contains($scope.settings.weaponHistoryStats, 'KPH'),
                 data: _.map(response.data, function(s) {
                   return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'kph')];
                 })
               }, {
                 name: 'SPM',
-                visible: false,
+                visible: _.contains($scope.settings.weaponHistoryStats, 'SPM'),
                 data: _.map(response.data, function(s) {
                   return [s.lastSaveDate * 1000, $filter('statCalc')(s, 'spm')];
                 })

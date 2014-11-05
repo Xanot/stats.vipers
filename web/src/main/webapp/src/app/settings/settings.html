@@ -70,6 +70,17 @@
               </td>
             </tr>
             <tr>
+              <td>Default weapon history stats</td>
+              <td>
+                <button type="button" class="btn btn-default btn-sm"
+                        ng-model="character.weaponHistoryStats" data-multiple="1"
+                        data-template="app/settings/select.tpl.html"
+                        ng-options="stat for stat in character.weaponHistoryStatsOptions" bs-select>
+                  <span class="caret"></span>
+                </button>
+              </td>
+            </tr>
+            <tr>
               <td>Default Sort</td>
               <td>
                 <select class="form-control input-sm" ng-options="option.toString() for option in character.sortOptions" ng-model="character.sort"></select>
