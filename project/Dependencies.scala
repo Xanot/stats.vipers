@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   private val akkaVersion      = "2.3.5"
   private val sprayVersion     = "1.3.1"
-  private val jettyVersion     = "9.2.2.v20140723"
+  private val jettyVersion     = "9.2.3.v20140905"
   private val scalaMockVersion = "3.2-RC1"
 
   val _common         = "com.vipers"             %% "common"                 %  "[0.1-SNAPSHOT,)"

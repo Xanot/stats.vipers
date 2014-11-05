@@ -32,20 +32,18 @@
   </div>
   <!-- Content -->
   <div class="row" ng-show="player.weaponStats.length > 0">
-    <table class="table table-bordered table-responsive">
+    <table class="table table-bordered table-responsive" style="border: 0">
       <thead>
-      <tr class="table-avg">
-        <td class="invisible"></td>
-        <td class="invisible"></td>
-        <td class="invisible"></td>
-        <td ng-class="{'invisible': sumKills == 0}"> {{ sumKills }} </td>
-        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgKdr | number: 2 }} </td>
-        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgAcc | number: 2 }}% </td>
-        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgHsr | number: 2 }}% </td>
-        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgKph | number: 2 }} </td>
-        <td ng-class="{'invisible': ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)}"> {{ avgSpm | number: 0 }} </td>
-        <td class="invisible"></td>
-        <td class="invisible"></td>
+      <tr>
+        <td class="invisible" style=" border: 0;"></td>
+        <td class="invisible" style=" border: 0;"></td>
+        <td class="invisible" style=" border: 0;"></td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'Kills') || sumKills == 0"> {{ sumKills }} </td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'KDR') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgKdr | number: 2 }} </td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'ACC') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgAcc | number: 2 }}% </td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'HSR') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgHsr | number: 2 }}% </td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'KPH') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgKph | number: 2 }} </td>
+        <td class="table-avg" ng-hide="!_.contains(settings.columns, 'SPM') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgSpm | number: 0 }} </td>
       </tr>
       <tr>
         <th>#</th>
@@ -58,45 +56,45 @@
             <span class="caret"></span>
           </button>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'Kills')">
           <a ng-click="predicate='_1.killCount'; reverse=!reverse;">
             Kills
           </a>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'KDR')">
           <a ng-click="predicate='_1.killCount / _1.deathCount'; reverse=!reverse;">
             <abr abbr="kdr"></abr>
           </a>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'ACC')">
           <a ng-click="predicate='_1.hitCount / _1.fireCount'; reverse=!reverse;">
             <abr abbr="acc"></abr>
           </a>
           <i class="fa fa-bullseye"></i>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'HSR')">
           <a ng-click="predicate='_1.headshotCount / _1.killCount'; reverse=!reverse;">
             <abr abbr="hsr"></abr>
           </a>
           <i class="fa fa-bullseye"></i>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'KPH')">
           <a ng-click="predicate='_1.killCount / _1.secondsPlayed'; reverse=!reverse;">
             <abr abbr="kph"></abr>
           </a>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'SPM')">
           <a ng-click="predicate='_1.score / _1.secondsPlayed'; reverse=!reverse;">
             <abr abbr="spm"></abr>
           </a>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'Last used')">
           <a ng-click="predicate='_1.lastSaveDate'; reverse=!reverse;">
             Used
           </a>
           <i class="fa fa-clock-o"></i>
         </th>
-        <th>
+        <th ng-show="_.contains(settings.columns, 'Total time')">
           <a ng-click="predicate='_1.secondsPlayed'; reverse=!reverse;">
             Time
           </a>
@@ -114,7 +112,7 @@
               <highchart id="chart1" config="stat.history"></highchart>
             </div>
             <span ng-switch-when="false">
-              <img class="item-img" ng-src="http://census.soe.com/{{ ::stat._2.imagePath }}" />
+              <img ng-show="settings.showWeaponImages" class="item-img" ng-src="http://census.soe.com/{{ ::stat._2.imagePath }}" />
               <a href="#/weapon/{{ ::stat._2.id }}">
                 {{ ::stat._2.name }}
               </a>
@@ -124,28 +122,28 @@
         <td>
           <img class="class-img" ng-repeat="class in ::stat._2.profiles" ng-src="http://census.soe.com/{{ ::class.imagePath }}" />
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'Kills')">
           {{ ::stat._1.killCount }}
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'KDR')">
           {{ ::(stat._1 | statCalc:'kdr' | number:2) }}
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'ACC')">
           {{ ::(stat._1 | statCalc:'acc' | number:2) }}%
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'HSR')">
           {{ ::(stat._1 | statCalc:'hsr' | number:2) }}%
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'KPH')">
           {{ ::(stat._1 | statCalc:'kph' | number:2) }}
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'SPM')">
           {{ ::(stat._1 | statCalc:'spm' | number:0) }}
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'Last used')">
           <span am-time-ago="::stat._1.lastSaveDate"></span>
         </td>
-        <td>
+        <td ng-show="_.contains(settings.columns, 'Total time')">
           {{ ::(stat._1.secondsPlayed | duration:'seconds':'d[d] h[h] m[m]') }}
         </td>
       </tr>

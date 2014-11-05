@@ -45,15 +45,33 @@
           <table class="table">
             <tbody>
             <tr>
-              <td>Default Sort</td>
+              <td>Weapon image</td>
               <td>
-                <select class="form-control input-sm" ng-options="option.toString() for option in sortOptions" ng-model="character.sort"></select>
+                <i class="fa fa-2x" ng-class="{'fa-toggle-on': character.showWeaponImages, 'fa-toggle-off': !character.showWeaponImages}"
+                   ng-click="character.showWeaponImages = !character.showWeaponImages"></i>
               </td>
             </tr>
             <tr>
-              <td>Order</td>
+              <td>Columns shown</td>
               <td>
-                <select class="form-control input-sm" ng-options="option.toString() for option in orderOptions" ng-model="character.order"></select>
+                <button type="button" class="btn btn-default btn-sm"
+                        ng-model="character.columns" data-multiple="1"
+                        data-template="app/settings/select.tpl.html"
+                        ng-options="column for column in character.columnOptions" bs-select>
+                  <span class="caret"></span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>Default Sort</td>
+              <td>
+                <select class="form-control input-sm" ng-options="option.toString() for option in character.sortOptions" ng-model="character.sort"></select>
+              </td>
+            </tr>
+            <tr>
+              <td>Sort Order</td>
+              <td>
+                <select class="form-control input-sm" ng-options="option.toString() for option in character.orderOptions" ng-model="character.order"></select>
               </td>
             </tr>
             </tbody>

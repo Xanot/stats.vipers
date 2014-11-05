@@ -17,16 +17,6 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     ];
     $scope.notificationTabs.activeTab = 0;
 
-    $scope.orderOptions = [
-      "desc",
-      "asc"
-    ];
-
-    $scope.sortOptions = [
-      "Used On",
-      "Kills"
-    ];
-
     $scope.setRealTimeDefaults = function() {
       SettingsService.setRealTimeDefaults();
     };
@@ -59,11 +49,21 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     }
 
     var realTimeSettings = category("realTime", {enabled: true});
-    var notificationSettings = category("notification",
-      {"beingIndexedEnabled":true, "beingIndexedExpireAfter": 5,
-        "indexedEnabled": true, "indexedExpireAfter": 60}
-    );
-    var characterSettings = category("character", {"sort": "Kills", "order": "desc"});
+    var notificationSettings = category("notification", {
+      "beingIndexedEnabled":true,
+      "beingIndexedExpireAfter": 5,
+      "indexedEnabled": true,
+      "indexedExpireAfter": 60
+    });
+    var characterSettings = category("character", {
+      "showWeaponImages": true,
+      "columnOptions": ["Kills", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
+      "columns": ["Kills", "ACC", "HSR", "KPH", "SPM", "Last used", "Total time"],
+      "sortOptions" : ["Used On", "Kills"],
+      "sort": "Kills",
+      "orderOptions": ["desc", "asc"],
+      "order": "desc"
+    });
     var abbreviationSettings = category("abbr", {enabled: false});
 
     return {

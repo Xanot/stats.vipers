@@ -46,8 +46,11 @@ angular.module('player-view', ['utils', 'ui.router'])
         $scope.player = player;
       }
 
-      function defaultSort() {
-        switch(localStorageService.get("character").sort) {
+      function applySettings() {
+        $scope._ = _;
+        $scope.settings = localStorageService.get("character");
+
+        switch($scope.settings.sort) {
           case "Used On":
             $scope.predicate = '_1.lastSaveDate';
             break;
@@ -55,10 +58,8 @@ angular.module('player-view', ['utils', 'ui.router'])
             $scope.predicate = '_1.killCount';
             break;
         }
-      }
 
-      function defaultOrder() {
-        if(localStorageService.get("character").order == "desc") {
+        if($scope.settings.order == "desc") {
           $scope.reverse = !$scope.reverse
         }
       }
@@ -116,8 +117,7 @@ angular.module('player-view', ['utils', 'ui.router'])
         return (score / secondsPlayed) * 60;
       }
 
-      defaultSort();
-      defaultOrder();
+      applySettings();
       processProfiles(resolvePlayer);
 
       $scope.filterClass = 'All';
