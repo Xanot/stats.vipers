@@ -96,7 +96,7 @@ angular.module('utils', ['constants'])
       },
       template: '<span ng-switch="abbrEnabled"><span ng-switch-when="true"><abbr title="{{ title }}">{{ abbr.toUpperCase() }}</abbr></span><span ng-switch-when="false">{{ abbr.toUpperCase() }}</span></span>',
       link: function(scope, elem, attrs) {
-        scope.abbrEnabled = localStorageService.get("abbr").enabled;
+        scope.abbrEnabled = localStorageService.get("global").abbr;
         if(scope.abbrEnabled) {
           switch(scope.abbr) {
             case "kdr":

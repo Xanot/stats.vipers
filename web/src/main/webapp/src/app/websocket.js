@@ -52,7 +52,7 @@
 
   angular.module('websocket', ['constants'])
     .run(['Constants', '$rootScope', function(Constants, $rootScope) {
-      $rootScope.$watch("realTime.enabled", function(newVal) {
+      $rootScope.$watch("global.websocket", function(newVal) {
         if(newVal) {
           connect(Constants.WebSocket.PROTOCOL + "://" + Constants.WebSocket.HOST + ":" + Constants.WebSocket.PORT);
         } else {

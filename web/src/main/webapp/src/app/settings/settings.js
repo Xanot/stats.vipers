@@ -17,8 +17,8 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
     ];
     $scope.notificationTabs.activeTab = 0;
 
-    $scope.setRealTimeDefaults = function() {
-      SettingsService.setRealTimeDefaults();
+    $scope.setGlobalDefaults = function() {
+      SettingsService.setGlobalDefaults();
     };
 
     $scope.setNotificationDefaults = function() {
@@ -27,10 +27,6 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
 
     $scope.setCharacterDefaults = function() {
       SettingsService.setCharacterDefaults();
-    };
-
-    $scope.setAbbrDefaults = function() {
-      SettingsService.setAbbrDefaults();
     };
   }])
 
@@ -48,7 +44,10 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
       }
     }
 
-    var realTimeSettings = category("realTime", {enabled: true});
+    var globalSettings = category("global", {
+      websocket: true,
+      abbr: false
+    });
     var notificationSettings = category("notification", {
       "beingIndexedEnabled":true,
       "beingIndexedExpireAfter": 5,
@@ -64,26 +63,21 @@ angular.module('settings', ['ui.router', 'LocalStorageModule'])
       "orderOptions": ["desc", "asc"],
       "order": "desc"
     });
-    var abbreviationSettings = category("abbr", {enabled: false});
 
     return {
       init: function() {
-        realTimeSettings.init();
+        globalSettings.init();
         notificationSettings.init();
         characterSettings.init();
-        abbreviationSettings.init();
       },
-      setRealTimeDefaults: function() {
-        realTimeSettings.setDefaults();
+      setGlobalDefaults: function() {
+        globalSettings.setDefaults();
       },
       setNotificationDefaults: function() {
         notificationSettings.setDefaults();
       },
       setCharacterDefaults: function() {
         characterSettings.setDefaults();
-      },
-      setAbbrDefaults: function() {
-        abbreviationSettings.setDefaults();
       }
     }
   }]);

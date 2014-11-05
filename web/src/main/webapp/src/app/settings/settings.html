@@ -1,19 +1,26 @@
 <div class="settings">
   <div class="row">
-    <!-- Real-time updates -->
+    <!-- Global -->
     <div class="col-md-4">
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Real-time Updates<small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setRealTimeDefaults()"></i></small></h3>
+          <h3 class="panel-title">Global<small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setGlobalDefaults()"></i></small></h3>
         </div>
         <div class="panel-body">
           <table class="table">
             <tbody>
             <tr>
-              <td>Enabled</td>
+              <td>Websocket</td>
               <td>
-                <i class="fa fa-2x" ng-class="{'fa-toggle-on': realTime.enabled, 'fa-toggle-off': !realTime.enabled}"
-                   ng-click="realTime.enabled = !realTime.enabled"></i>
+                <i class="fa fa-2x" ng-class="{'fa-toggle-on': global.websocket, 'fa-toggle-off': !global.websocket}"
+                   ng-click="global.websocket = !global.websocket"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>Abbreviation tooltip</td>
+              <td>
+                <i class="fa fa-2x" ng-class="{'fa-toggle-on': global.abbr, 'fa-toggle-off': !global.abbr}"
+                   ng-click="global.abbr = !global.abbr"></i>
               </td>
             </tr>
             </tbody>
@@ -80,29 +87,6 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <!-- Abbreviation -->
-    <div class="col-md-4">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3 class="panel-title">Abbreviation <small class="pull-right"><i class="fa fa-2x fa-undo" ng-click="setAbbrDefaults()"></i></small></h3>
-        </div>
-        <div class="panel-body">
-          <table class="table">
-            <tbody>
-            <tr>
-              <td>Enabled</td>
-              <td>
-                <i class="fa fa-2x" ng-class="{'fa-toggle-on': abbr.enabled, 'fa-toggle-off': !abbr.enabled}"
-                   ng-click="abbr.enabled = !abbr.enabled"></i>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <script type="text/ng-template" id="being-indexed.html">
@@ -131,14 +115,14 @@
     <tr>
       <td>Enabled</td>
       <td>
-        <i class="fa fa-2x" ng-class="{'fa-toggle-on': notification.indexedEnabled, 'fa-toggle-off': !notification.indexedEnabled, 'fa-disabled': !realTime.enabled}"
+        <i class="fa fa-2x" ng-class="{'fa-toggle-on': notification.indexedEnabled, 'fa-toggle-off': !notification.indexedEnabled, 'fa-disabled': !global.websocket}"
            ng-click="notification.indexedEnabled = !notification.indexedEnabled"></i>
       </td>
     </tr>
     <tr>
       <td>Expire After (seconds)</td>
       <td>
-        <input ng-disabled="!realTime.enabled || !notification.indexedEnabled" type="number" class="form-control input-sm" ng-model="notification.indexedExpireAfter">
+        <input ng-disabled="!global.websocket || !notification.indexedEnabled" type="number" class="form-control input-sm" ng-model="notification.indexedExpireAfter">
       </td>
     </tr>
     </tbody>
