@@ -21,8 +21,16 @@
     <div class="col-xs-2">
       <dl class="dl-horizontal">
         <dt><abr abbr="br"></abr></dt>
-        <dd><span bs-tooltip data-type="info" data-title="{{ ::player.battleRankPercent }}%" data-container="body"
-                  class="br{{ player.battleRank }}">{{ player.battleRank }}</span></dd>
+        <dd>
+          <span ng-switch="::(player.battleRank == 100)">
+            <span ng-switch-when="true">
+              <span class="br{{ player.battleRank }}">{{ player.battleRank }}</span>
+            </span>
+            <span ng-switch-when="false">
+              <span bs-tooltip data-type="info" data-title="{{ ::player.battleRankPercent }}%" data-container="body">{{ player.battleRank }}</span>
+            </span>
+          </span>
+        </dd>
         <dt><abr abbr="kdr"></abr></dt>
         <dd>{{ (player.kills / player.deaths | number:2) }}</dd>
         <dt><abr abbr="spm"></abr></dt>

@@ -23,28 +23,36 @@ class FetcherActor extends Actor {
   def receive = {
     case FetchCharacterRequest(name, withStats, statsLastSavedOn) =>
       Future {
-        sendRequest(ApiUrlBuilder.getCharacterByName(name, withStats, statsLastSavedOn)) \ "character_list" match {
-          case JArray(parent) if parent.nonEmpty =>
-            val JString(characterId) = parent(0) \ "character_id"
-            FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership,
-              parent(0).toWeaponStats(characterId), parent(0).toProfileStats(characterId), statsLastSavedOn.isEmpty)), (name, withStats))
-          case _ => FetchCharacterResponse(None, (name, withStats))
+        try {
+          sendRequest(ApiUrlBuilder.getCharacterByName(name, withStats, statsLastSavedOn)) \ "character_list" match {
+            case JArray(parent) if parent.nonEmpty =>
+              val JString(characterId) = parent(0) \ "character_id"
+              FetchCharacterResponse(Some((parent(0).toCharacter.get, (parent(0) \ "membership").toOutfitMembership,
+                parent(0).toWeaponStats(characterId), parent(0).toProfileStats(characterId), statsLastSavedOn.isEmpty)), (name, withStats))
+            case _ => FetchCharacterResponse(None, (name, withStats))
+          }
+        } catch {
+          case _ : Exception => FetchCharacterResponse(None, (name, withStats))
         }
       } pipeTo sender
     case m @ FetchOutfitRequest(alias) =>
       Future {
-        sendRequest(ApiUrlBuilder.getOutfitByAlias(alias)) \ "outfit_list" match {
-          case JArray(parent) if parent.nonEmpty =>
-            FetchOutfitResponse(Some(parent(0).toOutfit.get, {
-              val list = mutable.ListBuffer.empty[OutfitMember]
-              val JArray(parents) = parent(0) \ "members"
+        try {
+          sendRequest(ApiUrlBuilder.getOutfitByAlias(alias)) \ "outfit_list" match {
+            case JArray(parent) if parent.nonEmpty =>
+              FetchOutfitResponse(Some(parent(0).toOutfit.get, {
+                val list = mutable.ListBuffer.empty[OutfitMember]
+                val JArray(parents) = parent(0) \ "members"
 
-              parents.foreach { parent =>
-                list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
-              }
-              list
-            }), alias)
-          case _ => FetchOutfitResponse(None, alias)
+                parents.foreach { parent =>
+                  list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
+                }
+                list
+              }), alias)
+            case _ => FetchOutfitResponse(None, alias)
+          }
+        } catch {
+          case _ : Exception => FetchOutfitResponse(None, alias)
         }
       } pipeTo sender
     case FetchAllWeaponsRequest =>
