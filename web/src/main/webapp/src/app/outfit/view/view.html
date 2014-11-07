@@ -2,8 +2,15 @@
   <!-- Header -->
   <div class="row">
     <div class="col-xs-5">
-      <h4 class="faction-{{outfit.factionId}}">
-        {{ outfit.name }} <span ng-if="outfit.alias">[{{ outfit.alias }}]</span>
+      <h4 class="faction-{{outfit.factionId}}" ng-mouseleave="input = false">
+        <form ng-show="alias || input" ng-mouseleave="input = false" class="quick-search">
+          <input style="width: 80px" name="quick-outfit-input"
+                 type="text" class="form-control input-sm" ng-model="alias" placeholder="Alias"/>
+          <button class="hidden" type="submit" ng-click="go(alias)"></button>
+        </form>
+
+        <span ng-mouseover="input = true">{{ outfit.name }}</span>
+        <span ng-if="outfit.alias">[{{ outfit.alias }}]</span>
       </h4>
     </div>
     <div class="col-xs-3">

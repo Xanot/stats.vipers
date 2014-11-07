@@ -1,10 +1,17 @@
-<div>
+<div class="character-view">
   <!-- Header -->
   <div class="row">
     <div class="col-xs-7">
-      <h4 class="faction-{{player.factionId}}">
-        {{ player.name }}
-        <span ng-if="player.membership">
+      <h4 ng-mouseleave="input = false">
+        <form ng-show="characterName || input" ng-mouseleave="input = false" class="quick-search">
+          <input ng-style="{width:  ((characterName.length * 14) || 80) + 'px'}"
+                 name="quick-character-input" type="text" class="form-control input-sm" ng-model="characterName" placeholder="Search"/>
+          <button class="hidden" type="submit" ng-click="go(characterName)"></button>
+        </form>
+
+        <span class="faction-{{player.factionId}}" ng-mouseover="input = true">{{ player.name }}</span>
+
+        <span class="faction-{{player.factionId}}" ng-if="player.membership">
           [{{ player.membership.rankOrdinal | outfitRank }} of
           <a class="faction-{{player.factionId}}" ui-sref="outfit-view({alias : player.membership.outfitAlias})">{{ player.membership.outfitName }}</a>]
         </span>
@@ -13,10 +20,15 @@
     </div>
     <div class="col-xs-2">
       <dl class="dl-horizontal">
+        <dt><abr abbr="br"></abr></dt>
+        <dd><span bs-tooltip data-type="info" data-title="{{ ::player.battleRankPercent }}%" data-container="body"
+                  class="br{{ player.battleRank }}">{{ player.battleRank }}</span></dd>
         <dt><abr abbr="kdr"></abr></dt>
         <dd>{{ (player.kills / player.deaths | number:2) }}</dd>
         <dt><abr abbr="spm"></abr></dt>
         <dd>{{ (player.score / player.minutesPlayed | number:2) }}</dd>
+        <dt>Time</dt>
+        <dd>{{ (player.minutesPlayed | duration:'minutes':'d[d] h[h]') }}</dd>
       </dl>
     </div>
     <div class="col-xs-3">
@@ -31,7 +43,7 @@
     </div>
   </div>
   <!-- Content -->
-  <div class="row" ng-show="player.weaponStats.length > 0">
+  <div ng-show="player.weaponStats.length > 0">
     <table class="table table-bordered table-responsive" style="border: 0">
       <thead>
       <tr>
@@ -46,7 +58,7 @@
         <td class="table-avg" ng-hide="!_.contains(settings.columns, 'SPM') || ((filterClass == 'All' && !filterName.trim()) || sumKills == 0)"> {{ avgSpm | number: 0 }} </td>
       </tr>
       <tr>
-        <th>#</th>
+        <th># of {{ filteredWeaponStats.length }}</th>
         <th class="table-input">
           <input type="text" ng-model="filterName" class="form-control" placeholder="Name&hellip;">
         </th>
@@ -120,7 +132,10 @@
           </div>
         </td>
         <td>
-          <img class="class-img" ng-repeat="class in ::stat._2.profiles" ng-src="http://census.soe.com/{{ ::class.imagePath }}" />
+          <span ng-repeat="class in ::stat._2.profiles">
+            <span ng-if="::class.class" class="{{ ::class.class}}"></span>
+            <img ng-if="::class.imagePath" class="class-img"  ng-src="http://census.soe.com/{{ ::class.imagePath }}" />
+          </span>
         </td>
         <td ng-show="_.contains(settings.columns, 'Kills')">
           {{ ::stat._1.killCount }}

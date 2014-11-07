@@ -54,6 +54,10 @@ angular.module('outfit-view', ['utils', 'ui.router', 'websocket'])
         return $state.href('player-view', {name: name})
       };
 
+      $scope.go = function(alias) {
+        $state.transitionTo('outfit-view', {alias: alias})
+      };
+
       $scope.outfit = resolveOutfit;
 
       // Retrieve the outfit if it is updated

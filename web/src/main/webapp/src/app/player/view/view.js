@@ -33,14 +33,15 @@ angular.module('player-view', ['utils', 'ui.router'])
       })
   }])
 
-  .controller('PlayerViewController', ['$scope', '$filter', 'PlayerService', 'resolvePlayer', 'WebSocketService', 'NotificationService', 'localStorageService',
-    function($scope, $filter, PlayerService, resolvePlayer, WebSocketService, NotificationService, localStorageService) {
+  .controller('PlayerViewController', ['$scope', '$filter', '$state', 'PlayerService', 'resolvePlayer', 'WebSocketService',
+    'NotificationService', 'localStorageService', function($scope, $filter, $state, PlayerService, resolvePlayer,
+                                                           WebSocketService, NotificationService, localStorageService) {
       function processProfiles(player) {
         _.forEach(player.weaponStats, function(stat) { // Process profiles
           if(stat._2.profiles) {
             stat._2.profiles = $filter('profile')(stat._2.profiles)
           } else {
-            stat._2.profiles = [{name: 'Vehicle', imagePath: 'files/ps2/images/static/11875.png'}]
+            stat._2.profiles = [{name: 'Vehicle', class: 'fa fa-wheelchair fa-fw class-img'}]
           }
         });
         $scope.player = player;
@@ -129,7 +130,7 @@ angular.module('player-view', ['utils', 'ui.router'])
         {"value":"Infiltrator","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/204.png'/>"},
         {"value":"Engineer","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/201.png'/>"},
         {"value":"MAX","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/207.png'/>"},
-        {"value":"Vehicle","label":"<img class=\"class-img\" src='http://census.soe.com/files/ps2/images/static/11875.png'/>"}
+        {"value":"Vehicle","label":"<i class=\"fa fa-wheelchair fa-fw class-img\"></i>"}
       ];
 
       $scope.classMatcher = function(stat) {
@@ -242,6 +243,10 @@ angular.module('player-view', ['utils', 'ui.router'])
             };
           });
         }
+      };
+
+      $scope.go = function(name) {
+        $state.transitionTo('player-view', {name: name})
       };
 
       // Retrieve the character if it is updated

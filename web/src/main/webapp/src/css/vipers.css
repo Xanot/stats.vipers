@@ -3,6 +3,18 @@ body {
     background: #FFFFFF url(../img/bg.png);
 }
 
+.quick-search {
+    display: inline;
+}
+.quick-search input {
+    background-color: transparent;
+    padding: 0;
+    display: inline-block;
+    font: inherit;
+    height: inherit;
+    color: #fff;
+}
+
 /* Sidebar */
 #sidebar {
     background-color: #555555;
@@ -186,6 +198,9 @@ dt, dd {
 }
 
 /* Character page */
+.character-view dd, .character-view dt {
+    font-size: 12px;
+}
 .dropdown-menu {
     background-color: #242422;
 }
@@ -221,6 +236,7 @@ dt, dd {
     width: 32px;
     height: 32px;
     font-size: 32px;
+    color: #fff;
 }
 .highcharts-container{
     min-width: 400px;
