@@ -7,7 +7,8 @@ var gulp = require('gulp'),
     size = require('gulp-size'),
     bower = require('gulp-bower'),
     clean = require('gulp-clean'),
-    karma = require('gulp-karma');
+    karma = require('gulp-karma'),
+    templateCache = require('gulp-angular-templatecache');
 
 var buildDest = "../resources/client";
 
@@ -50,6 +51,12 @@ gulp.task('clean', function() {
   return gulp.src(buildDest, {read: false}).pipe(clean({force: true}));
 });
 
+gulp.task('templates', function() {
+  return gulp.src('./src/app/**/*.html')
+    .pipe(templateCache({standalone: true, root: 'app'}))
+    .pipe(gulp.dest(buildDest + '/app'))
+});
+
 gulp.task('minify-app-js', function () {
   return gulp.src('./src/app/**/*.js')
     .pipe(uglify())
@@ -70,10 +77,14 @@ gulp.task('build', ['clean'], function() {
   gulp.src(cssLibs).pipe(concat("vipers.libs.css")).pipe(gulp.dest(buildDest + '/css'));
   gulp.src(fonts).pipe(gulp.dest(buildDest + '/fonts'));
 
+  gulp.run('templates');
   gulp.run('minify-app-js');
   gulp.run('minify-app-css');
 
-  gulp.src('./src/**/*.*', { base: './src' }).pipe(gulp.dest(buildDest));
+  gulp.src(['./src/**/*.json',
+    './src/**/*.md',
+    './src/img/**/*',
+    './src/index.html'], { base: './src' }).pipe(gulp.dest(buildDest));
 });
 
 gulp.task('test', function() {
