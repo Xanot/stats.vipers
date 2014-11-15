@@ -14,7 +14,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
 
   private var fetcherActor : ActorRef = _
   private implicit val timeout = FetcherActor.timeout
-  override implicit val patienceConfig : PatienceConfig = PatienceConfig(Span(5000, Millis))
+  override implicit val patienceConfig : PatienceConfig = PatienceConfig(Span(30000, Millis))
 
   override def beforeAll(): Unit = {
     fetcherActor = system.actorOf(Props[FetcherActor])

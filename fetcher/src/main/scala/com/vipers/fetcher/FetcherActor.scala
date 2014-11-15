@@ -8,6 +8,7 @@ import akka.util.Timeout
 import com.vipers.fetcher.util.ApiUrlBuilder
 import com.vipers.fetcher.util.Wrapper.ApiDeserializer
 import com.vipers.model.DatabaseModels._
+import com.vipers.model.Page
 import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import spray.can.Http
@@ -57,20 +58,39 @@ class FetcherActor extends Actor {
       } pipeTo sender
     case FetchAllWeaponsRequest =>
       Future {
-        val JArray(weaponList) = sendRequest(ApiUrlBuilder.getAllWeapons) \ "weapon_list"
+        val JArray(weaponList) = {
+          val aggregation = for {
+            res1 <- sendAsyncRequest(ApiUrlBuilder.getAllWeapons(Page(Some(5000), Some(0))))
+            res2 <- sendAsyncRequest(ApiUrlBuilder.getAllWeapons(Page(Some(5000), Some(5000))))
+            res3 <- sendAsyncRequest(ApiUrlBuilder.getAllWeapons(Page(Some(5000), Some(10000))))
+            res4 <- sendAsyncRequest(ApiUrlBuilder.getAllWeapons(Page(Some(5000), Some(15000))))
+          } yield (res1, res2, res3, res4)
+
+          val result = Await.result(aggregation, timeout.duration)
+          parse(result._1.entity.asString) \ "item_list" ++
+            parse(result._2.entity.asString) \ "item_list" ++
+              parse(result._3.entity.asString) \ "item_list" ++
+                parse(result._4.entity.asString) \ "item_list"
+        }
+
         val weapons = mutable.ListBuffer.empty[Weapon]
         val weaponProps = mutable.ListBuffer.empty[WeaponProps]
         weaponList.foreach { json =>
-          weapons += json.toWeapon.get._1
-          weaponProps += json.toWeapon.get._2
+          json.toWeapon.map { wep =>
+            weapons += wep._1
+            weaponProps += wep._2
+          }
         }
         FetchAllWeaponsResponse(weapons, weaponProps)
       } pipeTo sender
   }
 
+  private def sendAsyncRequest(r : Uri) : Future[HttpResponse] = {
+    (IO(Http)(context.system) ? Get(r))(timeout).mapTo[HttpResponse]
+  }
+
   private def sendRequest(r : Uri) : JValue = {
-    val request = (IO(Http)(context.system) ? Get(r))(timeout).mapTo[HttpResponse]
-    parse(Await.result(request, timeout.duration).entity.asString)
+    parse(Await.result(sendAsyncRequest(r), timeout.duration).entity.asString)
   }
 }
 

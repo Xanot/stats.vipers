@@ -189,6 +189,16 @@ private[fetcher] object CensusQuery {
                         nested: Option[Seq[JoinQuery]] = None,
                         isOuter: Option[Boolean] = None) extends JoinQuery("item", injectAt, None, on, to, terms, hide, show, nested, isOuter)
 
+    case class WeaponJoin(injectAt: String = "weapon",
+                          on: Option[String] = None,
+                          to: Option[String] = None,
+                          terms: Option[Seq[(String, String)]] = None,
+                          hide: Option[Seq[String]] = None,
+                          show: Option[Seq[String]] = None,
+                          nested: Option[Seq[JoinQuery]] = None,
+                          isOuter: Option[Boolean] = None) extends JoinQuery("weapon", injectAt, None, on, to, terms, hide, show, nested, isOuter)
+
+
     case class ItemProfileJoin(injectAt: String = "item_profile",
                                on: Option[String] = Some("item_id"),
                                to: Option[String] = Some("item_id"),

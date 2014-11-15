@@ -118,49 +118,54 @@ private[fetcher] object Wrapper {
 
     def toWeapon : Option[(Weapon, WeaponProps)] = {
       def toItemProfile(itemProfile : JValue) : Short = {
-        val (JString(itemId), JString(profileId)) = (itemProfile \ "item_id", itemProfile \ "profile_id")
-
+        val JString(profileId) = itemProfile \ "profile_id"
         profileId.toShort
       }
 
       implicit val jsonFormats = org.json4s.DefaultFormats
       check {
+        val itemName = json \ "name" \ "en"
+        val itemDesc = json \ "description" \ "en"
         val itemToWeapon = json \ "item_to_weapon"
-        val item = itemToWeapon \ "item"
-        val itemName = item \ "name" \ "en"
-        val itemDescription = item \ "description" \ "en"
+
+        if(itemName == JNothing || itemDesc == JNothing || itemToWeapon == JNothing) {
+          return None
+        }
+
+        val weapon = itemToWeapon \ "weapon"
+
         val (JString(itemId), JString(name), description, factionId, JString(imagePath), JString(isVehicleWeapon),
           JString(moveModifier), JString(turnModifier)) = {
           (
-            item \ "item_id",
+            json \ "item_id",
             itemName,
-            itemDescription,
-            item \ "faction_id",
-            item \ "image_path",
-            item \ "is_vehicle_weapon",
-            json \ "move_modifier",
-            json \ "turn_modifier"
+            itemDesc,
+            json \ "faction_id",
+            json \ "image_path",
+            json \ "is_vehicle_weapon",
+            weapon \ "move_modifier",
+            weapon \ "turn_modifier"
           )
         }
 
         val (equipMs, fromIronSightsMs, toIronSightsMs, unEquipMs, sprintRecoveryMs) = {(
-          json \ "equip_ms",
-          json \ "from_iron_sights_ms",
-          json \ "to_iron_sights_ms",
-          json \ "unequip_ms",
-          json \ "sprint_recovery_ms"
+          weapon \ "equip_ms",
+          weapon \ "from_iron_sights_ms",
+          weapon \ "to_iron_sights_ms",
+          weapon \ "unequip_ms",
+          weapon \ "sprint_recovery_ms"
         )}
 
         val (heatBleedOffRate, heatCapacity, heatOverheatPenaltyMs) = {(
-          json \ "heat_bleed_off_rate",
-          json \ "heat_capacity",
-          json \ "heat_overheat_penalty_ms"
+          weapon \ "heat_bleed_off_rate",
+          weapon \ "heat_capacity",
+          weapon \ "heat_overheat_penalty_ms"
         )}
 
         (Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
           System.currentTimeMillis(), {
-            if(itemToWeapon \ "item_profile" != JNothing) {
-              val JArray(profiles) = itemToWeapon \ "item_profile"
+            if(json \ "item_profile" != JNothing) {
+              val JArray(profiles) = json \ "item_profile"
               Some(profiles.map( s => toItemProfile(s)).mkString(","))
             } else {
               None

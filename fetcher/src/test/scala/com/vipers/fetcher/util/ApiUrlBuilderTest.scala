@@ -1,6 +1,7 @@
 package com.vipers.fetcher.util
 
 import com.vipers.Test
+import com.vipers.model.Page
 import org.scalatest.FlatSpecLike
 
 class ApiUrlBuilderTest extends FlatSpecLike with Test {
@@ -61,11 +62,12 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
   // Weapon
   //================================================================================
   "getAllWeapons uri" should "be constructed" in {
-    val uri = ApiUrlBuilder.getAllWeapons
-    uri.path.tail.toString().endsWith("weapon") should be(right = true)
-    uri.query.length should be(3)
+    val uri = ApiUrlBuilder.getAllWeapons(Page(Some(100), Some(0)))
+    uri.path.tail.toString().endsWith("item") should be(right = true)
+    uri.query.length should be(4)
     uri.query.get("c:lang").get should be("en")
-    uri.query.get("c:limit").get should be("10000")
-    uri.query.get("c:join").get should be("item_to_weapon^inject_at:item_to_weapon(item^inject_at:item,item_profile^inject_at:item_profile^list:1^on:item_id^to:item_id)")
+    uri.query.get("c:start").get should be("0")
+    uri.query.get("c:limit").get should be("100")
+    uri.query.get("c:join").get should be("item_to_weapon^inject_at:item_to_weapon(weapon^inject_at:weapon),item_profile^inject_at:item_profile^list:1^on:item_id^to:item_id^show:profile_id")
   }
 }

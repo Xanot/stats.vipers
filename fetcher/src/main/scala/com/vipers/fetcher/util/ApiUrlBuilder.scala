@@ -65,9 +65,12 @@ private[fetcher] object ApiUrlBuilder {
   //================================================================================
   // Weapon
   //================================================================================
-  def getAllWeapons : Uri = {
-    val params = CensusQuery(None, Limit(10000), Join(ItemToWeaponJoin(nested = Some(Seq(ItemJoin(), ItemProfileJoin()))))).construct
-    construct(Uri.Path("weapon"), params.toMap)
+  def getAllWeapons(page : Page) : Uri = {
+    val params = CensusQuery(None, Join(
+      ItemToWeaponJoin(nested = Some(Seq(WeaponJoin())), isOuter = Some(false)),
+      ItemProfileJoin(show = Some(Seq("profile_id")))
+    )).construct
+    construct(Uri.Path("item"), params.toMap ++ withPage(page))
   }
 
   //================================================================================
