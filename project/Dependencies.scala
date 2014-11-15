@@ -1,27 +1,27 @@
 import sbt._
 
 object Dependencies {
-  private val akkaVersion      = "2.3.5"
-  private val sprayVersion     = "1.3.1"
+  private val akkaVersion      = "2.3.7"
+  private val sprayVersion     = "1.3.2"
   private val jettyVersion     = "9.2.3.v20140905"
-  private val scalaMockVersion = "3.2-RC1"
+  private val scalaMockVersion = "3.2"
+  private val selfVersion      = "0.5-SNAPSHOT"
 
-  val _common         = "com.vipers"             %% "common"                 %  "[0.1-SNAPSHOT,)"
-  val _commonTest     = "com.vipers"             %% "common"                 %  "[0.1-SNAPSHOT,)"   % "test" classifier "tests"
-  val _fetcher        = "com.vipers"             %% "fetcher"                %  "[0.1-SNAPSHOT,)"
-  val _indexer        = "com.vipers"             %% "indexer"                %  "[0.1-SNAPSHOT,)"
-  val _notifier       = "com.vipers"             %% "notifier"               %  "[0.1-SNAPSHOT,)"
+  val _common         = "com.vipers"             %% "common"                 %  selfVersion
+  val _commonTest     = "com.vipers"             %% "common"                 %  selfVersion        % "test" classifier "tests"
+  val _fetcher        = "com.vipers"             %% "fetcher"                %  selfVersion
+  val _indexer        = "com.vipers"             %% "indexer"                %  selfVersion
+  val _notifier       = "com.vipers"             %% "notifier"               %  selfVersion
 
   val logback        = "ch.qos.logback"          %  "logback-classic"        %  "[1.0.13,)"
-  val scalaMeter     = "com.storm-enroute"       %% "scalameter"             %  "[0.7-SNAPSHOT,)"  % "test"
-  val jbcrypt        = "org.mindrot"             %  "jbcrypt"                %  "[0.3m,)"
-  val json4sNative   = "org.json4s"              %% "json4s-native"          %  "[3.2.10,)"
+  val scalaMeter     = "com.storm-enroute"       %% "scalameter"             %  "0.7-SNAPSHOT"     % "test"
+  val json4sNative   = "org.json4s"              %% "json4s-native"          %  "[3.2.11,)"
   val slick          = "com.typesafe.slick"      %% "slick"                  %  "2.1.0"
-  val hikariCp       = "com.zaxxer"              %  "HikariCP-java6"         %  "[2.1.0,)"
-  val h2             = "com.h2database"          %  "h2"                     %  "1.4.181"
+  val hikariCp       = "com.zaxxer"              %  "HikariCP-java6"         %  "2.2.4"
+  val h2             = "com.h2database"          %  "h2"                     %  "1.4.182"
   val akkaActor      = "com.typesafe.akka"       %% "akka-actor"             %  akkaVersion
   val akkaSlf4j      = "com.typesafe.akka"       %% "akka-slf4j"             %  akkaVersion
-  val scalaTest      = "org.scalatest"           %% "scalatest"              %  "2.2.1"            % "test"
+  val scalaTest      = "org.scalatest"           %% "scalatest"              %  "2.2.2"            % "test"
   val akkaTest       = "com.typesafe.akka"       %% "akka-testkit"           %  akkaVersion        % "test"
 
   val sprayCan       = "io.spray"                %% "spray-can"              %  sprayVersion
@@ -32,7 +32,7 @@ object Dependencies {
 
   val jettyWebsocketServer = "org.eclipse.jetty.websocket" % "websocket-server"  % jettyVersion
   val jettyWebsocketApi    = "org.eclipse.jetty.websocket" % "websocket-api"     % jettyVersion
-  val websocketTest        = "com.ning"                    % "async-http-client" % "1.8.13"        % "test"
+  val websocketTest        = "com.ning"                    % "async-http-client" % "1.8.14"        % "test"
 
   val scalaMock            = "org.scalamock" %% "scalamock-core"              % scalaMockVersion % "test"
   val scalaMockSupport     = "org.scalamock" %% "scalamock-scalatest-support" % scalaMockVersion % "test"

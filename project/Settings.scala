@@ -5,6 +5,7 @@ import net.virtualvoid.sbt.graph.Plugin.graphSettings
 object Settings {
   lazy val basicSettings = Seq(
     scalaVersion := "2.11.4",
+    version := "0.5-SNAPSHOT",
     organization := "com.vipers",
     scalacOptions := Seq(
       "-encoding",
