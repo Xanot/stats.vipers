@@ -144,11 +144,16 @@ th a {
 }
 
 /* Table cell percentage */
+.progress-td {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
 td .progress {
     position: relative;
     height: 20px;
     background: transparent;
     margin-bottom: 0;
+    border-radius: 0 !important;
 }
 td .progress .progress-bar span {
     position: absolute;

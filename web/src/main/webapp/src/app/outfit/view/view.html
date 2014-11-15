@@ -102,7 +102,7 @@
             'ordinal-5' : member.membership.outfitRankOrdinal === 5}">{{ ::member.membership.outfitRank }}</span>
            - {{ ::(member.membership.outfitRankOrdinal | outfitRank) }}
         </td>
-        <td class="text-center">
+        <td class="text-center progress-td">
           <div ng-if="::(member.battleRank < 100)" class="progress" bs-tooltip data-type="info" data-title="{{ ::member.battleRankPercent }}%" data-container="body">
             <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" ng-style="::{'width': member.battleRankPercent + '%'}">
               <span>{{ ::member.battleRank }}</span>
