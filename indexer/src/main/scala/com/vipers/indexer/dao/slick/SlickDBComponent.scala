@@ -13,6 +13,7 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
   with SlickCharacterDAOComponent
   with SlickOutfitMembershipDAOComponent
   with SlickWeaponDAOComponent
+  with SlickWeaponPropsDAOComponent
   with SlickWeaponStatDAOComponent
   with SlickCharacterStatDAOComponent {
 
@@ -60,6 +61,9 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
       catch { case _ : Exception => }
 
       try { weaponDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponPropsDAO.table.ddl.create }
       catch { case _ : Exception => }
 
       try { weaponStatDAO.weaponStatsTable.ddl.create }

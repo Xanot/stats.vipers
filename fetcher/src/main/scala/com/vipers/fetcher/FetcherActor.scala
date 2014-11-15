@@ -58,11 +58,13 @@ class FetcherActor extends Actor {
     case FetchAllWeaponsRequest =>
       Future {
         val JArray(weaponList) = sendRequest(ApiUrlBuilder.getAllWeapons) \ "weapon_list"
-        val list = mutable.ListBuffer.empty[Weapon]
+        val weapons = mutable.ListBuffer.empty[Weapon]
+        val weaponProps = mutable.ListBuffer.empty[WeaponProps]
         weaponList.foreach { json =>
-          list += json.toWeapon.get
+          weapons += json.toWeapon.get._1
+          weaponProps += json.toWeapon.get._2
         }
-        FetchAllWeaponsResponse(list)
+        FetchAllWeaponsResponse(weapons, weaponProps)
       } pipeTo sender
   }
 
@@ -94,5 +96,5 @@ object FetcherActor {
   // Weapon request/response
   //================================================================================
   case object FetchAllWeaponsRequest
-  case class FetchAllWeaponsResponse(weapons : Seq[Weapon])
+  case class FetchAllWeaponsResponse(weapons : Seq[Weapon], weaponProps : Seq[WeaponProps])
 }

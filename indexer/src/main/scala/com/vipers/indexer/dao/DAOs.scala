@@ -51,6 +51,12 @@ private[indexer] object DAOs {
     trait WeaponDAO extends DAO[Weapon] {}
   }
 
+  trait WeaponPropsDAOComponent extends DAOComponent { this: DB =>
+    val weaponPropsDAO : WeaponPropsDAO
+
+    trait WeaponPropsDAO extends DAO[WeaponProps] {}
+  }
+
   trait WeaponStatDAOComponent extends DAOComponent { this: DB =>
     val weaponStatDAO : WeaponStatDAO
 

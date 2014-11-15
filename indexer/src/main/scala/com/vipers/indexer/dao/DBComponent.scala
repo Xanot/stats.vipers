@@ -8,5 +8,6 @@ private[indexer] trait DBComponent extends DB
   with CharacterDAOComponent
   with OutfitMembershipDAOComponent
   with WeaponDAOComponent
+  with WeaponPropsDAOComponent
   with WeaponStatDAOComponent
   with CharacterStatDAOComponent

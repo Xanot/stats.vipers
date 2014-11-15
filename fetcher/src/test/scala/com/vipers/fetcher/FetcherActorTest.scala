@@ -112,6 +112,8 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
       whenReady((fetcherActor ? FetchAllWeaponsRequest).mapTo[FetchAllWeaponsResponse]) { response =>
         response.weapons.length should be > 100
         response.weapons.filter(_.name == "Supernova FPC")(0).profiles should be(None) // No item profile for vehicle weapons
+
+        response.weaponProps.length should be(response.weapons.length)
       }
     }
   }

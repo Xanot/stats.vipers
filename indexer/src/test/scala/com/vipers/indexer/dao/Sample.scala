@@ -18,8 +18,13 @@ trait Sample {
   }
 
   object SampleWeapons {
-    lazy val NS15 = Weapon("75034","NS-15M",Some("Built on the concept of the NS-11A assault rifle, the remarkably accurate NS-15M LMG provides excellent sustained fire and above average projectile speed. All factions can use NS weapons."),None,"/files/ps2/images/static/8483.png",false,Some(800),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None,1413671383847L,Some("22"))
-    lazy val Corvus = Weapon("7152","Corvus VA55",Some("The Corvus VA55 features low recoil and high accuracy over sustained fire, making it a popular choice for long range engagements. VS use only."),Some(1),"/files/ps2/images/static/9470.png",false,Some(650),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None,1413671383823L,Some("16"))
+    lazy val NS15 = Weapon("75034","NS-15M",Some("Built on the concept of the NS-11A assault rifle, the remarkably accurate NS-15M LMG provides excellent sustained fire and above average projectile speed. All factions can use NS weapons."),None,"/files/ps2/images/static/8483.png",false,1413671383847L,Some("22"))
+    lazy val Corvus = Weapon("7152","Corvus VA55",Some("The Corvus VA55 features low recoil and high accuracy over sustained fire, making it a popular choice for long range engagements. VS use only."),Some(1),"/files/ps2/images/static/9470.png",false,1413671383823L,Some("16"))
+  }
+
+  object SampleWeaponProps {
+    lazy val NS15 = WeaponProps("75034",Some(800),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
+    lazy val Corvus = WeaponProps("7152",Some(650),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
   }
 
   object SampleCharacterProfileStat {

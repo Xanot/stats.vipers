@@ -116,7 +116,7 @@ private[fetcher] object Wrapper {
       }
     }
 
-    def toWeapon : Option[Weapon] = {
+    def toWeapon : Option[(Weapon, WeaponProps)] = {
       def toItemProfile(itemProfile : JValue) : Short = {
         val (JString(itemId), JString(profileId)) = (itemProfile \ "item_id", itemProfile \ "profile_id")
 
@@ -157,17 +157,7 @@ private[fetcher] object Wrapper {
           json \ "heat_overheat_penalty_ms"
         )}
 
-        Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
-          equipMs.toOption.map(_.extract[String].toInt),
-          fromIronSightsMs.toOption.map(_.extract[String].toInt),
-          toIronSightsMs.toOption.map(_.extract[String].toInt),
-          unEquipMs.toOption.map(_.extract[String].toInt),
-          sprintRecoveryMs.toOption.map(_.extract[String].toInt),
-          moveModifier.toFloat,
-          turnModifier.toFloat,
-          heatBleedOffRate.toOption.map(_.extract[String].toFloat),
-          heatCapacity.toOption.map(_.extract[String].toInt),
-          heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt),
+        (Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
           System.currentTimeMillis(), {
             if(itemToWeapon \ "item_profile" != JNothing) {
               val JArray(profiles) = itemToWeapon \ "item_profile"
@@ -175,7 +165,18 @@ private[fetcher] object Wrapper {
             } else {
               None
             }
-          })
+          }), WeaponProps(itemId, equipMs.toOption.map(_.extract[String].toInt),
+            fromIronSightsMs.toOption.map(_.extract[String].toInt),
+            toIronSightsMs.toOption.map(_.extract[String].toInt),
+            unEquipMs.toOption.map(_.extract[String].toInt),
+            sprintRecoveryMs.toOption.map(_.extract[String].toInt),
+            moveModifier.toFloat,
+            turnModifier.toFloat,
+            heatBleedOffRate.toOption.map(_.extract[String].toFloat),
+            heatCapacity.toOption.map(_.extract[String].toInt),
+            heatOverheatPenaltyMs.toOption.map(_.extract[String].toInt)
+          )
+        )
       }
     }
 

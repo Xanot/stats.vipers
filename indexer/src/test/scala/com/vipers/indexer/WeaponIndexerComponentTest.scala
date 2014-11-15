@@ -3,28 +3,33 @@ package com.vipers.indexer
 import com.vipers.Test
 import com.vipers.dbms.DB
 import com.vipers.fetcher.FetcherActor.FetchAllWeaponsResponse
-import com.vipers.indexer.WeaponIndexerComponentTest.MockWeaponDAO
-import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
+import com.vipers.indexer.WeaponIndexerComponentTest.{MockWeaponPropsDAO, MockWeaponDAO}
+import com.vipers.indexer.dao.DAOs.{WeaponPropsDAOComponent, WeaponDAOComponent}
 import com.vipers.indexer.dao.Sample
 import org.scalamock.scalatest.proxy.MockFactory
 import org.scalatest.{Suite, WordSpecLike}
 
 class WeaponIndexerComponentTest extends WordSpecLike with Test
-  with WeaponIndexerComponent with MockWeaponDAO with Sample {
+  with WeaponIndexerComponent with MockWeaponDAO with MockWeaponPropsDAO with Sample {
 
   private val weps = List(
     SampleWeapons.Corvus.copy(lastIndexedOn = System.currentTimeMillis()),
     SampleWeapons.NS15.copy(lastIndexedOn = System.currentTimeMillis())
   )
 
+  private val wepProps = List(SampleWeaponProps.Corvus, SampleWeaponProps.NS15)
+
   "Weapon indexer" should {
     "index weapons" in {
       inSequence {
         weaponDAO.expects('deleteAll)(None).returning(true)
         weaponDAO.expects('createAll)(weps, None).returning(true)
+
+        weaponPropsDAO.expects('deleteAll)(None).returning(true)
+        weaponPropsDAO.expects('createAll)(wepProps, None).returning(true)
       }
 
-      weaponIndexer.index(FetchAllWeaponsResponse(weps))
+      weaponIndexer.index(FetchAllWeaponsResponse(weps, wepProps))
       weaponIndexer.weaponsBeingIndexed.get() should be(false)
     }
 
@@ -33,6 +38,9 @@ class WeaponIndexerComponentTest extends WordSpecLike with Test
         weaponDAO.expects('findAll)(None).returning(List.empty)
         weaponDAO.expects('deleteAll)(None).returning(true)
         weaponDAO.expects('createAll)(weps, None).returning(true)
+
+        weaponPropsDAO.expects('deleteAll)(None).returning(true)
+        weaponPropsDAO.expects('createAll)(wepProps, None).returning(true)
       }
 
       weaponIndexer.retrieve match {
@@ -42,7 +50,7 @@ class WeaponIndexerComponentTest extends WordSpecLike with Test
       }
 
       weaponIndexer.weaponsBeingIndexed.get() should be(true)
-      weaponIndexer.index(FetchAllWeaponsResponse(weps))
+      weaponIndexer.index(FetchAllWeaponsResponse(weps, wepProps))
       weaponIndexer.weaponsBeingIndexed.get() should be(false)
     }
 
@@ -71,5 +79,9 @@ object WeaponIndexerComponentTest extends {
 
   trait MockWeaponDAO extends WeaponDAOComponent with MockDB with MockFactory { this: Suite =>
     override val weaponDAO = mock[WeaponDAO]
+  }
+
+  trait MockWeaponPropsDAO extends WeaponPropsDAOComponent with MockDB with MockFactory { this: Suite =>
+    override val weaponPropsDAO = mock[WeaponPropsDAO]
   }
 }

@@ -53,18 +53,20 @@ object DatabaseModels {
                     factionId : Option[Byte],
                     imagePath : String,
                     isVehicleWeapon : Boolean,
-                    equipMs : Option[Int],
-                    fromIronSightsMs : Option[Int],
-                    toIronSightsMs : Option[Int],
-                    unEquipMs : Option[Int],
-                    sprintRecoveryMs : Option[Int],
-                    moveModifier : Float,
-                    turnModifier : Float,
-                    heatBleedOffRate : Option[Float],
-                    heatCapacity : Option[Int],
-                    heatOverheatPenaltyMs : Option[Int],
                     lastIndexedOn : Long,
                     profiles : Option[String]) extends WithID
+
+  case class WeaponProps(override val id : String,  // Item id
+                         equipMs : Option[Int],
+                         fromIronSightsMs : Option[Int],
+                         toIronSightsMs : Option[Int],
+                         unEquipMs : Option[Int],
+                         sprintRecoveryMs : Option[Int],
+                         moveModifier : Float,
+                         turnModifier : Float,
+                         heatBleedOffRate : Option[Float],
+                         heatCapacity : Option[Int],
+                         heatOverheatPenaltyMs : Option[Int]) extends WithID
 
   case class WeaponStat(characterId : String,
                         itemId : String,
@@ -82,13 +84,4 @@ object DatabaseModels {
                          killedBy : Long,
                          playTime : Long,
                          score : Long)
-
-  case class Profile(override val id : String,
-                     name: String,
-                     factionId : Byte,
-                     imagePath : String,
-                     movementSpeed : Int,
-                     backpedalSpeedModifier: Float,
-                     sprintSpeedModifier: Float,
-                     strafeSpeedModifier: Float) extends WithID
 }

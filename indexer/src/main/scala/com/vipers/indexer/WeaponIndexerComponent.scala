@@ -4,10 +4,11 @@ import java.util.concurrent.atomic.AtomicBoolean
 import com.vipers.Logging
 import com.vipers.dbms.DB
 import com.vipers.fetcher.FetcherActor.FetchAllWeaponsResponse
-import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
+import com.vipers.indexer.dao.DAOs.{WeaponPropsDAOComponent, WeaponDAOComponent}
 import com.vipers.model.DatabaseModels.Weapon
 
-private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with WeaponDAOComponent =>
+private[indexer] trait WeaponIndexerComponent extends Logging { this: DB
+  with WeaponDAOComponent with WeaponPropsDAOComponent =>
   val weaponIndexer = new WeaponIndexer
 
   class WeaponIndexer extends Indexer {
@@ -18,6 +19,9 @@ private[indexer] trait WeaponIndexerComponent extends Logging { this: DB with We
         withTransaction { implicit s =>
           weaponDAO.deleteAll
           weaponDAO.createAll(response.weapons:_*)
+
+          weaponPropsDAO.deleteAll
+          weaponPropsDAO.createAll(response.weaponProps:_*)
 
           log.debug("Weapons have been indexed")
           weaponsBeingIndexed.compareAndSet(true, false)
