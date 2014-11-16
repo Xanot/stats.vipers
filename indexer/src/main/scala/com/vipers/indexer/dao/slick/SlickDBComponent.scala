@@ -9,11 +9,14 @@ import scala.slick.jdbc.JdbcBackend
 import scala.slick.jdbc.JdbcBackend.Database
 
 private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
+  with SlickGameDataIndexedOnDAOComponent
   with SlickOutfitDAOComponent
   with SlickCharacterDAOComponent
   with SlickOutfitMembershipDAOComponent
   with SlickWeaponDAOComponent
   with SlickWeaponPropsDAOComponent
+  with SlickWeaponAttachmentDAOComponent
+  with SlickWeaponAttachmentEffectDAOComponent
   with SlickWeaponStatDAOComponent
   with SlickCharacterStatDAOComponent {
 
@@ -48,6 +51,9 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
     import driver.simple._
 
     withTransaction { implicit  s =>
+      try { gameDataIndexedOnDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
       try { characterDAO.table.ddl.create }
       catch { case _ : Exception => }
 
@@ -64,6 +70,12 @@ private[indexer] trait SlickDBComponent extends DBComponent with SlickDB
       catch { case _ : Exception => }
 
       try { weaponPropsDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponAttachmentDAO.table.ddl.create }
+      catch { case _ : Exception => }
+
+      try { weaponAttachmentEffectDAO.table.ddl.create }
       catch { case _ : Exception => }
 
       try { weaponStatDAO.weaponStatsTable.ddl.create }

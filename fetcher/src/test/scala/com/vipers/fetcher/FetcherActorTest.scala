@@ -121,7 +121,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
     // Weapon Attachments
     //================================================================================
     "return all weapon attachments" in {
-      whenReady((fetcherActor ? FetchAllWeaponAttachments).mapTo[FetchAllWeaponAttachmentsResponse]) { response =>
+      whenReady((fetcherActor ? FetchAllWeaponAttachmentsRequest).mapTo[FetchAllWeaponAttachmentsResponse]) { response =>
         response.attachments.length should be > 100
         response.effects.length should be > 100
       }

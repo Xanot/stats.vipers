@@ -83,7 +83,7 @@ class FetcherActor extends Actor {
         }
         FetchAllWeaponsResponse(weapons, weaponProps)
       } pipeTo sender
-    case FetchAllWeaponAttachments =>
+    case FetchAllWeaponAttachmentsRequest =>
       Future {
         val JArray(weaponToAttachmentList) = {
           val aggregation = for {
@@ -109,7 +109,7 @@ class FetcherActor extends Actor {
             effects ++= wep._2
           }
         }
-        FetchAllWeaponAttachmentsResponse(attachments, effects)
+        FetchAllWeaponAttachmentsResponse(attachments, effects.distinct)
       } pipeTo sender
   }
 
@@ -149,6 +149,6 @@ object FetcherActor {
   //================================================================================
   // Weapon Attachment request/response
   //================================================================================
-  case object FetchAllWeaponAttachments
+  case object FetchAllWeaponAttachmentsRequest
   case class FetchAllWeaponAttachmentsResponse(attachments : Seq[WeaponAttachment], effects : Seq[WeaponAttachmentEffect])
 }

@@ -47,13 +47,15 @@ object DatabaseModels {
                               outfitRankOrdinal : Byte,
                               outfitMemberSinceDate : Long) extends WithID
 
+  case class GameDataIndexedOn(override val id : String,
+                               lastIndexedOn : Long) extends WithID
+
   case class Weapon(override val id : String, // Item id
                     name : String,
                     description : Option[String],
                     factionId : Option[Byte],
                     imagePath : String,
                     isVehicleWeapon : Boolean,
-                    lastIndexedOn : Long,
                     profiles : Option[String]) extends WithID
 
   case class WeaponProps(override val id : String,  // Item id
@@ -76,7 +78,7 @@ object DatabaseModels {
                               description : String,
                               passiveAbilityId : String) extends WithID
 
-  case class WeaponAttachmentEffect(override val id : String, // Effect id
+  case class WeaponAttachmentEffect(override val id : String, // Zone Effect id
                                     passiveAbilityId : String,
                                     effectName : String,
                                     fireGroupId : Option[String],

@@ -68,7 +68,7 @@ class ApiUrlBuilderTest extends FlatSpecLike with Test {
     uri.query.get("c:lang").get should be("en")
     uri.query.get("c:start").get should be("0")
     uri.query.get("c:limit").get should be("100")
-    uri.query.get("c:join").get should be("item_to_weapon^inject_at:item_to_weapon(weapon^inject_at:weapon),item_profile^inject_at:item_profile^list:1^on:item_id^to:item_id^show:profile_id")
+    uri.query.get("c:join").get should be("item_to_weapon^inject_at:item_to_weapon^outer:0(weapon^inject_at:weapon),item_profile^inject_at:item_profile^list:1^on:item_id^to:item_id^show:profile_id")
   }
 
   //================================================================================

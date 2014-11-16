@@ -164,7 +164,7 @@ private[fetcher] object Wrapper {
         )}
 
         (Weapon(itemId, name, description.toOption.map(_.extract[String]), factionId.toOption.map(_.extract[String].toByte), imagePath, isVehicleWeapon match { case "0" => false; case "1" => true},
-          System.currentTimeMillis(), {
+          {
             if(json \ "item_profile" != JNothing) {
               val JArray(profiles) = json \ "item_profile"
               Some(profiles.map( s => toItemProfile(s)).mkString(","))

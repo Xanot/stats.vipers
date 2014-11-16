@@ -18,7 +18,6 @@ private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with We
       def imagePath = column[String]("image_path", O.NotNull, O.DBType("VARCHAR(100)"))
       def factionId = column[Option[Byte]]("faction_id")
       def isVehicleWeapon = column[Boolean]("is_vehicle_weapon", O.NotNull)
-      def lastIndexedOn = column[Long]("last_indexed_on", O.NotNull)
       def profiles = column[Option[String]]("profiles")
 
       def * = (id,
@@ -27,7 +26,6 @@ private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with We
         factionId,
         imagePath,
         isVehicleWeapon,
-        lastIndexedOn,
         profiles) <> (Weapon.tupled, Weapon.unapply)
     }
   }

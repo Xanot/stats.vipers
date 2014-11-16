@@ -19,6 +19,12 @@ private[indexer] object DAOs {
     }
   }
 
+  trait GameDataIndexedOnDAOComponent extends DAOComponent { this: DB =>
+    val gameDataIndexedOnDAO :GameDataIndexedOnDAO
+
+    trait GameDataIndexedOnDAO extends DAO[GameDataIndexedOn] {}
+  }
+
   trait OutfitDAOComponent extends DAOComponent { this: DB =>
     val outfitDAO : OutfitDAO
 
@@ -55,6 +61,18 @@ private[indexer] object DAOs {
     val weaponPropsDAO : WeaponPropsDAO
 
     trait WeaponPropsDAO extends DAO[WeaponProps] {}
+  }
+
+  trait WeaponAttachmentDAOComponent extends DAOComponent { this: DB =>
+    val weaponAttachmentDAO : WeaponAttachmentDAO
+
+    trait WeaponAttachmentDAO extends DAO[WeaponAttachment] {}
+  }
+
+  trait WeaponAttachmentEffectDAOComponent extends DAOComponent { this : DB =>
+    val weaponAttachmentEffectDAO : WeaponAttachmentEffectDAO
+
+    trait WeaponAttachmentEffectDAO extends DAO[WeaponAttachmentEffect] {}
   }
 
   trait WeaponStatDAOComponent extends DAOComponent { this: DB =>

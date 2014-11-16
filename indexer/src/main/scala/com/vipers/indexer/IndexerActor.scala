@@ -14,27 +14,19 @@ import com.vipers.notifier.NotifierActor
 import com.vipers.notifier.NotifierActor._
 import scala.concurrent.Future
 import akka.pattern.pipe
-import scala.concurrent.duration.FiniteDuration
 
 class IndexerActor extends Actor
   with Logging with EventBusComponent with SlickDBComponent
   with OutfitIndexerComponent with CharacterIndexerComponent
-  with WeaponIndexerComponent {
+  with WeaponIndexerComponent with WeaponAttachmentIndexerComponent {
 
   import context.dispatcher
 
-  protected var fetcherActor : ActorRef = _
-  protected var notifierActor : ActorRef = _
+  private var fetcherActor : ActorRef = _
+  private var notifierActor : ActorRef = _
 
-  val weaponSchedule = context.system.scheduler.schedule(FiniteDuration(0, TimeUnit.MILLISECONDS),
-    FiniteDuration(Configuration.weaponsStaleAfter + 10000, TimeUnit.MILLISECONDS)) {
-    weaponIndexer.retrieve match {
-      case (needsIndexing, _) =>
-        if(needsIndexing) {
-          fetcherActor ! FetchAllWeaponsRequest
-        }
-    }
-  }
+  private val weaponSchedule = weaponIndexer.schedule(context.system)
+  private val weaponAttachmentSchedule = weaponAttachmentIndexer.schedule(context.system)
 
   override def preStart() : Unit = {
     eventBus.subscribe(self, classOf[NeedsIndexing])
@@ -46,6 +38,7 @@ class IndexerActor extends Actor
 
   override def postStop() : Unit = {
     weaponSchedule.cancel()
+    weaponAttachmentSchedule.cancel()
     notifierActor ! Stop
     fetcherActor ! PoisonPill
     notifierActor ! PoisonPill
@@ -68,6 +61,11 @@ class IndexerActor extends Actor
     case r : FetchAllWeaponsResponse =>
       Future {
         weaponIndexer.index(r)
+      }
+
+    case r : FetchAllWeaponAttachmentsResponse =>
+      Future {
+        weaponAttachmentIndexer.index(r)
       }
 
     //================================================================================
@@ -111,13 +109,15 @@ class IndexerActor extends Actor
 
     case CharacterNeedsIndexing(nameLower, statsLastSavedOn) => fetcherActor ! FetchCharacterRequest(nameLower, withStats = true, statsLastSavedOn)
     case OutfitNeedsIndexing(aliasLower) => fetcherActor ! FetchOutfitRequest(aliasLower)
+    case WeaponsNeedIndexing => fetcherActor ! FetchAllWeaponsRequest
+    case WeaponAttachmentsNeedIndexing => fetcherActor ! FetchAllWeaponAttachmentsRequest
 
     case e : AnyRef => log.error(e.toString)
   }
 }
 
 object IndexerActor {
-  val timeout = Timeout(30000, TimeUnit.MILLISECONDS)
+  val timeout = Timeout(60000, TimeUnit.MILLISECONDS)
 
   sealed trait IndexerMessage
 
