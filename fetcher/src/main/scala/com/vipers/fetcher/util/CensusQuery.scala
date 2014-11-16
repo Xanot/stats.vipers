@@ -253,5 +253,14 @@ private[fetcher] object CensusQuery {
                                         nested : Option[Seq[JoinQuery]] = None,
                                         isOuter : Option[Boolean] = None) extends JoinQuery("characters_stat_history", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
 
+    case class ZoneEffectJoin(injectAt : String = "zone_effect",
+                              on : Option[String] = None,
+                              to : Option[String] = None,
+                              terms : Option[Seq[(String, String)]] = None,
+                              hide : Option[Seq[String]] = None,
+                              show : Option[Seq[String]] = None,
+                              nested : Option[Seq[JoinQuery]] = None,
+                              isOuter : Option[Boolean] = None) extends JoinQuery("zone_effect", injectAt, Some(true), on, to, terms, hide, show, nested, isOuter)
+
   }
 }

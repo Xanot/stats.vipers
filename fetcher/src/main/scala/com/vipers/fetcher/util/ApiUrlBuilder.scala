@@ -74,6 +74,18 @@ private[fetcher] object ApiUrlBuilder {
   }
 
   //================================================================================
+  // Weapon Attachments
+  //================================================================================
+  def getAllWeaponAttachments(page : Page) : Uri = {
+    val params = CensusQuery(None, Join(
+      ItemJoin(isOuter = Some(false), nested = Some(Seq(
+        ZoneEffectJoin(on = Some("passive_ability_id"), to = Some("ability_id"), isOuter = Some(false))
+      )))
+    )).construct
+    construct(Uri.Path("weapon_to_attachment"), params.toMap ++ withPage(page))
+  }
+
+  //================================================================================
   // Utility
   //================================================================================
   private def construct(path : Uri.Path, params : Map[String, String]) : Uri = {

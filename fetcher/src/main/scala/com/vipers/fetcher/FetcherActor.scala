@@ -83,6 +83,34 @@ class FetcherActor extends Actor {
         }
         FetchAllWeaponsResponse(weapons, weaponProps)
       } pipeTo sender
+    case FetchAllWeaponAttachments =>
+      Future {
+        val JArray(weaponToAttachmentList) = {
+          val aggregation = for {
+            res1 <- sendAsyncRequest(ApiUrlBuilder.getAllWeaponAttachments(Page(Some(5000), Some(0))))
+            res2 <- sendAsyncRequest(ApiUrlBuilder.getAllWeaponAttachments(Page(Some(5000), Some(5000))))
+            res3 <- sendAsyncRequest(ApiUrlBuilder.getAllWeaponAttachments(Page(Some(5000), Some(10000))))
+            res4 <- sendAsyncRequest(ApiUrlBuilder.getAllWeaponAttachments(Page(Some(5000), Some(15000))))
+          } yield (res1, res2, res3, res4)
+
+          val result = Await.result(aggregation, timeout.duration)
+          parse(result._1.entity.asString) \ "weapon_to_attachment_list" ++
+            parse(result._2.entity.asString) \ "weapon_to_attachment_list" ++
+              parse(result._3.entity.asString) \ "weapon_to_attachment_list" ++
+                parse(result._4.entity.asString) \ "weapon_to_attachment_list"
+        }
+
+        val attachments = mutable.ListBuffer.empty[WeaponAttachment]
+        val effects = mutable.ListBuffer.empty[WeaponAttachmentEffect]
+        weaponToAttachmentList.foreach { json =>
+          val JString(weaponGroupId) = json \ "weapon_group_id"
+          (json \ "item").toWeaponAttachment(weaponGroupId).map { wep =>
+            attachments += wep._1
+            effects ++= wep._2
+          }
+        }
+        FetchAllWeaponAttachmentsResponse(attachments, effects)
+      } pipeTo sender
   }
 
   private def sendAsyncRequest(r : Uri) : Future[HttpResponse] = {
@@ -117,4 +145,10 @@ object FetcherActor {
   //================================================================================
   case object FetchAllWeaponsRequest
   case class FetchAllWeaponsResponse(weapons : Seq[Weapon], weaponProps : Seq[WeaponProps])
+
+  //================================================================================
+  // Weapon Attachment request/response
+  //================================================================================
+  case object FetchAllWeaponAttachments
+  case class FetchAllWeaponAttachmentsResponse(attachments : Seq[WeaponAttachment], effects : Seq[WeaponAttachmentEffect])
 }

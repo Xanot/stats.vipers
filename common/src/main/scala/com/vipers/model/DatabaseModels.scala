@@ -57,6 +57,7 @@ object DatabaseModels {
                     profiles : Option[String]) extends WithID
 
   case class WeaponProps(override val id : String,  // Item id
+                         weaponGroupId : Option[String],
                          equipMs : Option[Int],
                          fromIronSightsMs : Option[Int],
                          toIronSightsMs : Option[Int],
@@ -67,6 +68,25 @@ object DatabaseModels {
                          heatBleedOffRate : Option[Float],
                          heatCapacity : Option[Int],
                          heatOverheatPenaltyMs : Option[Int]) extends WithID
+
+  case class WeaponAttachment(override val id : String, // Item id
+                              weaponGroupId : String,
+                              name : String,
+                              imagePath : String,
+                              description : String,
+                              passiveAbilityId : String) extends WithID
+
+  case class WeaponAttachmentEffect(override val id : String, // Effect id
+                                    passiveAbilityId : String,
+                                    effectName : String,
+                                    fireGroupId : Option[String],
+                                    fireModeId : Option[String],
+                                    added : Option[Float],
+                                    percentAdded : Option[Float],
+                                    setDirectly : Option[Float],
+                                    weaponMountId : Option[String],
+                                    equipSlot : Option[String]) extends WithID
+
 
   case class WeaponStat(characterId : String,
                         itemId : String,

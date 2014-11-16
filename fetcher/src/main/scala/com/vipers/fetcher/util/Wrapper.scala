@@ -148,7 +148,8 @@ private[fetcher] object Wrapper {
           )
         }
 
-        val (equipMs, fromIronSightsMs, toIronSightsMs, unEquipMs, sprintRecoveryMs) = {(
+        val (groupId, equipMs, fromIronSightsMs, toIronSightsMs, unEquipMs, sprintRecoveryMs) = {(
+          weapon \ "weapon_group_id",
           weapon \ "equip_ms",
           weapon \ "from_iron_sights_ms",
           weapon \ "to_iron_sights_ms",
@@ -170,7 +171,8 @@ private[fetcher] object Wrapper {
             } else {
               None
             }
-          }), WeaponProps(itemId, equipMs.toOption.map(_.extract[String].toInt),
+          }), WeaponProps(itemId, groupId.toOption.map(_.extract[String]),
+            equipMs.toOption.map(_.extract[String].toInt),
             fromIronSightsMs.toOption.map(_.extract[String].toInt),
             toIronSightsMs.toOption.map(_.extract[String].toInt),
             unEquipMs.toOption.map(_.extract[String].toInt),
@@ -260,6 +262,55 @@ private[fetcher] object Wrapper {
           }
         }
         list.toList
+      }
+    }
+
+    def toWeaponAttachment(weaponGroupId : String) : Option[(WeaponAttachment, List[WeaponAttachmentEffect])] = {
+      implicit val jsonFormats = org.json4s.DefaultFormats
+
+      def toWeaponAttachmentEffect(passiveAbilityId : String, effect : JValue) : WeaponAttachmentEffect = {
+        val (JString(effectId), JString(effectName), fireGroupId, fireModeId, added,
+            percentAdded, setDirectly, weaponMountId, equipSlot) = (
+          effect \ "zone_effect_id",
+          effect \ "string1",
+          effect \ "param1",
+          effect \ "param2",
+          effect \ "param3",
+          effect \ "param4",
+          effect \ "param5",
+          effect \ "param6",
+          effect \ "param7"
+        )
+
+        WeaponAttachmentEffect(effectId, passiveAbilityId, effectName,
+          fireGroupId.toOption.map(_.extract[String]),
+          fireModeId.toOption.map(_.extract[String]),
+          added.toOption.map(_.extract[String].toFloat),
+          percentAdded.toOption.map(_.extract[String].toFloat),
+          setDirectly.toOption.map(_.extract[String].toFloat),
+          weaponMountId.toOption.map(_.extract[String]),
+          equipSlot.toOption.map(_.extract[String])
+        )
+      }
+
+      check {
+        if(json \ "passive_ability_id" == JNothing) {
+          return None
+        }
+
+        val (JString(itemId), JString(name), JString(description), JString(imagePath), JString(passiveAbilityId)) = (
+            json \ "item_id",
+            json \ "name" \ "en",
+            json \ "description" \"en",
+            json \ "image_path",
+            json \ "passive_ability_id"
+          )
+
+        (WeaponAttachment(itemId, weaponGroupId, name, imagePath, description, passiveAbilityId), {
+          val JArray(effects) = json \ "zone_effect"
+          for(effect <- effects if effect \ "string1" != JNothing)
+            yield toWeaponAttachmentEffect(passiveAbilityId, effect)
+        })
       }
     }
 

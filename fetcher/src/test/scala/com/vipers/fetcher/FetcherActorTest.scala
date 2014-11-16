@@ -14,7 +14,7 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
 
   private var fetcherActor : ActorRef = _
   private implicit val timeout = FetcherActor.timeout
-  override implicit val patienceConfig : PatienceConfig = PatienceConfig(Span(30000, Millis))
+  override implicit val patienceConfig : PatienceConfig = PatienceConfig(Span(60000, Millis))
 
   override def beforeAll(): Unit = {
     fetcherActor = system.actorOf(Props[FetcherActor])
@@ -114,6 +114,16 @@ class FetcherActorTest(_system : ActorSystem) extends TestKit(_system) with Word
         response.weapons.filter(_.name == "Supernova FPC")(0).profiles should be(None) // No item profile for vehicle weapons
 
         response.weaponProps.length should be(response.weapons.length)
+      }
+    }
+
+    //================================================================================
+    // Weapon Attachments
+    //================================================================================
+    "return all weapon attachments" in {
+      whenReady((fetcherActor ? FetchAllWeaponAttachments).mapTo[FetchAllWeaponAttachmentsResponse]) { response =>
+        response.attachments.length should be > 100
+        response.effects.length should be > 100
       }
     }
   }

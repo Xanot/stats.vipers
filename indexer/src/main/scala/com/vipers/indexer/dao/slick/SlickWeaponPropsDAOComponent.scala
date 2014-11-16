@@ -13,6 +13,7 @@ private[indexer] trait SlickWeaponPropsDAOComponent extends SlickDAOComponent wi
     override val table = TableQuery[WeaponProps]
 
     sealed class WeaponProps(tag : Tag) extends TableWithID(tag, "weapon_props") {
+      def weaponGroupId = column[Option[String]]("weapon_group_id", O.DBType("VARCHAR(10)"))
       def equipMs = column[Option[Int]]("equip_ms")
       def fromIronSightsMs = column[Option[Int]]("from_iron_sights_ms")
       def toIronSightsMs = column[Option[Int]]("to_iron_sights_ms")
@@ -25,6 +26,7 @@ private[indexer] trait SlickWeaponPropsDAOComponent extends SlickDAOComponent wi
       def heatOverheatPenaltyMs = column[Option[Int]]("heat_overheat_penalty_ms")
 
       def * = (id,
+        weaponGroupId,
         equipMs,
         fromIronSightsMs,
         toIronSightsMs,

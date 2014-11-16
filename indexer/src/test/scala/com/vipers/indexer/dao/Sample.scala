@@ -23,8 +23,8 @@ trait Sample {
   }
 
   object SampleWeaponProps {
-    lazy val NS15 = WeaponProps("75034",Some(800),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
-    lazy val Corvus = WeaponProps("7152",Some(650),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
+    lazy val NS15 = WeaponProps("75034",Some("1102"),Some(800),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
+    lazy val Corvus = WeaponProps("7152",Some("86"),Some(650),Some(150),Some(150),Some(250),Some(300),1.0f,1.0f,None,None,None)
   }
 
   object SampleCharacterProfileStat {
