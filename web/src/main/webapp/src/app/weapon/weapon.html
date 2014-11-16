@@ -1,0 +1,93 @@
+<div class="weapon-view">
+  <div class="row weapon-header">
+    <div class="col-xs-12">
+      <h3>
+        <small>
+          <img ng-src="//census.soe.com/{{ weapon._1.imagePath }}" class="item-img img-thumbnail" />
+        </small>
+        &nbsp;
+        {{ weapon._1.name }}
+      </h3>
+    </div>
+  </div>
+
+  <div class="row weapon-description">
+    <div class="col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading progress-bar-striped"><span class="fa fa-info"></span>&nbsp;&nbsp; Info</div>
+        <div class="panel-body">
+          <p>
+            {{ weapon._1.description }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="weapon._3.length > 0" class="row weapon-attachments">
+    <div class="col-xs-12">
+      <div class="panel panel-default">
+        <div class="panel-heading progress-bar-striped"><span class="fa fa-chain"></span>&nbsp;&nbsp; Attachments</div>
+        <div class="panel-body">
+          <table class="table table-bordered table-responsive">
+            <thead>
+            <tr>
+              <th>#</th>
+              <th class="table-input">
+                <input type="text" ng-model="filterAttachmentName" class="form-control" placeholder="Name&hellip;">
+              </th>
+              <th>Effects</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="attachment in weapon._3 | filter: { _1: { name : filterAttachmentName || '' } }">
+              <td> {{ $index + 1 }} </td>
+              <td>
+                <img ng-src="//census.soe.com/{{ ::attachment._1.imagePath }}" class="item-img" />
+                <span>&nbsp;{{ ::attachment._1.name }}</span>
+              </td>
+              <td>
+                <div ng-repeat="effect in ::attachment._2">
+                  <span class="attachment-stat">
+                    <span ng-switch="::(effect.added > 0)">
+                      <span ng-switch-when="true">
+                        <span ng-class="::{'fa-plus': !effect.setDirectly, 'fa-cog': effect.setDirectly}"  class="fa"></span> {{ ::effect.added }}
+                      </span>
+                      <span ng-switch-when="false">
+                        <span ng-switch="::(effect.added < 0)">
+                          <span ng-switch-when="true">
+                            <span ng-class="::{'fa-minus': !effect.setDirectly, 'fa-cog': effect.setDirectly}" class="fa"></span> {{ ::effect.added * -1 }}
+                          </span>
+                          <span ng-switch-when="false">
+                            <span ng-switch="::(effect.percentAdded > 0)">
+                              <span ng-switch-when="true">
+                                <span ng-class="::{'fa-plus': !effect.setDirectly, 'fa-cog': effect.setDirectly}" class="fa"></span> {{ ::effect.percentAdded }}%
+                              </span>
+                              <span ng-switch-when="false">
+                                <span ng-switch="::(effect.percentAdded < 0)">
+                                  <span ng-switch-when="true">
+                                    <span ng-class="::{'fa-minus': !effect.setDirectly, 'fa-cog': effect.setDirectly}" class="fa"></span> {{ ::effect.percentAdded * -1 }}%
+                                  </span>
+                                  <span ng-switch-when="false">
+                                    <span class="fa fa-cog"></span> {{ ::effect.added }}
+                                  </span>
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+
+                    {{ effect.effectName }}
+                  </span>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

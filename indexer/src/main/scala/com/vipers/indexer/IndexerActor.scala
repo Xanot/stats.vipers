@@ -101,6 +101,13 @@ class IndexerActor extends Actor
         }
       } pipeTo sender
 
+    case GetWeaponRequest(itemId) =>
+      Future {
+        withSession { implicit s =>
+          weaponDAO.findWeaponWithAttachments(itemId)
+        }
+      } pipeTo sender
+
     //================================================================================
     // Events
     //================================================================================
@@ -125,6 +132,7 @@ object IndexerActor {
   case class GetOutfitRequest(aliasLower : String) extends IndexerMessage
   case class GetCharacterRequest(nameLower : String) extends IndexerMessage
   case class GetCharactersWeaponStatHistory(characterId : String, itemId : String) extends IndexerMessage
+  case class GetWeaponRequest(itemId : String) extends IndexerMessage
 
   // Sent
   case object BeingIndexed extends IndexerMessage

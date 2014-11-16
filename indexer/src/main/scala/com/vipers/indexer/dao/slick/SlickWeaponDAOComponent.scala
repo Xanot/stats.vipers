@@ -2,15 +2,36 @@ package com.vipers.indexer.dao.slick
 
 import com.vipers.dbms.SlickDB
 import com.vipers.indexer.dao.DAOs.WeaponDAOComponent
-import com.vipers.model.DatabaseModels.Weapon
+import com.vipers.model.DatabaseModels.{WeaponAttachmentEffect, WeaponAttachment, WeaponProps, Weapon}
 
-private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with WeaponDAOComponent { this: SlickDB =>
+private[indexer] trait SlickWeaponDAOComponent extends SlickDAOComponent with WeaponDAOComponent {
+  this: SlickDB
+    with SlickWeaponPropsDAOComponent
+    with SlickWeaponAttachmentDAOComponent
+    with SlickWeaponAttachmentEffectDAOComponent =>
   import driver.simple._
 
   override lazy val weaponDAO = new SlickWeaponDAO
 
   sealed class SlickWeaponDAO extends SlickDAO[Weapon] with WeaponDAO {
     override val table = TableQuery[Weapons]
+
+    private lazy val findWeaponWithPropsCompiled = Compiled((itemId : Column[String]) => {
+      for {
+        weapon <- table if weapon.id === itemId
+        weaponProps <- weaponPropsDAO.table if weaponProps.id === weapon.id
+      } yield(weapon, weaponProps)
+    })
+    override def findWeaponWithAttachments(itemId : String)(implicit s : Session) :
+      Option[(Weapon, WeaponProps, List[(WeaponAttachment, List[WeaponAttachmentEffect])])] = {
+      findWeaponWithPropsCompiled(itemId).firstOption flatMap { case(weapon, weaponProps) =>
+        weaponProps.weaponGroupId.map { groupId =>
+          val attachments = weaponAttachmentDAO.filterByWeaponGroupId(groupId)
+            .map { attachment => (attachment, weaponAttachmentEffectDAO.filterByAbilityId(attachment.passiveAbilityId)) }
+          (weapon, weaponProps, attachments)
+        }
+      }
+    }
 
     sealed class Weapons(tag : Tag) extends TableWithID(tag, "weapon") {
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))

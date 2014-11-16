@@ -1,6 +1,8 @@
 'use strict';
 
-angular.module('main', ['templates', 'websocket', 'notification', 'navbar', 'home', 'outfit', 'player', 'settings', 'config.highcharts',
+angular.module('main', ['templates', 'websocket', 'notification', 'navbar', 'home', 'outfit', 'player', 'weapon',
+  'settings', 'config.highcharts',
+
   'ui.router', 'ngSanitize', 'ngAnimate', 'mgcrea.ngStrap', 'angularMoment', 'angular-loading-bar', 'infinite-scroll',
   'LocalStorageModule', 'highcharts-ng'])
 

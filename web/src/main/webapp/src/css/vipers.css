@@ -248,3 +248,44 @@ dt, dd {
     height: 400px;
     margin: 0 auto
 }
+
+/* Weapon page */
+.weapon-view .panel-heading {
+    background-color: #5752ba;
+    font-weight: bold;
+}
+.weapon-view .panel-heading {
+    font-weight: bold;
+}
+.weapon-view h3 {
+    font-weight: bold;
+}
+.weapon-header .item-img {
+    width: 192px;
+    border-radius: 3px;
+    height: 96px;
+}
+.weapon-attachments .item-img {
+    width: 48px;
+    height: 48px;
+}
+.weapon-attachments .panel {
+    border: none;
+}
+.weapon-attachments .panel-body {
+    padding: 0;
+}
+.weapon-attachments .table {
+    margin-bottom: 0;
+    border: none;
+}
+.weapon-attachments .fa-plus {
+    color: green;
+}
+.weapon-attachments .fa-minus {
+    color: red;
+}
+.weapon-attachments .attachment-stat {
+    color: #ff9000;
+}
+

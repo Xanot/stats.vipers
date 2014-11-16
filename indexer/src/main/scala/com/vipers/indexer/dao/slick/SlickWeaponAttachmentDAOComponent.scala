@@ -13,6 +13,13 @@ private[indexer] trait SlickWeaponAttachmentDAOComponent extends SlickDAOCompone
   sealed class SlickWeaponAttachmentDAO extends SlickDAO[WeaponAttachment] with WeaponAttachmentDAO {
     override val table = TableQuery[WeaponAttachments]
 
+    private lazy val filterByWeaponGroupIdCompiled = Compiled((weaponGroupId : Column[String]) => {
+      table.filter(_.weaponGroupId === weaponGroupId)
+    })
+    override def filterByWeaponGroupId(weaponGroupId : String)(implicit s : Session) : List[WeaponAttachment] = {
+      filterByWeaponGroupIdCompiled(weaponGroupId).list
+    }
+
     sealed class WeaponAttachments(tag : Tag) extends TableWithID(tag, "weapon_attachments") {
       def weaponGroupId = column[String]("weapon_group_id", O.NotNull, O.DBType("VARCHAR(10)"))
       def name = column[String]("name", O.NotNull, O.DBType("VARCHAR(100)"))

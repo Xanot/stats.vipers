@@ -1,5 +1,11 @@
 [
   {
+    "title": "v0.0.5 needless-mustard",
+    "slug": "needless-mustard",
+    "file": "app/home/posts/v0.0.5.md",
+    "creationDate": "1416164920"
+  },
+  {
     "title": "v0.0.4 cobalt-meta",
     "slug": "cobalt-meta",
     "file": "app/home/posts/v0.0.4.md",

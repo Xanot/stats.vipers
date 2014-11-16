@@ -54,7 +54,9 @@ private[indexer] object DAOs {
   trait WeaponDAOComponent extends DAOComponent { this: DB =>
     val weaponDAO : WeaponDAO
 
-    trait WeaponDAO extends DAO[Weapon] {}
+    trait WeaponDAO extends DAO[Weapon] {
+      def findWeaponWithAttachments(itemId : String)(implicit s : Session) : Option[(Weapon, WeaponProps, List[(WeaponAttachment, List[WeaponAttachmentEffect])])]
+    }
   }
 
   trait WeaponPropsDAOComponent extends DAOComponent { this: DB =>
@@ -66,13 +68,17 @@ private[indexer] object DAOs {
   trait WeaponAttachmentDAOComponent extends DAOComponent { this: DB =>
     val weaponAttachmentDAO : WeaponAttachmentDAO
 
-    trait WeaponAttachmentDAO extends DAO[WeaponAttachment] {}
+    trait WeaponAttachmentDAO extends DAO[WeaponAttachment] {
+      def filterByWeaponGroupId(weaponGroupId : String)(implicit s : Session) : List[WeaponAttachment]
+    }
   }
 
   trait WeaponAttachmentEffectDAOComponent extends DAOComponent { this : DB =>
     val weaponAttachmentEffectDAO : WeaponAttachmentEffectDAO
 
-    trait WeaponAttachmentEffectDAO extends DAO[WeaponAttachmentEffect] {}
+    trait WeaponAttachmentEffectDAO extends DAO[WeaponAttachmentEffect] {
+      def filterByAbilityId(abilityId : String)(implicit s : Session) : List[WeaponAttachmentEffect]
+    }
   }
 
   trait WeaponStatDAOComponent extends DAOComponent { this: DB =>
