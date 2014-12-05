@@ -82,7 +82,7 @@ object NotifierActor {
     server.setHandler(context)
 
     val holderEvents = new ServletHolder("WebSocketServlet", new WebSocketServlet {
-      override def configure(factory : WebSocketServletFactory) {
+      override def configure(factory : WebSocketServletFactory) : Unit = {
         factory.register(classOf[NotifierSocket])
       }
     }.getClass)

@@ -90,7 +90,7 @@ private[indexer] trait CharacterIndexerComponent extends Logging { this: DBCompo
 
           val weaponStats = weaponStatDAO.getCharactersMostRecentWeaponStats(c.id)
 
-          Some(c, membership, c.lastIndexedOn + Configuration.characterStaleAfter, weaponStats)
+          Some((c, membership, c.lastIndexedOn + Configuration.characterStaleAfter, weaponStats))
         }.getOrElse {
           indexChar(nameLower, None)
           None

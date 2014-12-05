@@ -7,12 +7,12 @@ import org.json4s.JsonAST.{JObject, JString}
 import org.json4s.native.JsonMethods._
 
 private[notifier] class NotifierSocket extends WebSocketAdapter with Logging {
-  override protected def onWebSocketConnect(sess : Session) {
+  override protected def onWebSocketConnect(sess : Session) : Unit = {
     super.onWebSocketConnect(sess)
     NotifierActor.connections.add(this)
   }
 
-  override protected def onWebSocketText(message : String) {
+  override protected def onWebSocketText(message : String) : Unit = {
     parse(message) match {
       case JObject(msg) =>
         msg match {
@@ -27,11 +27,11 @@ private[notifier] class NotifierSocket extends WebSocketAdapter with Logging {
     }
   }
 
-  override protected def onWebSocketClose(statusCode : Int , reason : String) {
+  override protected def onWebSocketClose(statusCode : Int , reason : String) : Unit = {
     super.onWebSocketClose(statusCode, reason)
   }
 
-  override protected def onWebSocketError(cause : Throwable) {
+  override protected def onWebSocketError(cause : Throwable) : Unit = {
     cause.printStackTrace()
   }
 

@@ -59,7 +59,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       weaponStatsTable.filter(r => r.characterId === characterId && r.itemId === itemId)
     })
     def getCharactersMostRecentWeaponStat(characterId : String, itemId : String)(implicit s : Session) : Option[WeaponStat] = {
-      getCharactersMostRecentWeaponStatCompiled(characterId, itemId).firstOption
+      getCharactersMostRecentWeaponStatCompiled((characterId, itemId)).firstOption
     }
 
     override def createOrUpdateLastIndexedOn(characterId : String, stamp : Long)(implicit s : Session) = {
@@ -70,7 +70,7 @@ private[indexer] trait SlickWeaponStatDAOComponent extends WeaponStatDAOComponen
       weaponStatsTimeSeriesTable.filter(r => r.characterId === characterId && r.itemId === weaponId).sortBy(_.lastSaved.asc)
     })
     override def getCharactersWeaponStatHistory(characterId : String, itemId : String)(implicit s : Session) : List[WeaponStat] = {
-      getCharactersWeaponStatHistoryCompiled(characterId, itemId).list
+      getCharactersWeaponStatHistoryCompiled((characterId, itemId)).list
     }
 
     sealed class WeaponStats(tag : Tag) extends Table[WeaponStat](tag, "weapon_stats") with WeaponStatColumns {

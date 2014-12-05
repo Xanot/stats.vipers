@@ -18,7 +18,7 @@ private[indexer] trait WeaponAttachmentIndexerComponent extends GameDataIndexerC
     override protected val staleAfter: Long = Configuration.weaponAttachmentsStaleAfter
     override protected val needsIndexingEvent = WeaponAttachmentsNeedIndexing
 
-    override protected def indexImpl(response : FetchAllWeaponAttachmentsResponse)(implicit s: Session) {
+    override protected def indexImpl(response : FetchAllWeaponAttachmentsResponse)(implicit s: Session) : Unit = {
       weaponAttachmentDAO.deleteAll
       weaponAttachmentDAO.createAll(response.attachments:_*)
 

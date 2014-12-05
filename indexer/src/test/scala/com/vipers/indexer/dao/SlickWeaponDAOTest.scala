@@ -3,10 +3,14 @@ package com.vipers.indexer.dao
 import java.sql.SQLException
 
 import com.vipers.dao.DAOTest
-import com.vipers.indexer.dao.slick.SlickWeaponDAOComponent
+import com.vipers.indexer.dao.slick.{SlickWeaponAttachmentEffectDAOComponent, SlickWeaponAttachmentDAOComponent, SlickWeaponPropsDAOComponent, SlickWeaponDAOComponent}
 import org.scalatest.WordSpecLike
 
-class SlickWeaponDAOTest extends WordSpecLike with DAOTest with SlickDBTest with SlickWeaponDAOComponent with Sample {
+class SlickWeaponDAOTest extends WordSpecLike with DAOTest with SlickDBTest with Sample
+  with SlickWeaponDAOComponent
+  with SlickWeaponPropsDAOComponent
+  with SlickWeaponAttachmentDAOComponent
+  with SlickWeaponAttachmentEffectDAOComponent {
   import driver.simple._
 
   override protected val ddl = weaponDAO.table.ddl

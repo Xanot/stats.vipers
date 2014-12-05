@@ -13,12 +13,12 @@ trait WeaponApi extends Route { this: ApiActor =>
   protected lazy val weaponRoute = {
     path("weapon" / Segment) { itemId =>
       get {
-        onComplete(indexerActor ? GetWeaponRequest(itemId)) {
-          case Success(r : Option[AnyRef]) => r match {
+        onComplete((indexerActor ? GetWeaponRequest(itemId)).mapTo[Option[_]]) {
+          case Success(r : Option[_]) => r match {
             case Some(_) => complete(r)
             case None => complete(NotFound)
           }
-          case Failure(f) => complete(InternalServerError, f.getStackTrace.mkString("\n"))
+          case Failure(f) => complete(InternalServerError -> f.getStackTrace.mkString("\n"))
         }
       }
     }

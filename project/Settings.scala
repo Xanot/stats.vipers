@@ -1,6 +1,5 @@
 import sbt._
 import Keys._
-import net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 object Settings {
   lazy val basicSettings = Seq(
@@ -8,24 +7,17 @@ object Settings {
     version := "0.5-SNAPSHOT",
     organization := "com.vipers",
     scalacOptions := Seq(
-      "-encoding",
-      "utf8",
+      "-deprecation",
+      "-encoding", "UTF-8",
       "-feature",
       "-unchecked",
-      "-deprecation",
-      "-language:postfixOps"
-      ),
-    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+      "-Xfatal-warnings",
+      "-Xlint",
+      "-Yno-adapted-args",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Xfuture"
+    ),
     parallelExecution in Test := false
-  ) ++ graphSettings
-
-  lazy val scalaMeterSettings = Seq(
-    testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
-    logBuffered := false
-  )
-
-  lazy val localPublishSettings = Seq(
-    publishArtifact in (Test, packageDoc) := false,
-    publishArtifact in (Compile, packageDoc) := false
   )
 }

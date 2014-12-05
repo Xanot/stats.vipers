@@ -51,11 +51,6 @@ class CensusQueryTest extends WordSpecLike with Test {
       Sort(("field", DESC), ("field", ASC)).construct should be(("c:sort", "field:-1,field:1"))
     }
   }
-  "SimpleCensusQueryCommand" should {
-    "construct Tree command" in {
-      ???
-    }
-  }
   "CommaSeparatedCensusQueryCommand" should {
     "construct Join command" in {
       Join(
@@ -80,7 +75,7 @@ class CensusQueryTest extends WordSpecLike with Test {
   "CensusQuery" should {
     "be constructed with Search and without commands" in {
       CensusQuery(Some(Search("name.first_lower", "xanot"))).construct match {
-        case search :: Nil => search should be("name.first_lower", "xanot")
+        case search :: Nil => search should be(("name.first_lower", "xanot"))
       }
     }
     "be constructed without Search and without commands" in {
@@ -92,9 +87,9 @@ class CensusQueryTest extends WordSpecLike with Test {
         Timing(true)
       ).construct match {
         case search :: show :: timing :: Nil =>
-          search should be("name.first_lower", "xanot")
-          show should be("c:show", "field1,field2")
-          timing should be("c:timing", "true")
+          search should be(("name.first_lower", "xanot"))
+          show should be(("c:show", "field1,field2"))
+          timing should be(("c:timing", "true"))
       }
     }
     "be constructed without Search and several commands" in {
@@ -104,11 +99,11 @@ class CensusQueryTest extends WordSpecLike with Test {
         Join(CharacterJoin(nested = Some(Seq(FactionJoin()))), FactionJoin())
       ).construct match {
         case show :: timing :: join :: Nil =>
-          show should be("c:show", "field1,field2")
-          timing should be("c:timing", "true")
-          join should be("c:join",
+          show should be(("c:show", "field1,field2"))
+          timing should be(("c:timing", "true"))
+          join should be(("c:join",
             "character^inject_at:character(faction^inject_at:faction),faction^inject_at:faction"
-          )
+          ))
       }
     }
     "be added with another CensusQuery" in {
@@ -120,14 +115,14 @@ class CensusQueryTest extends WordSpecLike with Test {
 
       p.construct match {
         case search:: show :: timing :: join :: cas :: limit :: Nil =>
-          search should be("alias_lower", "vipr")
-          show should be("c:show", "field1,field2")
-          timing should be("c:timing", "true")
-          join should be("c:join",
+          search should be(("alias_lower", "vipr"))
+          show should be(("c:show", "field1,field2"))
+          timing should be(("c:timing", "true"))
+          join should be(("c:join",
             "character^inject_at:character(faction^inject_at:faction),faction^inject_at:faction"
-          )
-          cas should be("c:case", "true")
-          limit should be("c:limit", "10")
+          ))
+          cas should be(("c:case", "true"))
+          limit should be(("c:limit", "10"))
       }
 
       (CensusQuery(None, Start(5)) ++ None ++ Some(CensusQuery(None, Limit(10)))).construct match {
@@ -139,8 +134,8 @@ class CensusQueryTest extends WordSpecLike with Test {
     "be added with CensusQueryCommand" in {
       (CensusQuery(None, commands = Case(true)) + None + Limit(10)).construct match {
         case cas :: limit :: Nil =>
-          cas should be("c:case", "true")
-          limit should be("c:limit", "10")
+          cas should be(("c:case", "true"))
+          limit should be(("c:limit", "10"))
       }
     }
   }

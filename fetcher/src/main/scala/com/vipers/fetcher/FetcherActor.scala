@@ -41,7 +41,7 @@ class FetcherActor extends Actor {
         try {
           sendRequest(ApiUrlBuilder.getOutfitByAlias(alias)) \ "outfit_list" match {
             case JArray(parent) if parent.nonEmpty =>
-              FetchOutfitResponse(Some(parent(0).toOutfit.get, {
+              FetchOutfitResponse(Some((parent(0).toOutfit.get, {
                 val list = mutable.ListBuffer.empty[OutfitMember]
                 val JArray(parents) = parent(0) \ "members"
 
@@ -49,7 +49,7 @@ class FetcherActor extends Actor {
                   list += (((parent \ "character").toCharacter.get, parent.toOutfitMembership.get))
                 }
                 list
-              }), alias)
+              })), alias)
             case _ => FetchOutfitResponse(None, alias)
           }
         } catch {

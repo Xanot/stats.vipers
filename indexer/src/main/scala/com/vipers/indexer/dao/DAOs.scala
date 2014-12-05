@@ -86,9 +86,9 @@ private[indexer] object DAOs {
 
     trait WeaponStatDAO {
       def insertTimeSeries(weaponStats : WeaponStat*)(implicit s : Session) : Unit
-      def createAll(weaponStats : WeaponStat*)(implicit s : Session)
-      def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session)
-      def createOrUpdateLastIndexedOn(characterId : String, stamp : Long)(implicit s : Session)
+      def createAll(weaponStats : WeaponStat*)(implicit s : Session) : Unit
+      def createOrUpdate(weaponStat : WeaponStat)(implicit s : Session) : Unit
+      def createOrUpdateLastIndexedOn(characterId : String, stamp : Long)(implicit s : Session) : Unit
       def getCharactersWeaponStatsLastIndexedOn(characterId : String)(implicit s : Session) : Option[Long]
       def getCharactersWeaponStatsLastSavedOn(characterId : String)(implicit s : Session) : Option[Long]
       def getCharactersMostRecentWeaponStat(characterId : String, itemId : String)(implicit s : Session) : Option[WeaponStat]
@@ -101,8 +101,8 @@ private[indexer] object DAOs {
     val characterStatDAO : CharacterStatDAO
 
     trait CharacterStatDAO {
-      def createAll(profileStats : ProfileStat*)(implicit s : Session)
-      def createOrUpdate(profileStat : ProfileStat)(implicit s : Session)
+      def createAll(profileStats : ProfileStat*)(implicit s : Session) : Unit
+      def createOrUpdate(profileStat : ProfileStat)(implicit s : Session) : Unit
       def getCharactersProfileStats(characterId : String)(implicit s : Session) : List[ProfileStat]
     }
   }

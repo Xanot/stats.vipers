@@ -25,7 +25,7 @@ trait GameDataIndexerComponent { this: DB with GameDataIndexedOnDAOComponent wit
       }
     }
 
-    protected def indexImpl(response : FetcherResponse)(implicit s : Session)
+    protected def indexImpl(response : FetcherResponse)(implicit s : Session) : Unit
     def index(response : FetcherResponse) = {
       try {
         withTransaction { implicit s =>

@@ -1,12 +1,16 @@
 package com.vipers.indexer.dao
 
 import com.vipers.dao.DAOTest
-import com.vipers.indexer.dao.slick.{SlickWeaponDAOComponent, SlickWeaponStatDAOComponent}
-import com.vipers.model.DatabaseModels.WeaponStat
+import com.vipers.indexer.dao.slick._
 import org.scalatest.WordSpecLike
 
 class SlickWeaponStatDAOTest extends WordSpecLike with DAOTest with SlickDBTest with Sample
-  with SlickWeaponStatDAOComponent with SlickWeaponDAOComponent{
+  with SlickWeaponStatDAOComponent
+  with SlickWeaponDAOComponent
+  with SlickWeaponPropsDAOComponent
+  with SlickWeaponAttachmentDAOComponent
+  with SlickWeaponAttachmentEffectDAOComponent {
+
   import driver.simple._
 
   override protected val ddl = weaponDAO.table.ddl ++

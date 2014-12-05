@@ -24,7 +24,7 @@ trait OutfitApi extends JsonRoute { this: ApiActor =>
                       case BeingIndexed => NotFound
                     }
                   }
-                case Failure(m) => complete(InternalServerError, m.getStackTrace.mkString("\n"))
+                case Failure(m) => complete(InternalServerError -> m.getStackTrace.mkString("\n"))
               }
             }
           }

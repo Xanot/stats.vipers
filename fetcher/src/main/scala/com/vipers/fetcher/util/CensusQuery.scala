@@ -83,15 +83,6 @@ private[fetcher] object CensusQuery {
 
     case class Join(protected val values: JoinQuery*) extends CommaSeparatedCensusQueryCommand[JoinQuery]("join")
 
-    case class Tree(protected val value: TreeQuery) extends SimpleCensusQueryCommand("tree", value)
-
-    //================================================================================
-    // Tree
-    //================================================================================
-    sealed abstract class TreeQuery() {
-      ???
-    }
-
     //================================================================================
     // Join
     //================================================================================

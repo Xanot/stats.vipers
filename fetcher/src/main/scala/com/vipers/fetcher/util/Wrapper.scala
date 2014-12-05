@@ -205,7 +205,7 @@ private[fetcher] object Wrapper {
             map(itemId)._2 += ((statName, value.toLong))
           } else {
             val JString(lastSave) = stat \ "last_save"
-            map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
+            map += (itemId -> ((lastSave.toLong, mutable.ListBuffer((statName, value.toLong)))))
           }
         }
 
@@ -223,7 +223,7 @@ private[fetcher] object Wrapper {
             val JString(vehicleId) = stat \ "vehicle_id"
             if(vehicleId == "0") {
               val JString(lastSave) = stat \ "last_save"
-              map += (itemId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
+              map += (itemId -> ((lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong)))))
             }
           }
         }
@@ -335,7 +335,7 @@ private[fetcher] object Wrapper {
               map(profileId)._2 += ((statName, value.toLong))
             } else {
               val JString(lastSave) = stat \ "last_save"
-              map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, value.toLong))))
+              map += (profileId -> ((lastSave.toLong, mutable.ListBuffer((statName, value.toLong)))))
             }
           }
         }
@@ -355,7 +355,7 @@ private[fetcher] object Wrapper {
               map(profileId)._2 += ((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))
             } else {
               val JString(lastSave) = stat \ "last_save"
-              map += (profileId -> (lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong))))
+              map += (profileId -> ((lastSave.toLong, mutable.ListBuffer((statName, valueNc.toLong + valueTr.toLong + valueVs.toLong)))))
             }
           }
         }
