@@ -10,12 +10,12 @@ var gulp = require('gulp'),
     karma = require('gulp-karma'),
     templateCache = require('gulp-angular-templatecache');
 
-var buildDest = "../resources/client";
+var buildDest = "../../../../client-production";
 
 var jsLibs = [
     "./bower_components/moment/min/moment.min.js",
     "./bower_components/moment-duration-format/lib/moment-duration-format.js",
-    "./lib/arg.js/arg-1.2.min.js",
+    "./bower_components/arg.js/dist/arg-1.2.min.js",
     "./lib/marked/marked-0.3.2.min.js",
     "./bower_components/lodash/dist/lodash.min.js",
     "./bower_components/highcharts/adapters/standalone-framework.js",
